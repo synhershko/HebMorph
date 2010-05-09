@@ -184,6 +184,67 @@ namespace HebMorph.DataStructures
             {
                 DictNode child = cur.Children[childPos];
 
+                // Utility variables
+                byte? tmp;
+
+                // Iteration-scope variables (per tolerator function)
+                float iterationScore = score;
+                byte iterationKeyPos = keyPos;
+                string consumedLetters = string.Empty, iterationWord = word.Clone().ToString();
+
+                bool tolerated = false;
+                byte ownKeyPos = 0;
+
+                while (ownKeyPos < child._Key.Length && iterationKeyPos < key.Length)
+                {
+                    float tmpScore = iterationScore;
+                    tmp = tolFunc(key, ref iterationKeyPos, iterationWord, ref tmpScore, child._Key[ownKeyPos]);
+                    if (!tolerated && tmp != null)
+                    {
+                        tolerated = true;
+                        iterationScore = tmpScore;
+                        if (tmp > 0)
+                        {
+                            if ((byte)tmp <= child._Key.Length)
+                                consumedLetters += new string(child._Key, ownKeyPos, (byte)tmp);
+                            ownKeyPos += (byte)tmp;
+                        }
+                    }
+                    else
+                    {
+                        if (key[iterationKeyPos] != child._Key[ownKeyPos])
+                        {
+                            goto EscapeTag;
+                        }
+                        else
+                        {
+                            tolerated = false;
+                            consumedLetters += child._Key[ownKeyPos];
+                            ownKeyPos++;
+                            iterationKeyPos++;
+                        }
+                    }
+                }
+                if (ownKeyPos >= child._Key.Length)
+                {
+                    iterationWord += consumedLetters;
+                    //change iterationScore to be tmpScore
+                    if (iterationKeyPos > 0)
+                    {
+                        if (iterationKeyPos == key.Length)
+                        {
+                            if (child.Value != null)
+                                resultsSet.Add(new LookupResult(iterationWord, child.Value, iterationScore));
+                        }
+                        else
+                            LookupTolerantImpl(child, key, iterationKeyPos, iterationWord, iterationScore, tolFunc, resultsSet);
+                    }
+                }
+
+            EscapeTag:
+                continue;
+
+                /*
                 string consumedLetters = word;
                 float matchScore = score;
                 byte _keyPos = child.Matches(key, keyPos, ref consumedLetters, ref matchScore, tolFunc);
@@ -197,6 +258,7 @@ namespace HebMorph.DataStructures
                     else
                         LookupTolerantImpl(child, key, _keyPos, consumedLetters, matchScore, tolFunc, resultsSet);
                 }
+                */
             }
         }
 
