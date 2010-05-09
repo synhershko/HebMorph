@@ -1,0 +1,11 @@
+HebMorph is copyright (C) 2010, Itamar Syn-Hershko.
+
+HebMorph relies on Hspell, copyright (C) 2000-2010, Nadav Har'El and Dan Kenigsberg.
+
+It is released to the public licensed under the GNU General Public License
+(GPL). See the COPYING file included in this distribution for the whole text
+of the GNU General Public License version 2.
+
+Note that not only the programs in the distribution, but also the
+dictionary files and the generated word lists, are licensed under the GPL.
+There is no warranty of any kind for the contents of this distribution.
