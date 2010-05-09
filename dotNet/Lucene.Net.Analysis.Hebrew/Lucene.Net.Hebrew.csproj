@@ -40,7 +40,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Search\HebrewMaskFilter.cs" />
     <Compile Include="Search\HebrewMaskPayloadSimilarity.cs" />
-    <Compile Include="Search\HebrewTermQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Dev\Libraries\Lucene.Net\trunk\C#\src\Lucene.Net\Lucene.Net.csproj">
