@@ -30,6 +30,7 @@ namespace HebMorph
     /// </summary>
     public static class LookupTolerators
     {
+        public delegate byte? ToleranceFuncDelegate(char[] key, ref byte keyPos, string word, ref float score, char curChar);
 
         /// <summary>
         /// Tolerate all standard Em Kriya appearances (Yud [incl. doubling], Vav, and double consonant Vav)

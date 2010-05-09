@@ -23,6 +23,7 @@ namespace HebMorph.DataStructures
 {
     using System;
     using System.Collections.Generic;
+    using ToleranceFuncDelegate = HebMorph.LookupTolerators.ToleranceFuncDelegate;
 
     public class DictRadix<T>
     {
@@ -31,51 +32,27 @@ namespace HebMorph.DataStructures
             public char[] _Key;
             public T Value;
             public DictNode[] Children;
+        }
 
-            public byte Matches(char[] key, byte keyPos, ref string word, ref float score,
-                ToleranceFuncDelegate tolFunc)
+        protected class TolerantLookupCrawler
+        {
+            public TolerantLookupCrawler()
             {
-                byte ownKeyPos = 0;
-                byte? tmp;
-                bool tolerated = false;
-                string consumedLetters = string.Empty;
-                while (ownKeyPos < _Key.Length && keyPos < key.Length)
-                {
-                    float tmpScore = score;
-                    tmp = tolFunc(key, ref keyPos, word, ref tmpScore, _Key[ownKeyPos]);
-                    if (!tolerated && tmp != null)
-                    {
-                        tolerated = true;
-                        score = tmpScore;
-                        if (tmp > 0)
-                        {
-                            if ((byte)tmp <= _Key.Length)
-                                consumedLetters += new string(_Key, ownKeyPos, (byte)tmp);
-                            ownKeyPos += (byte)tmp;
-                        }
-                    }
-                    else
-                    {
-                        if (key[keyPos] != _Key[ownKeyPos])
-                            return 0;
-                        else
-                        {
-                            tolerated = false;
-                            consumedLetters += _Key[ownKeyPos];
-                            ownKeyPos++;
-                            keyPos++;
-                        }
-                    }
-                }
-                if (ownKeyPos >= _Key.Length)
-                {
-                    word += consumedLetters;
-                    return keyPos;
-                }
-
-                return 0;
             }
 
+            ToleranceFuncDelegate[] toleranceFunctions;
+            DictRadix<T> enclosingInstance;
+            char[] key;
+            List<LookupResult> resultSet;
+
+            public List<LookupResult> LookupTolerant(string strKey)
+            {
+                return resultSet;
+            }
+
+            private void LookupTolerantImpl(DictNode cur, byte keyPos, string word, float score)
+            {
+            }
         }
 
         protected DictNode m_root;
@@ -163,8 +140,6 @@ namespace HebMorph.DataStructures
             public float Score;
         }
 
-        public delegate byte? ToleranceFuncDelegate(char[]key, ref byte keyPos, string word, ref float score, char curChar);
-
         public List<LookupResult> LookupTolerant(string strKey, ToleranceFuncDelegate tolFunc)
         {
             List<LookupResult> ret = new List<LookupResult>();
@@ -243,22 +218,6 @@ namespace HebMorph.DataStructures
 
             EscapeTag:
                 continue;
-
-                /*
-                string consumedLetters = word;
-                float matchScore = score;
-                byte _keyPos = child.Matches(key, keyPos, ref consumedLetters, ref matchScore, tolFunc);
-                if (_keyPos > 0)
-                {
-                    if (_keyPos == key.Length)
-                    {
-                        if (child.Value != null)
-                            resultsSet.Add(new LookupResult(consumedLetters, child.Value, matchScore));
-                    }
-                    else
-                        LookupTolerantImpl(child, key, _keyPos, consumedLetters, matchScore, tolFunc, resultsSet);
-                }
-                */
             }
         }
 
