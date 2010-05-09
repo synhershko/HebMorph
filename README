@@ -1,0 +1,40 @@
+This is an open-source effort for making Hebrew properly searchable by various IR software libraries, while maintaining decent recall, precision and relevancy in retrievals. All code and files are released under the GNU General Public License version 2.
+
+HebMorph is copyright (C) 2010, Itamar Syn-Hershko.
+HebMorph currently relies on Hspell, copyright (C) 2000-2010, Nadav Har'El and Dan Kenigsberg (http://hspell.ivrix.org.il/).
+
+/*************************
+
+NOTE: HebMorph is looking for a better name, as it is not just a morphological tool, but rather an umbrella project of a much wider mission.
+
+**************************/
+
+It is released to the public licensed under the GNU General Public License
+(GPL). See the COPYING file included in this distribution for the whole text
+of the GNU General Public License version 2. Note that not only the programs in the distribution, but also the
+dictionary files and the generated word lists, are licensed under the GPL.
+There is no warranty of any kind for the contents of this distribution.
+
+This code should be considered as pre-alpha, and is likely to change dramatically in the next few weeks / months.
+
+The first code release includes:
+-=-=-=-=-=-=-=-=-=-=-=-=-=
+* Hebrew morphological analyzer written in .NET, able to spell-check words and provide useful linguistic information on a given word. This is based on the excellent hspell dictionaries (http://hspell.ivrix.org.il/), and can be used to a large variety of tasks. We use it to stem / lemmatize.
+* Tolerance for spelling differences very common in Niqqud-less spelling (which is most of the text being indexed today). Valid omitting or additions of Yud or Vav, for example, should not prevent the word from being correctly identified.
+* Hebrew Tokenizer, able to tag tokens as Hebrew, NonHebrew, Numerics, Hebrew constructs (Smichut) and Acronyms.
+* Very basic stop list for common not-so-meaningful words.
+* Lucene.Net integration, utilizing the Tokenizer and morphological analyzer, allowing for Hebrew texts to be properly searchable. It also ignores Niqqud characters, and handles non-Hebrew words, numbers, and OOV cases correctly. This allows to (finally) perform proper Hebrew searches, no matter the affixes or inflections used in indexing or queries.
+* Test applications for the above, including GUIs for performing morphological analysis on texts and to index files and perform simple Hebrew-enabled searches on them using Lucene.Net.
+* A small Hebrew corpus (taken from he.wikipedia.org) is available to download from the Downloads tab, and is meant to be used with LuceneNetHebrewTests to demonstrate the indexing and searching capabilities of the Lucene.Net integration.
+
+Work is being currently done on:
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+* Improving words recognition and scoring, and finding as many methods as possible to allow removal of as many ambiguities as possible.
+* Using Niqqud (where supplied with the word, even partially) for disambiguation.
+* Part-of-Speech modules, even light, for more disambiguation.
+* Using term vectors and frequencies to detect and correctly analyse OOV cases, and to further help with disambiguations.
+* Loading of external dictionaries, and storing the dictionary radix in a versioned format to allow for an easy distribution with an index and / or IR code.
+* Creating tools and obtaining a corpus for doing relevance testing, and tweaking the library's code and algorithms based on the findings.
+* Looking into more methods to provide good Hebrew indexing capabilities (light-stemming algorithms for example).
+* Porting the code to other languages, such as Java and C/C++, will be done after the library stabilizes.
+* Integration with more IR technologies (SQLite, Xapian etc.).
