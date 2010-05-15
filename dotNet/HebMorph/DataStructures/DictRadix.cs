@@ -36,22 +36,116 @@ namespace HebMorph.DataStructures
 
         protected class TolerantLookupCrawler
         {
-            public TolerantLookupCrawler()
+            protected class MatchCandidate
             {
+                public MatchCandidate(byte _keyPos, string _word, float _score)
+                {
+                    this.keyPos = _keyPos;
+                    this.Word = _word;
+                    this.Score = _score;
+                }
+
+                public byte keyPos;
+                public string Word;
+                public float Score = 1.0f;
+            }
+
+            public TolerantLookupCrawler(DictRadix<T> _enclosingInstance, ToleranceFuncDelegate[] _tolFuncs)
+            {
+                this.enclosingInstance = _enclosingInstance;
+                this.toleranceFunctions = _tolFuncs;
             }
 
             ToleranceFuncDelegate[] toleranceFunctions;
             DictRadix<T> enclosingInstance;
+
             char[] key;
-            List<LookupResult> resultSet;
+            List<LookupResult> resultSet = new List<LookupResult>();
 
             public List<LookupResult> LookupTolerant(string strKey)
             {
-                return resultSet;
+                lock (resultSet)
+                {
+                    key = strKey.ToCharArray();
+                    resultSet.Clear();
+                    LookupTolerantImpl(enclosingInstance.RootNode, new MatchCandidate(0, string.Empty, 1.0f));
+                }
+                if (resultSet.Count > 0)
+                    return resultSet;
+                return null;
             }
 
-            private void LookupTolerantImpl(DictNode cur, byte keyPos, string word, float score)
+            private void LookupTolerantImpl(DictNode cur, MatchCandidate mc)
             {
+                if (cur.Children == null)
+                    return;
+
+                System.Diagnostics.Trace.WriteLine("--------------------------");
+                System.Diagnostics.Trace.WriteLine(string.Format("Processing children for word {0}", mc.Word));
+                for (byte childPos = 0; childPos < cur.Children.Length; childPos++)
+                {
+                    DictNode child = cur.Children[childPos];
+
+                    DoKeyMatching(child, 0, mc);
+                }
+                System.Diagnostics.Trace.WriteLine(string.Format("Completed processing node children for word {0}", mc.Word));
+                System.Diagnostics.Trace.WriteLine("--------------------------");
+            }
+
+            private void DoKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc)
+            {
+                byte currentKeyPos = mc.keyPos, startingNodeKeyPos = nodeKeyPos;
+                while (nodeKeyPos < node._Key.Length && currentKeyPos < key.Length)
+                {
+                    // toleration
+                    foreach (ToleranceFuncDelegate tf in toleranceFunctions)
+                    {
+                        byte tmpKeyPos = mc.keyPos;
+                        float tmpScore = mc.Score;
+                        byte? tret = tf(key, ref tmpKeyPos, mc.Word, ref tmpScore, node._Key[nodeKeyPos]);
+                        if (tret != null)
+                        {
+                            System.Diagnostics.Trace.WriteLine(string.Format("{0} tolerated a char, attempting word {1}", tf.Method.Name, mc.Word + node._Key[nodeKeyPos]));
+
+                            string consumedLetters = string.Empty;
+                            if (((byte)tret > 0) && ((byte)tret <= node._Key.Length))
+                                consumedLetters = new string(node._Key, nodeKeyPos, (byte)tret);
+                            MatchCandidate nmc = new MatchCandidate(tmpKeyPos, mc.Word + consumedLetters, tmpScore);
+                            if ((nodeKeyPos + (byte)tret) == node._Key.Length)
+                                LookupTolerantImpl(node, nmc);
+                            else
+                                DoKeyMatching(node, (byte)(nodeKeyPos + (byte)tret), nmc);
+                        }
+                    }
+
+                    // standard key matching
+                    if (node._Key[nodeKeyPos] != key[currentKeyPos])
+                        break;
+
+                    System.Diagnostics.Trace.WriteLine(string.Format("Matched char: {0}", key[currentKeyPos]));
+                    currentKeyPos++;
+                    nodeKeyPos++;
+                }
+
+                if (nodeKeyPos == node._Key.Length)
+                {
+                    if (currentKeyPos == key.Length)
+                    {
+                        System.Diagnostics.Trace.WriteLine(string.Format("Consumed the whole key"));
+                        if (node.Value != null)
+                            resultSet.Add(
+                                new LookupResult(mc.Word + new string(node._Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
+                                node.Value, mc.Score)
+                                );
+                    }
+                    else
+                    {
+                        MatchCandidate nmc = new MatchCandidate(currentKeyPos,
+                            mc.Word + new string(node._Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
+                            mc.Score);
+                        LookupTolerantImpl(node, nmc);
+                    }
+                }
             }
         }
 
@@ -140,85 +234,10 @@ namespace HebMorph.DataStructures
             public float Score;
         }
 
-        public List<LookupResult> LookupTolerant(string strKey, ToleranceFuncDelegate tolFunc)
+        public List<LookupResult> LookupTolerant(string strKey, ToleranceFuncDelegate[] tolFuncs)
         {
-            List<LookupResult> ret = new List<LookupResult>();
-            LookupTolerantImpl(m_root, strKey.ToCharArray(), 0, string.Empty, 1.0f, tolFunc, ret);
-            if (ret.Count > 0)
-                return ret;
-            return null;
-        }
-
-        private void LookupTolerantImpl(DictNode cur, char[] key, byte keyPos, string word, float score,
-            ToleranceFuncDelegate tolFunc, List<LookupResult> resultsSet)
-        {
-            if (cur == null || cur.Children == null)
-                return;
-
-            for (byte childPos = 0; childPos < cur.Children.Length; childPos++)
-            {
-                DictNode child = cur.Children[childPos];
-
-                // Utility variables
-                byte? tmp;
-
-                // Iteration-scope variables (per tolerator function)
-                float iterationScore = score;
-                byte iterationKeyPos = keyPos;
-                string consumedLetters = string.Empty, iterationWord = word.Clone().ToString();
-
-                bool tolerated = false;
-                byte ownKeyPos = 0;
-
-                while (ownKeyPos < child._Key.Length && iterationKeyPos < key.Length)
-                {
-                    float tmpScore = iterationScore;
-                    tmp = tolFunc(key, ref iterationKeyPos, iterationWord, ref tmpScore, child._Key[ownKeyPos]);
-                    if (!tolerated && tmp != null)
-                    {
-                        tolerated = true;
-                        iterationScore = tmpScore;
-                        if (tmp > 0)
-                        {
-                            if ((byte)tmp <= child._Key.Length)
-                                consumedLetters += new string(child._Key, ownKeyPos, (byte)tmp);
-                            ownKeyPos += (byte)tmp;
-                        }
-                    }
-                    else
-                    {
-                        if (key[iterationKeyPos] != child._Key[ownKeyPos])
-                        {
-                            goto EscapeTag;
-                        }
-                        else
-                        {
-                            tolerated = false;
-                            consumedLetters += child._Key[ownKeyPos];
-                            ownKeyPos++;
-                            iterationKeyPos++;
-                        }
-                    }
-                }
-                if (ownKeyPos >= child._Key.Length)
-                {
-                    iterationWord += consumedLetters;
-                    //change iterationScore to be tmpScore
-                    if (iterationKeyPos > 0)
-                    {
-                        if (iterationKeyPos == key.Length)
-                        {
-                            if (child.Value != null)
-                                resultsSet.Add(new LookupResult(iterationWord, child.Value, iterationScore));
-                        }
-                        else
-                            LookupTolerantImpl(child, key, iterationKeyPos, iterationWord, iterationScore, tolFunc, resultsSet);
-                    }
-                }
-
-            EscapeTag:
-                continue;
-            }
+            TolerantLookupCrawler tlc = new TolerantLookupCrawler(this, tolFuncs);
+            return tlc.LookupTolerant(strKey);
         }
 
         private int GetCharArrayLength(char[] ar)
