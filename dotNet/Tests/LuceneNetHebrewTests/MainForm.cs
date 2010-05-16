@@ -33,7 +33,7 @@ namespace LuceneNetHebrewTests
             // Locate the hspell-data-files folder
             string exeFile = (new System.Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase)).AbsolutePath;
             string path = System.IO.Path.GetDirectoryName(exeFile);
-            int loc = path.LastIndexOf(@"\dotNet\");
+            int loc = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + "dotNet" + System.IO.Path.DirectorySeparatorChar);
             if (loc > -1)
             {
                 path = path.Remove(loc + 1);
@@ -55,7 +55,7 @@ namespace LuceneNetHebrewTests
         }
 
         Analyzer analyzer;
-        string tempPath = System.IO.Path.GetTempPath() + "hebMorphIndex\\";
+        string tempPath = System.IO.Path.GetTempPath() + "hebMorphIndex" + System.IO.Path.DirectorySeparatorChar;
 
         private void btnInitAnalyzer_Click(object sender, EventArgs e)
         {
@@ -63,7 +63,7 @@ namespace LuceneNetHebrewTests
             {
                 if (analyzer == null)
                 {
-                    string hspellPath = SelectProjectFolder("Select a path to HSpell data files", @"hspell-data-files\");
+                    string hspellPath = SelectProjectFolder("Select a path to HSpell data files", "hspell-data-files" + System.IO.Path.DirectorySeparatorChar);
                     if (hspellPath == null)
                         return;
 
@@ -98,7 +98,7 @@ namespace LuceneNetHebrewTests
                     {
                         Document doc = new Document();
                         string text = System.IO.File.ReadAllText(f);
-                        string title = f.Substring(f.LastIndexOf('\\') + 1).Replace(".txt", "");
+                        string title = f.Substring(f.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1).Replace(".txt", "");
                         Fieldable titleField = new Field("title", title, Field.Store.YES, Field.Index.ANALYZED);
                         titleField.SetBoost(5.0f);
                         doc.Add(titleField);

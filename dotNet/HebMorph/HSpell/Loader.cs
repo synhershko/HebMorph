@@ -108,7 +108,8 @@ namespace HebMorph.HSpell
 
         public static DictRadix<MorphData> LoadDictionaryFromHSpellFolder(string path, bool bLoadMorphData)
         {
-            if (!path.EndsWith("\\")) path += "\\";
+            if (path[path.Length - 1] != Path.DirectorySeparatorChar)
+                path += Path.DirectorySeparatorChar;
 
             if (bLoadMorphData)
             {

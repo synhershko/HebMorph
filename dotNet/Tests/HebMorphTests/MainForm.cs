@@ -34,11 +34,11 @@ namespace TestApplication
             // Locate the hspell-data-files folder
             string exeFile = (new System.Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase)).AbsolutePath;
             string path = System.IO.Path.GetDirectoryName(exeFile);
-            int loc = path.LastIndexOf(@"\dotNet\");
+            int loc = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + "dotNet" + System.IO.Path.DirectorySeparatorChar);
             if (loc > -1)
             {
                 path = path.Remove(loc + 1);
-                path = System.IO.Path.Combine(path, @"hspell-data-files\");
+                path = System.IO.Path.Combine(path, "hspell-data-files" + System.IO.Path.DirectorySeparatorChar);
                 fbd.SelectedPath = path;
             }
 
