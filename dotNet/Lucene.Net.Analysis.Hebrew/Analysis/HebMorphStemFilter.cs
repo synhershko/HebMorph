@@ -71,7 +71,7 @@ namespace Lucene.Net.Analysis.Hebrew
             if (typeAtt.Type().Equals(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew)))
             {
                 // Analyze the current term
-                IList<HebMorph.Result> morphResults = hebMorphAnalyzer.CheckWord(termAtt.Term());
+                IList<HebMorph.Result> morphResults = hebMorphAnalyzer.CheckWordTolerant(termAtt.Term());
 
                 if (morphResults != null && morphResults.Count > 0)
                 {

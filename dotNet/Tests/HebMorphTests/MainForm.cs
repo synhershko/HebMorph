@@ -146,7 +146,7 @@ namespace TestApplication
                 // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
                 // stem ambiguities retreived in the next lines...
 
-                List<Result> res = m_analyzer.CheckWord(word);
+                List<Result> res = m_analyzer.CheckWordTolerant(word);
                 if (res == null)
                 {
                     LoggerWriteLine("{0}: No match found{1}{2}", word, Environment.NewLine, "------");

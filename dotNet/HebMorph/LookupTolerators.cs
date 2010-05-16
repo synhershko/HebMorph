@@ -115,7 +115,9 @@ namespace HebMorph
         {
             if (curChar != 'ו' || // check current trie position
                 keyPos == 0 || keyPos + 1 == key.Length || // check this isn't the end or the beginning of a word (no one misses Vav there)
-                key[keyPos] == 'י' || key[keyPos] == 'ה') // Vav shouldn't be tolerated before a Yud or a Heh
+                key[keyPos] == 'י' || key[keyPos] == 'ה' || // Vav shouldn't be tolerated before a Yud or a Heh
+                key[keyPos] == 'ו' // Don't low-rank exact matches
+                )
                 return null;
 
             char prevChar = word[word.Length - 1];

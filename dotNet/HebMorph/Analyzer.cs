@@ -136,7 +136,7 @@ namespace HebMorph
             return word;
         }
 
-        public List<Result> CheckWord(string word)
+        public List<Result> CheckWordExact(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
@@ -173,6 +173,22 @@ namespace HebMorph
                     }
                 }
             }
+
+            // TODO: Support Gimatria
+
+            if (ret.Count > 0)
+                return ret;
+            return null;
+        }
+
+        public List<Result> CheckWordTolerant(string word)
+        {
+            // TODO: Verify word to be non-empty and contain Hebrew characters?
+
+            RealSortedList<Result> ret = new RealSortedList<Result>();
+
+            byte prefLen = 0;
+            int prefixMask;
 
             List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.LookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
             if (tolerated != null)
