@@ -28,7 +28,7 @@ namespace HebMorph
     public class MorphData
     {
         public HSpell.DMask[] DescFlags;
-        public string[] Stems;
+        public string[] Lemmas;
         public byte Prefixes;
 
         public override bool Equals(object obj)
@@ -41,7 +41,7 @@ namespace HebMorph
 
             for (int i = 0; i < DescFlags.Length; i++)
             {
-                if (DescFlags[i] != o.DescFlags[i] || !Stems[i].Equals(o.Stems[i]))
+                if (DescFlags[i] != o.DescFlags[i] || !Lemmas[i].Equals(o.Lemmas[i]))
                     return false;
             }
             return true;
@@ -49,7 +49,7 @@ namespace HebMorph
 
         public override int GetHashCode()
         {
-            return DescFlags.GetHashCode() * Stems.GetHashCode();
+            return DescFlags.GetHashCode() * Lemmas.GetHashCode();
         }
     }
 }

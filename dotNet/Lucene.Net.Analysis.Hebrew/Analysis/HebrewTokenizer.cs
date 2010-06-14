@@ -34,7 +34,7 @@ namespace Lucene.Net.Analysis.Hebrew
     /// </summary>
     public class HebrewTokenizer : Tokenizer
     {
-        private HebMorph.Analyzer hebMorphAnalyzer;
+        private HebMorph.Lemmatizer hebMorphAnalyzer;
         private HebMorph.Tokenizer hebMorphTokenizer;
 
         private TermAttribute termAtt;
@@ -43,13 +43,13 @@ namespace Lucene.Net.Analysis.Hebrew
         private TypeAttribute typeAtt;
 
         #region Constructors
-        public HebrewTokenizer(System.IO.TextReader input, HebMorph.Analyzer _hebMorphAnalyzer)
+        public HebrewTokenizer(System.IO.TextReader input, HebMorph.Lemmatizer _hebMorphAnalyzer)
             //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
         {
             Init(input, _hebMorphAnalyzer);
         }
 
-        private void Init(System.IO.TextReader input, HebMorph.Analyzer _hebMorphAnalyzer)
+        private void Init(System.IO.TextReader input, HebMorph.Lemmatizer _hebMorphAnalyzer)
         {
             termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
             offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));

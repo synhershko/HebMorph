@@ -30,10 +30,10 @@ namespace Lucene.Net.Analysis.Hebrew
 {
     public class HebMorphStemFilter : TokenFilter
     {
-        public HebMorphStemFilter(TokenStream _input, HebMorph.Analyzer _hebMorphAnalyzer)
+        public HebMorphStemFilter(TokenStream _input, HebMorph.Lemmatizer _lemmatizer)
             : base(_input)
         {
-            this.hebMorphAnalyzer = _hebMorphAnalyzer;
+            this.hebMorphLemmatizer = _lemmatizer;
 
             termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
             posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
@@ -41,7 +41,7 @@ namespace Lucene.Net.Analysis.Hebrew
             payAtt = (PayloadAttribute)AddAttribute(typeof(PayloadAttribute));
         }
 
-        protected HebMorph.Analyzer hebMorphAnalyzer;
+        protected HebMorph.Lemmatizer hebMorphLemmatizer;
 
         protected TermAttribute termAtt;
         protected PositionIncrementAttribute posIncrAtt;
@@ -49,14 +49,14 @@ namespace Lucene.Net.Analysis.Hebrew
         protected PayloadAttribute payAtt;
 
         private State current = null;
-        private IList<HebMorph.Result> stack = null;
+        private IList<HebMorph.HebrewToken> stack = null;
         private int index = 0;
 
         public override bool IncrementToken()
         {
             while (stack != null && index < stack.Count) // pop from stack if any
             {
-                HebMorph.Result res = stack[index++];
+                HebMorph.HebrewToken res = stack[index++];
                 if (IsRelevant(res) && CreateToken(res, current))
                     return true;
             }
@@ -71,7 +71,7 @@ namespace Lucene.Net.Analysis.Hebrew
             if (typeAtt.Type().Equals(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew)))
             {
                 // Analyze the current term
-                IList<HebMorph.Result> morphResults = hebMorphAnalyzer.CheckWordTolerant(termAtt.Term());
+                IList<HebMorph.HebrewToken> morphResults = hebMorphLemmatizer.CheckWordTolerant(termAtt.Term());
 
                 if (morphResults != null && morphResults.Count > 0)
                 {
@@ -99,20 +99,20 @@ namespace Lucene.Net.Analysis.Hebrew
             return true;
         }
 
-        protected virtual bool IsRelevant(HebMorph.Result morphResult)
+        protected virtual bool IsRelevant(HebMorph.HebrewToken morphResult)
         {
             return (morphResult.Score > 0.7f);
         }
 
-        protected bool CreateToken(HebMorph.Result morphResult, State current)
+        protected bool CreateToken(HebMorph.HebrewToken morphResult, State current)
         {
             CreateToken(morphResult);
             return true;
         }
 
-        protected virtual bool CreateToken(HebMorph.Result morphResult)
+        protected virtual bool CreateToken(HebMorph.HebrewToken morphResult)
         {
-            termAtt.SetTermBuffer(morphResult.Stem);
+            termAtt.SetTermBuffer(morphResult.Lemma);
             posIncrAtt.SetPositionIncrement(0);
             
             byte[] data = new byte[1];

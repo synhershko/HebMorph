@@ -71,6 +71,7 @@ namespace HebMorph.HSpell
                 return null;
             }
 
+            // Note: What HSpell call "stems", which we define as lemmas
             private List<int> wordStems = new List<int>();
             internal List<int> ReadStemFile()
             {
@@ -158,7 +159,7 @@ namespace HebMorph.HSpell
                             data.DescFlags = dataLoader.ReadDescFile();
 
                             List<int> stemReferences = dataLoader.ReadStemFile();
-                            data.Stems = new string[stemReferences.Count];
+                            data.Lemmas = new string[stemReferences.Count];
                             int stemPosition = 0;
                             foreach (int r in stemReferences)
                             {
@@ -166,11 +167,11 @@ namespace HebMorph.HSpell
                                 // TODO: Try looking into changing this in hspell itself
                                 if (lookup[r].Equals("שונות") && !lookup[r].Equals(lookup[i]))
                                 {
-                                    data.Stems[stemPosition++] = null;
+                                    data.Lemmas[stemPosition++] = null;
                                 }
                                 else
                                 {
-                                    data.Stems[stemPosition++] = lookup[r];
+                                    data.Lemmas[stemPosition++] = lookup[r];
                                 }
                             }
                             ret.AddNode(lookup[i], data);

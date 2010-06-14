@@ -42,6 +42,7 @@ namespace TestApplication
             this.button1 = new System.Windows.Forms.Button();
             this.btnLoadHSpellFolder = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnTestCoverage = new System.Windows.Forms.Button();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             groupBox4 = new System.Windows.Forms.GroupBox();
             label2 = new System.Windows.Forms.Label();
@@ -63,6 +64,7 @@ namespace TestApplication
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(this.btnTestCoverage);
             splitContainer1.Panel1.Controls.Add(groupBox4);
             splitContainer1.Panel1.Controls.Add(groupBox3);
             // 
@@ -81,12 +83,12 @@ namespace TestApplication
             groupBox4.Controls.Add(this.btnCheck);
             groupBox4.Controls.Add(this.txbCheck);
             groupBox4.Controls.Add(label2);
-            groupBox4.Location = new System.Drawing.Point(3, 0);
+            groupBox4.Location = new System.Drawing.Point(3, 37);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new System.Drawing.Size(577, 144);
+            groupBox4.Size = new System.Drawing.Size(577, 143);
             groupBox4.TabIndex = 11;
             groupBox4.TabStop = false;
-            groupBox4.Text = "Morphologic engine";
+            groupBox4.Text = "Morphological engine";
             // 
             // btnCheck
             // 
@@ -128,9 +130,9 @@ namespace TestApplication
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             groupBox3.Controls.Add(this.txbLogger);
-            groupBox3.Location = new System.Drawing.Point(3, 150);
+            groupBox3.Location = new System.Drawing.Point(3, 186);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new System.Drawing.Size(577, 242);
+            groupBox3.Size = new System.Drawing.Size(577, 206);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
             groupBox3.Text = "Logger";
@@ -146,7 +148,7 @@ namespace TestApplication
             this.txbLogger.Name = "txbLogger";
             this.txbLogger.ReadOnly = true;
             this.txbLogger.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txbLogger.Size = new System.Drawing.Size(562, 217);
+            this.txbLogger.Size = new System.Drawing.Size(562, 181);
             this.txbLogger.TabIndex = 6;
             // 
             // groupBox2
@@ -228,6 +230,16 @@ namespace TestApplication
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Dictionary viewer";
             // 
+            // btnTestCoverage
+            // 
+            this.btnTestCoverage.Location = new System.Drawing.Point(3, 3);
+            this.btnTestCoverage.Name = "btnTestCoverage";
+            this.btnTestCoverage.Size = new System.Drawing.Size(145, 28);
+            this.btnTestCoverage.TabIndex = 12;
+            this.btnTestCoverage.Text = "Test dictionary coverage";
+            this.btnTestCoverage.UseVisualStyleBackColor = true;
+            this.btnTestCoverage.Click += new System.EventHandler(this.btnTestCoverage_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -261,6 +273,7 @@ namespace TestApplication
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnTestCoverage;
     }
 }
 

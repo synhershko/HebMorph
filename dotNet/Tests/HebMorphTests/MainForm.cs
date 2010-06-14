@@ -15,7 +15,7 @@ namespace TestApplication
     public partial class MainForm : Form
     {
         DictRadix<MorphData> m_dict;
-        HebMorph.Analyzer m_analyzer = new Analyzer();
+        HebMorph.Lemmatizer m_analyzer = new Lemmatizer();
 
         public MainForm()
         {
@@ -146,7 +146,7 @@ namespace TestApplication
                 // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
                 // stem ambiguities retreived in the next lines...
 
-                List<Result> res = m_analyzer.CheckWordTolerant(word);
+                List<HebrewToken> res = m_analyzer.CheckWordTolerant(word);
                 if (res == null)
                 {
                     LoggerWriteLine("{0}: No match found{1}{2}", word, Environment.NewLine, "------");
@@ -155,7 +155,7 @@ namespace TestApplication
 
                 int curPrefix = -1;
                 string curWord = string.Empty;
-                foreach (Result r in res)
+                foreach (HebrewToken r in res)
                 {
                     if (curPrefix != r.PrefixLength || !curWord.Equals(r.Word))
                     {
@@ -172,6 +172,12 @@ namespace TestApplication
                 }
                 LoggerWriteLine("------");
             }
+        }
+        
+        private void btnTestCoverage_Click(object sender, EventArgs e)
+        {
+            //DictionaryCoverageTester dct = new DictionaryCoverageTester();
+            //dct.ShowDialog();
         }
     }
 }
