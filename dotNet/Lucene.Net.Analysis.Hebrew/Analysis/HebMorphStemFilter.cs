@@ -71,7 +71,7 @@ namespace Lucene.Net.Analysis.Hebrew
             if (typeAtt.Type().Equals(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew)))
             {
                 // Analyze the current term
-                IList<HebMorph.HebrewToken> morphResults = hebMorphLemmatizer.CheckWordTolerant(termAtt.Term());
+                IList<HebMorph.HebrewToken> morphResults = hebMorphLemmatizer.Lemmatize(termAtt.Term());
 
                 if (morphResults != null && morphResults.Count > 0)
                 {
@@ -94,6 +94,14 @@ namespace Lucene.Net.Analysis.Hebrew
                     // TODO: Right now we store the word as-is. Perhaps we can assume this is a Noun or a name,
                     // and try removing prefixes and suffixes based on that?
                 }
+            }
+            else
+            {
+                // Applying LowerCaseFilter for Non-Hebrew terms
+                char[] buffer = termAtt.TermBuffer();
+                int length = termAtt.TermLength();
+                for (int i = 0; i < length; i++)
+                    buffer[i] = System.Char.ToLower(buffer[i]);
             }
             
             return true;

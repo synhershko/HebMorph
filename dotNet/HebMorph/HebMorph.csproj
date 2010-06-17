@@ -44,6 +44,8 @@
     <Compile Include="Lemmatizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructures\RealSortedList.cs" />
+    <Compile Include="StreamLemmatizer.cs" />
+    <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

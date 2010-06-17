@@ -146,7 +146,7 @@ namespace TestApplication
                 // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
                 // stem ambiguities retreived in the next lines...
 
-                List<HebrewToken> res = m_analyzer.CheckWordTolerant(word);
+                List<HebrewToken> res = m_analyzer.LemmatizeTolerant(word);
                 if (res == null)
                 {
                     LoggerWriteLine("{0}: No match found{1}{2}", word, Environment.NewLine, "------");
@@ -157,15 +157,15 @@ namespace TestApplication
                 string curWord = string.Empty;
                 foreach (HebrewToken r in res)
                 {
-                    if (curPrefix != r.PrefixLength || !curWord.Equals(r.Word))
+                    if (curPrefix != r.PrefixLength || !curWord.Equals(r.Text))
                     {
                         curPrefix = r.PrefixLength;
-                        curWord = r.Word;
+                        curWord = r.Text;
                         if (curPrefix == 0)
-                            LoggerWriteLine("Legal word: {0} (score: {1})", r.Word, r.Score);
+                            LoggerWriteLine("Legal word: {0} (score: {1})", r.Text, r.Score);
                         else
                         {
-                            LoggerWriteLine("Legal combination: {0}+{1} (score: {2})", r.Word.Substring(0, curPrefix), r.Word.Substring(curPrefix), r.Score);
+                            LoggerWriteLine("Legal combination: {0}+{1} (score: {2})", r.Text.Substring(0, curPrefix), r.Text.Substring(curPrefix), r.Score);
                         }
                     }
                     LoggerWriteLine(r.ToString());

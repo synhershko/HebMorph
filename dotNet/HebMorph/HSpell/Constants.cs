@@ -1453,6 +1453,8 @@ namespace HebMorph.HSpell
         D_OSMICHUT = 131072,
         D_SPECNOUN = 262144,
         D_STARTBIT = 524288,
+
+        D_ACRONYM = 1048576,
     }
 
     [Flags]

@@ -32,8 +32,16 @@ namespace HebMorph
         private DictRadix<HebMorph.MorphData> m_dict;
         private DictRadix<int> m_prefixes;
         private bool m_IsInitialized = false;
-
         public bool IsInitialized { get { return m_IsInitialized; } }
+
+        public Lemmatizer()
+        {
+        }
+
+        public Lemmatizer(string hspellPath, bool loadMorpholicData, bool allowHeHasheela)
+        {
+            InitFromHSpellFolder(hspellPath, loadMorpholicData, allowHeHasheela);
+        }
 
         public void InitFromHSpellFolder(string path, bool loadMorpholicData, bool allowHeHasheela)
         {
@@ -76,7 +84,24 @@ namespace HebMorph
             return word;
         }
 
-        public List<HebrewToken> CheckWordExact(string word)
+        /// <summary>
+        /// Removes all Niqqud character from a word
+        /// </summary>
+        /// <param name="word">A string to remove Niqqud from</param>
+        /// <returns>A new word "clean" of Niqqud chars</returns>
+        public string RemoveNiqqud(string word)
+        {
+            int length = word.Length, j = 0;
+            StringBuilder sb = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                if (word[i] < 1455 || word[i] > 1476) // current position is not a Niqqud character
+                    sb[j++] = word[i];
+            }
+            return sb.ToString();
+        }
+
+        public List<HebrewToken> Lemmatize(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
@@ -121,7 +146,7 @@ namespace HebMorph
             return null;
         }
 
-        public List<HebrewToken> CheckWordTolerant(string word)
+        public List<HebrewToken> LemmatizeTolerant(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
@@ -166,8 +191,6 @@ namespace HebMorph
                     }
                 }
             }
-
-            // TODO: Support Gimatria
 
             if (ret.Count > 0)
                 return ret;

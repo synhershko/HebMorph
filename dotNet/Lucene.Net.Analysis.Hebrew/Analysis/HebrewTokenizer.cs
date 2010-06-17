@@ -118,7 +118,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 {
                     nextToken = hebMorphAnalyzer.TryStrippingPrefix(nextToken);
 
-                    // Redect acronym, in case it was a false positive
+                    // Re-detect acronym, in case it was a false positive
                     if (nextToken.IndexOf('"') == -1)
                         tokenType |= ~HebMorph.Tokenizer.TokenType.Acronym;
                 }
