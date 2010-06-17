@@ -29,17 +29,25 @@ namespace HebMorph
     {
         private Tokenizer _tokenizer;
 
+        public StreamLemmatizer()
+        {
+        }
+
         public StreamLemmatizer(System.IO.TextReader input)
+        {
+            SetStream(input);
+        }
+
+        public void SetStream(System.IO.TextReader input)
         {
             _tokenizer = new Tokenizer(input);
         }
 
-        public int LemmatizeNextToken(List<Token> retTokens)
+        public int LemmatizeNextToken(out string nextToken, IList<Token> retTokens)
         {
             retTokens.Clear();
 
             int currentPos = 0;
-            string nextToken;
             Tokenizer.TokenType tokenType;
 
             // Used to loop over certain noise cases
@@ -53,6 +61,11 @@ namespace HebMorph
 
                 if ((tokenType & Tokenizer.TokenType.Hebrew) > 0)
                 {
+                    // Right now we are blindly removing all Niqqud characters. Later we will try and make some
+                    // use of Niqqud for some cases. We do this before everything else to allow for a correct
+                    // identification of prefixes.
+                    nextToken = RemoveNiqqud(nextToken);
+
                     // Ignore "words" which are actually only prefixes in a single word.
                     // This first case is easy to spot, since the prefix and the following word will be
                     // separated by a dash marked as a construct (סמיכות) by the Tokenizer
@@ -81,22 +94,18 @@ namespace HebMorph
                     // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
                     // stem ambiguities retreived later...
 
-                    // Right now we are blindly removing all Niqqud characters. Later we will try and make some
-                    // use of Niqqud for some cases.
-                    nextToken = RemoveNiqqud(nextToken);
-                    
                     IList<HebrewToken> lemmas = Lemmatize(nextToken);
 
                     if (lemmas != null && lemmas.Count > 0)
                     {
-                        // TODO: Filter Stop Words
+                        // TODO: Filter Stop Words based on morphological data
                         // TODO: Check for worthy lemmas, if there are none then perform tolerant lookup and check again...
                         if ((tokenType & Tokenizer.TokenType.Construct) > 0)
                         {
                             // TODO: Test for (lemma.Mask & DMask.D_OSMICHUT) > 0
                         }
 
-                        foreach (Token t in lemmas)
+                        foreach (Token t in lemmas) // temp catch-all
                             retTokens.Add(t);
                     }
 
@@ -106,8 +115,7 @@ namespace HebMorph
                         // TODO: Treat an acronym as a noun and strip affixes accordingly?
                         retTokens.Add(new HebrewToken(nextToken, 0, HebMorph.HSpell.DMask.D_ACRONYM, nextToken, 1.0f));
                     }
-
-                    if (retTokens.Count == 0)
+                    else if (retTokens.Count == 0)
                     {
                         lemmas = LemmatizeTolerant(nextToken);
                         if (lemmas != null && lemmas.Count > 0)
@@ -119,14 +127,14 @@ namespace HebMorph
                                 // TODO: Test for (lemma.Mask & DMask.D_OSMICHUT) > 0
                             }
 
-                            foreach (Token t in lemmas)
+                            foreach (Token t in lemmas) // temp catch-all
                                 retTokens.Add(t);
                         }
                         else // Word unknown to hspell - OOV case
                         {
                             // TODO: Right now we store the word as-is. Perhaps we can assume this is a Noun or a name,
                             // and try removing prefixes and suffixes based on that?
-                            retTokens.Add(new HebrewToken(nextToken, 0, 0, nextToken, 1.0f));
+                            //retTokens.Add(new HebrewToken(nextToken, 0, 0, null, 1.0f));
                         }
                     }
                 }

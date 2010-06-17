@@ -96,12 +96,12 @@ namespace HebMorph
             for (int i = 0; i < length; i++)
             {
                 if (word[i] < 1455 || word[i] > 1476) // current position is not a Niqqud character
-                    sb[j++] = word[i];
+                    sb.Append(word[i]);
             }
             return sb.ToString();
         }
 
-        public List<HebrewToken> Lemmatize(string word)
+        public IList<HebrewToken> Lemmatize(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
@@ -139,14 +139,12 @@ namespace HebMorph
                 }
             }
 
-            // TODO: Support Gimatria
-
             if (ret.Count > 0)
                 return ret;
             return null;
         }
 
-        public List<HebrewToken> LemmatizeTolerant(string word)
+        public IList<HebrewToken> LemmatizeTolerant(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 

@@ -15,7 +15,7 @@ namespace TestApplication
     public partial class MainForm : Form
     {
         DictRadix<MorphData> m_dict;
-        HebMorph.Lemmatizer m_analyzer = new Lemmatizer();
+        HebMorph.Lemmatizer m_lemmatizer;
 
         public MainForm()
         {
@@ -105,70 +105,58 @@ namespace TestApplication
 
         private void btnCheck_Click(object sender, EventArgs e)
         {
-            if (!m_analyzer.IsInitialized)
+            if (m_lemmatizer == null || !m_lemmatizer.IsInitialized || !(m_lemmatizer is StreamLemmatizer))
             {
+                m_lemmatizer = new HebMorph.StreamLemmatizer(new System.IO.StringReader(txbCheck.Text));
+
                 string hspellPath = SelectHSpellFolderPath();
                 if (hspellPath == null)
                     return;
 
-                m_analyzer.InitFromHSpellFolder(hspellPath, true, false);
+                m_lemmatizer.InitFromHSpellFolder(hspellPath, true, false);
+            } else
+            {
+                (m_lemmatizer as StreamLemmatizer).SetStream(new System.IO.StringReader(txbCheck.Text));
             }
 
-
-            HebMorph.Tokenizer tk = new HebMorph.Tokenizer(new System.IO.StringReader(txbCheck.Text));
-
-            string word;
-            HebMorph.Tokenizer.TokenType tokenType;
-            while ((tokenType = tk.NextToken(out word)) != 0)
+            string word = string.Empty;
+            List<Token> tokens = new List<Token>();
+            while ((m_lemmatizer as StreamLemmatizer).LemmatizeNextToken(out word, tokens) > 0)
             {
-                if ((tokenType & Tokenizer.TokenType.Hebrew) == 0)
+                if (tokens.Count == 0)
                 {
-                    LoggerWriteLine("{0}: Not a Hebrew word; detected as {1}{2}{3}", word, tokenType, Environment.NewLine, "------");
+                    LoggerWriteLine("{0}: Unrecognized word{1}{2}", word, Environment.NewLine, "------");
                     continue;
                 }
 
-                // Ignore "words" which are actually only prefixes in a single word.
-                // This first case is easy to spot, since the prefix and the following word will be
-                // separated by a dash marked as a construct (סמיכות) by the Tokenizer
-                if ((tokenType & Tokenizer.TokenType.Construct) > 0)
+                if (tokens.Count == 1 && !(tokens[0] is HebrewToken))
                 {
-                    if (m_analyzer.IsLegalPrefix(word))
-                        continue;
-                }
-
-                // This second case is a bit more complex. We take a risk of splitting a valid acronym or
-                // abbrevated word into two, so we send it to an external function to analyze the word, and
-                // get a possibly corrected word. Examples for words we expect to simplify by this operation
-                // are ה"שטיח", ש"המידע.
-                if ((tokenType & Tokenizer.TokenType.Acronym) > 0)
-                    word = m_analyzer.TryStrippingPrefix(word);
-
-                // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
-                // stem ambiguities retreived in the next lines...
-
-                List<HebrewToken> res = m_analyzer.LemmatizeTolerant(word);
-                if (res == null)
-                {
-                    LoggerWriteLine("{0}: No match found{1}{2}", word, Environment.NewLine, "------");
+                    LoggerWriteLine("{0}: Not a Hebrew word; detected as {1}{2}{3}", word,
+                        tokens[0].IsNumeric ? "Numeric" : "NonHebrew", Environment.NewLine, "------");
                     continue;
                 }
 
                 int curPrefix = -1;
                 string curWord = string.Empty;
-                foreach (HebrewToken r in res)
+                foreach (Token r in tokens)
                 {
-                    if (curPrefix != r.PrefixLength || !curWord.Equals(r.Text))
+                    HebrewToken ht = r as HebrewToken;
+                    if (ht == null)
+                        continue;
+
+                    if (curPrefix != ht.PrefixLength || !curWord.Equals(ht.Text))
                     {
-                        curPrefix = r.PrefixLength;
-                        curWord = r.Text;
+                        curPrefix = ht.PrefixLength;
+                        curWord = ht.Text;
                         if (curPrefix == 0)
-                            LoggerWriteLine("Legal word: {0} (score: {1})", r.Text, r.Score);
+                            LoggerWriteLine("Legal word: {0} (score: {1})", ht.Text, ht.Score);
                         else
                         {
-                            LoggerWriteLine("Legal combination: {0}+{1} (score: {2})", r.Text.Substring(0, curPrefix), r.Text.Substring(curPrefix), r.Score);
+                            LoggerWriteLine("Legal combination: {0}+{1} (score: {2})", ht.Text.Substring(0, curPrefix),
+                                ht.Text.Substring(curPrefix), ht.Score);
                         }
                     }
-                    LoggerWriteLine(r.ToString());
+                    LoggerWriteLine(ht.ToString());
                 }
                 LoggerWriteLine("------");
             }
