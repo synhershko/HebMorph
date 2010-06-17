@@ -22,6 +22,8 @@ namespace LuceneNetHebrewTests.Tests
 
         public void Run()
         {
+            bool bCaught = true;
+
             // Warm up with exact matches...
             AssertFoundInText("בת", "בת");
             AssertFoundInText("שבתו", "שבתו");
@@ -33,9 +35,15 @@ namespace LuceneNetHebrewTests.Tests
             AssertFoundInText("שבתו", "תו"); // prefixes
             AssertFoundInText("שבתו", "ישב"); // verb inflections
             AssertFoundInText("שבתו", "שבתנו");
-            AssertFoundInText("שבתו", "שיבה"); // tolerance
+            
+            try
+            {
+                AssertFoundInText("שבתו", "שיבה"); // too much of a tolerance for searches...
+                bCaught = false;
+            }
+            catch { }
+            Assert(bCaught);
 
-            bool bCaught = true;
             try
             {
                 AssertFoundInText("שבתו", "שביו"); // incorrect

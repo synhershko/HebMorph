@@ -35,12 +35,25 @@ namespace HebMorph
 
         public StreamLemmatizer(System.IO.TextReader input)
         {
-            SetStream(input);
+            _tokenizer = new Tokenizer(input);
         }
 
         public void SetStream(System.IO.TextReader input)
         {
-            _tokenizer = new Tokenizer(input);
+            if (_tokenizer == null)
+                _tokenizer = new Tokenizer(input);
+            else
+                _tokenizer.Reset(input);
+        }
+
+        private int _startOffset, _endOffset;
+        public int StartOffset
+        {
+            get { return _startOffset; }
+        }
+        public int EndOffset
+        {
+            get { return _endOffset; }
         }
 
         public int LemmatizeNextToken(out string nextToken, IList<Token> retTokens)
@@ -53,9 +66,11 @@ namespace HebMorph
             // Used to loop over certain noise cases
             while (true)
             {
+                _startOffset = _tokenizer.Offset;
                 tokenType = _tokenizer.NextToken(out nextToken);
                 if (tokenType == 0)
                     return 0; // EOS
+                _endOffset = _tokenizer.Offset;
 
                 ++currentPos;
 
@@ -98,7 +113,7 @@ namespace HebMorph
 
                     if (lemmas != null && lemmas.Count > 0)
                     {
-                        // TODO: Filter Stop Words based on morphological data
+                        // TODO: Filter Stop Words based on morphological data (hspell 'x' identification)
                         // TODO: Check for worthy lemmas, if there are none then perform tolerant lookup and check again...
                         if ((tokenType & Tokenizer.TokenType.Construct) > 0)
                         {

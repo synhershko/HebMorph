@@ -43,7 +43,7 @@ namespace HebMorph
         public int Offset
         {
             get { return inputOffset; }
-            set { inputOffset = value; }
+            //set { inputOffset = value; }
         }
 
         private const int IO_BUFFER_SIZE = 4096;

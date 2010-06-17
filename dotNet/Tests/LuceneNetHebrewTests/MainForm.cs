@@ -67,7 +67,7 @@ namespace LuceneNetHebrewTests
                     if (hspellPath == null)
                         return;
 
-                    analyzer = new HebMorphAnalyzer(hspellPath);
+                    analyzer = new MorphAnalyzer(hspellPath);
                 }
 
                 // Recreate the index

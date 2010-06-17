@@ -25,7 +25,7 @@ using System.Text;
 
 namespace Lucene.Net.Analysis.Hebrew
 {
-    public class HebMorphAnalyzer : Analyzer
+    public class MorphAnalyzer : Analyzer
     {
         /// <summary>An unmodifiable set containing some common Hebrew words that are usually not
         /// useful for searching.
@@ -33,22 +33,20 @@ namespace Lucene.Net.Analysis.Hebrew
         public static readonly System.Collections.Hashtable STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
 
         private bool enableStopPositionIncrements = true;
-        private HebMorph.Lemmatizer hebMorphLemmatizer;
+        private HebMorph.StreamLemmatizer hebMorphLemmatizer;
 
-        public HebMorphAnalyzer(HebMorph.Lemmatizer hml)
+        public MorphAnalyzer(HebMorph.StreamLemmatizer hml)
             : base()
         {
             hebMorphLemmatizer = hml;
         }
 
-        public HebMorphAnalyzer(string HSpellDataFilesPath)
+        public MorphAnalyzer(string HSpellDataFilesPath)
             : base()
         {
-            hebMorphLemmatizer = new HebMorph.Lemmatizer();
+            hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
             hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
         }
-
-        // TODO: Support loading external stop lists
 
         private class SavedStreams
         {
@@ -62,21 +60,11 @@ namespace Lucene.Net.Analysis.Hebrew
             if (streams == null)
             {
                 streams = new SavedStreams();
-                streams.source = new HebrewTokenizer(reader, hebMorphLemmatizer);
-                
-                // IMPORTANT: Currently we are filtering Niqqud characters _before_ passing it to HebMorph's analyzer.
-                // Once the analyzer becomes aware of Niqqud characters, and uses them to correctly resolve or reduce ambiguities,
-                // NiqqudFilter will need to be called _after_ using HebMorph analyzer.
-                streams.result = new NiqqudFilter(streams.source);
+                streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer);
 
-                // TODO: should we ignoreCase in StopFilter?
-                streams.result = new StopFilter(enableStopPositionIncrements, streams.result, STOP_WORDS_SET);
-
-                if (hebMorphLemmatizer != null && hebMorphLemmatizer.IsInitialized)
-                    streams.result = new HebMorphStemFilter(streams.result, hebMorphLemmatizer);
-
-                // TODO: Apply LowerCaseFilter to NonHebrew tokens only
-                streams.result = new LowerCaseFilter(streams.result);
+                // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
+                // all by itself
+                streams.result = new StopFilter(enableStopPositionIncrements, streams.source, STOP_WORDS_SET);
 
                 SetPreviousTokenStream(streams);
             }
@@ -89,21 +77,11 @@ namespace Lucene.Net.Analysis.Hebrew
 
         public override TokenStream TokenStream(string fieldName, System.IO.TextReader reader)
         {
-            TokenStream result = new HebrewTokenizer(reader, hebMorphLemmatizer);
+            TokenStream result = new StreamLemmasFilter(reader, hebMorphLemmatizer);
 
-            // IMPORTANT: Currently we are filtering Niqqud characters _before_ passing it to HebMorph's analyzer.
-            // Once the analyzer becomes aware of Niqqud characters, and uses them to correctly resolve or reduce ambiguities,
-            // NiqqudFilter will need to be called _after_ using HebMorph analyzer.
-            result = new NiqqudFilter(result);
-
-            // TODO: should we ignoreCase in StopFilter?
+            // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
+            // all by itself
             result = new StopFilter(enableStopPositionIncrements, result, STOP_WORDS_SET);
-
-            if (hebMorphLemmatizer != null && hebMorphLemmatizer.IsInitialized)
-                result = new HebMorphStemFilter(result, hebMorphLemmatizer);
-
-            // TODO: Apply LowerCaseFilter to NonHebrew tokens only
-            result = new LowerCaseFilter(result);
 
             return result;
         }
