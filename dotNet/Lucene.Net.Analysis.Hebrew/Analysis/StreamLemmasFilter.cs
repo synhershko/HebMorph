@@ -142,17 +142,22 @@ namespace Lucene.Net.Analysis.Hebrew
                 return true;
             }
 
-            CreateHebrewToken(stack[0] as HebMorph.HebrewToken);
+            HebMorph.HebrewToken hebToken = stack[0] as HebMorph.HebrewToken;
+            CreateHebrewToken(hebToken);
             if (stack.Count == 1) // We have only have one result, no need to push it to the stack
             {
-                posIncrAtt.SetPositionIncrement(1);
-                stack.Clear();
+                if (hebToken.Lemma.Equals(word)) // ... but only if the actual word matches the lemma
+                {
+                    posIncrAtt.SetPositionIncrement(1);
+                    stack.Clear();
+                    return true;
+                }
             }
-            else
-            {
-                index++;
-                current = CaptureState();
-            }
+
+            // Mark the original term to increase precision. This will get indexed in the next iteration
+            hebToken.Lemma = word + "$";
+            current = CaptureState();
+
             return true;
         }
 
