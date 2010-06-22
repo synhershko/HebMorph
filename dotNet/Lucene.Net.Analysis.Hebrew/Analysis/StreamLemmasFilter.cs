@@ -89,37 +89,45 @@ namespace Lucene.Net.Analysis.Hebrew
 
         public override bool IncrementToken()
         {
-            while (index < stack.Count) // pop from stack if any
+            // Index all unique lemmas at the same position
+            while (index < stack.Count)
             {
                 HebMorph.HebrewToken res = stack[index++] as HebMorph.HebrewToken;
 
                 if (res == null || previousLemma == res.Lemma) // Skip multiple lemmas (we will merge morph properties later)
                     continue;
 
-                if (CreateHebrewToken(res, current))
+                previousLemma = res.Lemma;
+
+                if (CreateHebrewToken(res))
                     return true;
             }
 
+            // Reset state
             ClearAttributes();
-
             index = 0;
             stack.Clear();
             current = null;
+            previousLemma = null;
 
-            string word = string.Empty;
+            // Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
+            // an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
+            string word = string.Empty; // to hold the original word from the stream
             if (_streamLemmatizer.LemmatizeNextToken(out word, stack) == 0)
                 return false; // EOS
 
+            // Store the location of the word in the original stream
             offsetAtt.SetOffset(_streamLemmatizer.StartOffset, _streamLemmatizer.EndOffset);
 
+            // OOV case -- for now store word as-is and return true
             if (stack.Count == 0)
             {
-                // OOV -- for now store word as-is and return true
                 SetTermText(word);
                 typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
                 return true;
             }
 
+            // A non-Hebrew word
             if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))
             {
                 SetTermText(word);
@@ -142,20 +150,37 @@ namespace Lucene.Net.Analysis.Hebrew
                 return true;
             }
 
+            // If we arrived here, we hit a Hebrew word
             HebMorph.HebrewToken hebToken = stack[0] as HebMorph.HebrewToken;
-            CreateHebrewToken(hebToken);
-            if (stack.Count == 1) // We have only have one result, no need to push it to the stack
+
+            // If only one lemma was returned for this word
+            if (stack.Count == 1)
             {
-                if (hebToken.Lemma.Equals(word)) // ... but only if the actual word matches the lemma
+                // Index the lemma alone if it exactly matches the word minus prefixes
+                if (hebToken.Lemma.Equals(word.Substring(hebToken.PrefixLength)))
                 {
+                    CreateHebrewToken(hebToken);
                     posIncrAtt.SetPositionIncrement(1);
                     stack.Clear();
                     return true;
                 }
+                // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
+                else
+                {
+                    SetTermText(word.Substring(hebToken.PrefixLength) + "$");
+                }
             }
 
-            // Mark the original term to increase precision. This will get indexed in the next iteration
-            hebToken.Lemma = word + "$";
+            // More than one lemma exist. Mark and store the original term to increase precision, while all
+            // lemmas will be popped out of the stack and get stored at the next call to IncrementToken.
+            else
+            {
+                SetTermText(word + "$");
+            }
+
+            typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+            posIncrAtt.SetPositionIncrement(0);
+
             current = CaptureState();
 
             return true;
