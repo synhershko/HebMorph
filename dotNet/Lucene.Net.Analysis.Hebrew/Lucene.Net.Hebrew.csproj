@@ -33,6 +33,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analysis\HebrewTokenizer.cs" />
+    <Compile Include="Analysis\NiqqudFilter.cs" />
+    <Compile Include="Analysis\SimpleAnalyzer.cs" />
     <Compile Include="Analysis\StreamLemmasFilter.cs" />
     <Compile Include="Analysis\MorphAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

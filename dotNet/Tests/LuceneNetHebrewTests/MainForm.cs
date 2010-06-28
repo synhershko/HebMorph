@@ -71,7 +71,7 @@ namespace LuceneNetHebrewTests
                 }
 
                 // Recreate the index
-                IndexWriter writer = new IndexWriter(tempPath, new SimpleAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
+                IndexWriter writer = new IndexWriter(tempPath, new Lucene.Net.Analysis.SimpleAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
                 writer.Close();
                 
             }
