@@ -50,7 +50,7 @@ namespace Lucene.Net.Analysis.Hebrew
         }
 
         public HebrewTokenizer(System.IO.TextReader _input, HebMorph.DataStructures.DictRadix<int> _prefixesTree)
-        //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
+            //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
         {
             Init(_input, _prefixesTree);
         }
@@ -61,7 +61,7 @@ namespace Lucene.Net.Analysis.Hebrew
             offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
             //posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
             typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
-            this.hebMorphTokenizer = new HebMorph.Tokenizer(input);
+            this.hebMorphTokenizer = new HebMorph.Tokenizer(_input);
             this.prefixesTree = _prefixesTree;
         }
         #endregion
