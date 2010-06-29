@@ -153,6 +153,12 @@ namespace Lucene.Net.Analysis.Hebrew
             // OOV case -- for now store word as-is and return true
             if (stack.Count == 0)
             {
+                // Mark this word as "original term" if requested.
+                // TODO: To allow more advanced uses we may need to store both options (marked and unmarked)
+                // instead of just one.
+                if (alwaysSaveMarkedOriginal)
+                    word += "$";
+
                 SetTermText(word);
                 typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
                 return true;
@@ -161,6 +167,11 @@ namespace Lucene.Net.Analysis.Hebrew
             // A non-Hebrew word
             if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))
             {
+                // Mark this word as "original term" if requested.
+                // TODO: Better make AddSuffixFilter recognize Token types?
+                if (alwaysSaveMarkedOriginal)
+                    word += "$";
+
                 SetTermText(word);
 
                 HebMorph.Token tkn = stack[0];
