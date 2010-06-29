@@ -35,6 +35,8 @@ namespace Lucene.Net.Analysis.Hebrew
 
         private bool enableStopPositionIncrements = true;
 
+        public String termsSuffix = null;
+
         // TODO: Support loading external stop lists
 
         private class SavedStreams
@@ -62,6 +64,9 @@ namespace Lucene.Net.Analysis.Hebrew
                 // TODO: Apply LowerCaseFilter to NonHebrew tokens only
                 streams.result = new LowerCaseFilter(streams.result);
 
+                if (!string.IsNullOrEmpty(termsSuffix))
+                    streams.result = new AddSuffixFilter(streams.result, termsSuffix.ToCharArray());
+
                 SetPreviousTokenStream(streams);
             }
             else
@@ -83,6 +88,9 @@ namespace Lucene.Net.Analysis.Hebrew
 
             // TODO: Apply LowerCaseFilter to NonHebrew tokens only
             result = new LowerCaseFilter(result);
+
+            if (!string.IsNullOrEmpty(termsSuffix))
+                result = new AddSuffixFilter(result, termsSuffix.ToCharArray());
 
             return result;
         }

@@ -32,6 +32,15 @@ namespace Lucene.Net.Analysis.Hebrew
         /// </summary>
         public static readonly System.Collections.Hashtable STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
 
+        /// <summary>
+        /// Set to true to mark tokens with a $ prefix also when there is only one lemma returned
+        /// from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
+        /// namespace) to perform searches on the same field used for the Morph analyzer. When used this
+        /// way, make sure to turn this on only while indexing, so searches don't get slower.
+        /// Default is false to save some index space.
+        /// </summary>
+        public bool alwaysSaveMarkedOriginal = false;
+
         private bool enableStopPositionIncrements = true;
         private HebMorph.StreamLemmatizer hebMorphLemmatizer;
 
@@ -60,7 +69,7 @@ namespace Lucene.Net.Analysis.Hebrew
             if (streams == null)
             {
                 streams = new SavedStreams();
-                streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer);
+                streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer, alwaysSaveMarkedOriginal);
 
                 // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
                 // all by itself

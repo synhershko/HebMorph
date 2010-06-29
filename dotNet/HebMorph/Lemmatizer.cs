@@ -91,7 +91,7 @@ namespace HebMorph
         /// <returns>A new word "clean" of Niqqud chars</returns>
         public string RemoveNiqqud(string word)
         {
-            int length = word.Length, j = 0;
+            int length = word.Length;
             StringBuilder sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {

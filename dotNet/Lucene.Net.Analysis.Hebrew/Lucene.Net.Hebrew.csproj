@@ -33,6 +33,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddSuffixFilter.cs" />
     <Compile Include="Analysis\HebrewTokenizer.cs" />
     <Compile Include="Analysis\NiqqudFilter.cs" />
     <Compile Include="Analysis\SimpleAnalyzer.cs" />

@@ -36,6 +36,8 @@ namespace Lucene.Net.Analysis.Hebrew
         protected TypeAttribute typeAtt;
         //protected PayloadAttribute payAtt;
 
+        public bool alwaysSaveMarkedOriginal;
+
         private State current = null;
         private IList<HebMorph.Token> stack = new List<HebMorph.Token>();
         private int index = 0;
@@ -45,10 +47,16 @@ namespace Lucene.Net.Analysis.Hebrew
         public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer)
             //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
         {
-            Init(input, _lemmatizer);
+            Init(input, _lemmatizer, false);
         }
 
-        private void Init(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer)
+        public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer, bool AlwaysSaveMarkedOriginal)
+            //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
+        {
+            Init(input, _lemmatizer, AlwaysSaveMarkedOriginal);
+        }
+
+        private void Init(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer, bool AlwaysSaveMarkedOriginal)
         {
             termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
             offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
@@ -58,6 +66,7 @@ namespace Lucene.Net.Analysis.Hebrew
 
             this._streamLemmatizer = _lemmatizer;
             this._streamLemmatizer.SetStream(input);
+            this.alwaysSaveMarkedOriginal = AlwaysSaveMarkedOriginal;
         }
         #endregion
 
@@ -157,7 +166,7 @@ namespace Lucene.Net.Analysis.Hebrew
             if (stack.Count == 1)
             {
                 // Index the lemma alone if it exactly matches the word minus prefixes
-                if (hebToken.Lemma.Equals(word.Substring(hebToken.PrefixLength)))
+                if (!alwaysSaveMarkedOriginal && hebToken.Lemma.Equals(word.Substring(hebToken.PrefixLength)))
                 {
                     CreateHebrewToken(hebToken);
                     posIncrAtt.SetPositionIncrement(1);
