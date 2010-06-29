@@ -41,6 +41,12 @@ namespace Lucene.Net.Analysis.Hebrew
         /// </summary>
         public bool alwaysSaveMarkedOriginal = false;
 
+        /// <summary>
+        /// A filter object to provide flexibility on deciding which lemmas are valid as index terms
+        /// and which are not.
+        /// </summary>
+        public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
+
         private bool enableStopPositionIncrements = true;
         private HebMorph.StreamLemmatizer hebMorphLemmatizer;
 
@@ -69,7 +75,8 @@ namespace Lucene.Net.Analysis.Hebrew
             if (streams == null)
             {
                 streams = new SavedStreams();
-                streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer, alwaysSaveMarkedOriginal);
+                streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer,
+                    lemmaFilter, alwaysSaveMarkedOriginal);
 
                 // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
                 // all by itself
@@ -86,7 +93,8 @@ namespace Lucene.Net.Analysis.Hebrew
 
         public override TokenStream TokenStream(string fieldName, System.IO.TextReader reader)
         {
-            TokenStream result = new StreamLemmasFilter(reader, hebMorphLemmatizer);
+            TokenStream result = new StreamLemmasFilter(reader, hebMorphLemmatizer,
+                lemmaFilter, alwaysSaveMarkedOriginal);
 
             // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
             // all by itself

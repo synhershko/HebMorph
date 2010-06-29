@@ -37,9 +37,11 @@ namespace Lucene.Net.Analysis.Hebrew
         //protected PayloadAttribute payAtt;
 
         public bool alwaysSaveMarkedOriginal;
+        public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
         private State current = null;
         private IList<HebMorph.Token> stack = new List<HebMorph.Token>();
+        private IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
         private int index = 0;
         private string previousLemma = null;
 
@@ -47,16 +49,31 @@ namespace Lucene.Net.Analysis.Hebrew
         public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer)
             //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
         {
-            Init(input, _lemmatizer, false);
+            Init(input, _lemmatizer, null, false);
         }
 
         public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer, bool AlwaysSaveMarkedOriginal)
             //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
         {
-            Init(input, _lemmatizer, AlwaysSaveMarkedOriginal);
+            Init(input, _lemmatizer, null, AlwaysSaveMarkedOriginal);
         }
 
-        private void Init(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer, bool AlwaysSaveMarkedOriginal)
+        public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer,
+            HebMorph.LemmaFilters.LemmaFilterBase _lemmaFilter, bool AlwaysSaveMarkedOriginal)
+        //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
+        {
+            Init(input, _lemmatizer, _lemmaFilter, AlwaysSaveMarkedOriginal);
+        }
+
+        public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer,
+            HebMorph.LemmaFilters.LemmaFilterBase _lemmaFilter)
+        //: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
+        {
+            Init(input, _lemmatizer, _lemmaFilter, false);
+        }
+
+        private void Init(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer,
+            HebMorph.LemmaFilters.LemmaFilterBase _lemmaFilter, bool AlwaysSaveMarkedOriginal)
         {
             termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
             offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
@@ -67,6 +84,7 @@ namespace Lucene.Net.Analysis.Hebrew
             this._streamLemmatizer = _lemmatizer;
             this._streamLemmatizer.SetStream(input);
             this.alwaysSaveMarkedOriginal = AlwaysSaveMarkedOriginal;
+            this.lemmaFilter = _lemmaFilter;
         }
         #endregion
 
@@ -127,6 +145,10 @@ namespace Lucene.Net.Analysis.Hebrew
 
             // Store the location of the word in the original stream
             offsetAtt.SetOffset(_streamLemmatizer.StartOffset, _streamLemmatizer.EndOffset);
+
+            // Do some filtering if requested...
+            if (lemmaFilter != null)
+                stack = lemmaFilter.FilterCollection(stack, filterCache);
 
             // OOV case -- for now store word as-is and return true
             if (stack.Count == 0)

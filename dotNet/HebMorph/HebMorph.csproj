@@ -34,6 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HebrewToken.cs" />
+    <Compile Include="LemmaFilters\BasicLemmaFilter.cs" />
+    <Compile Include="LemmaFilters\LemmaFilterBase.cs" />
     <Compile Include="LookupTolerators.cs" />
     <Compile Include="MorphData.cs" />
     <Compile Include="StopWords.cs" />
