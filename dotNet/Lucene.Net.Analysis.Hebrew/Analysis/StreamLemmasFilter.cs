@@ -146,6 +146,35 @@ namespace Lucene.Net.Analysis.Hebrew
             // Store the location of the word in the original stream
             offsetAtt.SetOffset(_streamLemmatizer.StartOffset, _streamLemmatizer.EndOffset);
 
+            // A non-Hebrew word
+            if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))
+            {
+                // Mark this word as "original term" if requested.
+                // TODO: Better make AddSuffixFilter recognize Token types?
+                if (alwaysSaveMarkedOriginal)
+                    word += "$";
+
+                SetTermText(word);
+
+                HebMorph.Token tkn = stack[0];
+                if (tkn.IsNumeric)
+                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Numeric));
+                else
+                {
+                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.NonHebrew));
+
+                    // Applying LowerCaseFilter for Non-Hebrew terms
+                    char[] buffer = termAtt.TermBuffer();
+                    int length = termAtt.TermLength();
+                    for (int i = 0; i < length; i++)
+                        buffer[i] = System.Char.ToLower(buffer[i]);
+                }
+
+                stack.Clear();
+                return true;
+            }
+
+            // If we arrived here, we hit a Hebrew word
             // Do some filtering if requested...
             if (lemmaFilter != null)
                 stack = lemmaFilter.FilterCollection(stack, filterCache);
@@ -164,40 +193,11 @@ namespace Lucene.Net.Analysis.Hebrew
                 return true;
             }
 
-            // A non-Hebrew word
-            if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))
-            {
-                // Mark this word as "original term" if requested.
-                // TODO: Better make AddSuffixFilter recognize Token types?
-                if (alwaysSaveMarkedOriginal)
-                    word += "$";
-
-                SetTermText(word);
-
-                HebMorph.Token tkn = stack[0];
-                if (tkn.IsNumeric)
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Numeric));
-                else
-                {
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.NonHebrew));
-                    
-                    // Applying LowerCaseFilter for Non-Hebrew terms
-                    char[] buffer = termAtt.TermBuffer();
-                    int length = termAtt.TermLength();
-                    for (int i = 0; i < length; i++)
-                        buffer[i] = System.Char.ToLower(buffer[i]);
-                }
-
-                stack.Clear();
-                return true;
-            }
-
-            // If we arrived here, we hit a Hebrew word
-            HebMorph.HebrewToken hebToken = stack[0] as HebMorph.HebrewToken;
-
             // If only one lemma was returned for this word
             if (stack.Count == 1)
             {
+                HebMorph.HebrewToken hebToken = stack[0] as HebMorph.HebrewToken;
+
                 // Index the lemma alone if it exactly matches the word minus prefixes
                 if (!alwaysSaveMarkedOriginal && hebToken.Lemma.Equals(word.Substring(hebToken.PrefixLength)))
                 {
