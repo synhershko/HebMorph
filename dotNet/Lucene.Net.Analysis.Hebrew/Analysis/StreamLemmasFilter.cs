@@ -40,7 +40,7 @@ namespace Lucene.Net.Analysis.Hebrew
         public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
         private State current = null;
-        private IList<HebMorph.Token> stack = new List<HebMorph.Token>();
+        private List<HebMorph.Token> stack = new List<HebMorph.Token>();
         private IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
         private int index = 0;
         private string previousLemma = null;
@@ -177,7 +177,11 @@ namespace Lucene.Net.Analysis.Hebrew
             // If we arrived here, we hit a Hebrew word
             // Do some filtering if requested...
             if (lemmaFilter != null)
-                stack = lemmaFilter.FilterCollection(stack, filterCache);
+            {
+                lemmaFilter.FilterCollection(stack, filterCache);
+                stack.Clear();
+                stack.AddRange(filterCache);
+            }
 
             // OOV case -- for now store word as-is and return true
             if (stack.Count == 0)
