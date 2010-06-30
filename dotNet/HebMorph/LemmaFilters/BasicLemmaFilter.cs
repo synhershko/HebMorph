@@ -21,6 +21,7 @@
 
 using System;
 using System.Collections.Generic;
+using HebMorph.HSpell;
 
 namespace HebMorph.LemmaFilters
 {
@@ -43,7 +44,13 @@ namespace HebMorph.LemmaFilters
             if (t is HebrewToken)
             {
                 HebrewToken ht = t as HebrewToken;
+
+                // Pose a minimum score limit for words
                 if (ht.Score < 0.7f)
+                    return false;
+
+                // Pose a higher threshold to verbs (easier to get irrelevant verbs from toleration)
+                if ((ht.Mask & DMask.D_TYPEMASK) == DMask.D_VERB && ht.Score < 0.85f)
                     return false;
             }
             return true;
