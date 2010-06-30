@@ -209,7 +209,9 @@ namespace Lucene.Net.Analysis.Hebrew
                 // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
                 else
                 {
-                    SetTermText(word.Substring(hebToken.PrefixLength) + "$");
+                    // DILEMMA: Does indexing word.Substring(hebToken.PrefixLength) + "$" make more or less sense?
+                    // For now this is kept the way it is below to support duality of SimpleAnalyzer and MorphAnalyzer
+                    SetTermText(word + "$");
                 }
             }
 
