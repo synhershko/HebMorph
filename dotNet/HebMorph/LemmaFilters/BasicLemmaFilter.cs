@@ -36,7 +36,7 @@ namespace HebMorph.LemmaFilters
             if (collection.Count > 1)
                 return base.FilterCollection(collection, preallocatedOut);
             else
-                return collection;
+                return null;
         }
 
         public override bool IsValidToken(Token t)

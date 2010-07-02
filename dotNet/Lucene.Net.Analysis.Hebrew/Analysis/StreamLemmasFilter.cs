@@ -33,7 +33,7 @@ namespace Lucene.Net.Analysis.Hebrew
         private TermAttribute termAtt;
         private OffsetAttribute offsetAtt;
         private PositionIncrementAttribute posIncrAtt;
-        protected TypeAttribute typeAtt;
+        private TypeAttribute typeAtt;
         //protected PayloadAttribute payAtt;
 
         public bool alwaysSaveMarkedOriginal;
@@ -88,32 +88,6 @@ namespace Lucene.Net.Analysis.Hebrew
         }
         #endregion
 
-        #region Token types
-        public enum TOKEN_TYPES : int
-        {
-            Hebrew = 0,
-            NonHebrew = 1,
-            Numeric = 2,
-            Construct = 3,
-            Acronym = 4,
-        }
-
-        public static readonly string[] TOKEN_TYPE_SIGNATURES = new string[]
-        {
-            "<HEBREW>",
-            "<NON_HEBREW>",
-            "<NUM>",
-            "<CONSTRUCT>",
-            "<ACRONYM>",
-            null
-        };
-
-        public static string TokenTypeSignature(TOKEN_TYPES tokenType)
-        {
-            return TOKEN_TYPE_SIGNATURES[(int)tokenType];
-        }
-        #endregion
-
         public override bool IncrementToken()
         {
             // Index all unique lemmas at the same position
@@ -149,19 +123,14 @@ namespace Lucene.Net.Analysis.Hebrew
             // A non-Hebrew word
             if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))
             {
-                // Mark this word as "original term" if requested.
-                // TODO: Better make AddSuffixFilter recognize Token types?
-                if (alwaysSaveMarkedOriginal)
-                    word += "$";
-
                 SetTermText(word);
 
                 HebMorph.Token tkn = stack[0];
                 if (tkn.IsNumeric)
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Numeric));
+                    typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
                 else
                 {
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.NonHebrew));
+                    typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
 
                     // Applying LowerCaseFilter for Non-Hebrew terms
                     char[] buffer = termAtt.TermBuffer();
@@ -176,9 +145,8 @@ namespace Lucene.Net.Analysis.Hebrew
 
             // If we arrived here, we hit a Hebrew word
             // Do some filtering if requested...
-            if (lemmaFilter != null)
+            if (lemmaFilter != null && lemmaFilter.FilterCollection(stack, filterCache) != null)
             {
-                lemmaFilter.FilterCollection(stack, filterCache);
                 stack.Clear();
                 stack.AddRange(filterCache);
             }
@@ -186,14 +154,12 @@ namespace Lucene.Net.Analysis.Hebrew
             // OOV case -- for now store word as-is and return true
             if (stack.Count == 0)
             {
-                // Mark this word as "original term" if requested.
-                // TODO: To allow more advanced uses we may need to store both options (marked and unmarked)
-                // instead of just one.
-                if (alwaysSaveMarkedOriginal)
-                    word += "$";
+                // TODO: To allow for more advanced uses, fill stack with processed tokens and
+                // SetPositionIncrement(0)
 
-                SetTermText(word);
-                typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+                SetTermText(word + "$");
+                typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+                posIncrAtt.SetPositionIncrement(1);
                 return true;
             }
 
@@ -226,7 +192,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 SetTermText(word + "$");
             }
 
-            typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+            typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
             posIncrAtt.SetPositionIncrement(0);
 
             current = CaptureState();
@@ -259,7 +225,7 @@ namespace Lucene.Net.Analysis.Hebrew
             posIncrAtt.SetPositionIncrement(0);
 
             // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
-            typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+            typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
             /*
              * Morph payload
