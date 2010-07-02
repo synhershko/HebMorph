@@ -30,13 +30,16 @@ namespace Lucene.Net.Analysis
     public class AddSuffixFilter : TokenFilter
     {
         private TermAttribute termAtt;
-        private char[] suffix;
+        private TypeAttribute typeAtt;
 
-        public AddSuffixFilter(TokenStream input, char[] _suffix)
+        public Dictionary<string, char[]> suffixByTokenType = null;
+
+        public AddSuffixFilter(TokenStream input, Dictionary<string, char[]> _suffixByTokenType)
             : base(input)
         {
             termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
-            this.suffix = _suffix;
+            typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
+            this.suffixByTokenType = _suffixByTokenType;
         }
 
         public override bool IncrementToken()
@@ -44,6 +47,13 @@ namespace Lucene.Net.Analysis
             if (!input.IncrementToken())
                 // reached EOS -- return null
                 return false;
+
+            if (suffixByTokenType == null)
+                return true;
+
+            char[] suffix;
+            if (!suffixByTokenType.TryGetValue(typeAtt.Type(), out suffix))
+                return true;
 
             char[] buffer = termAtt.TermBuffer();
             int length = termAtt.TermLength();

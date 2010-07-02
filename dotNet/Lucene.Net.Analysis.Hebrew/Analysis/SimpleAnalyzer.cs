@@ -34,8 +34,16 @@ namespace Lucene.Net.Analysis.Hebrew
         public static readonly HebMorph.DataStructures.DictRadix<int> PrefixTree = HebMorph.HSpell.LingInfo.BuildPrefixTree(false);
 
         private bool enableStopPositionIncrements = true;
+        private Dictionary<string, char[]> suffixByTokenType = null;
 
-        public String termsSuffix = null;
+        public void RegisterSuffix(String tokenType, String suffix)
+        {
+            if (suffixByTokenType == null)
+                suffixByTokenType = new Dictionary<string, char[]>();
+
+            if (!suffixByTokenType.ContainsKey(tokenType))
+                suffixByTokenType.Add(tokenType, suffix.ToCharArray());
+        }
 
         // TODO: Support loading external stop lists
 
@@ -44,7 +52,6 @@ namespace Lucene.Net.Analysis.Hebrew
             public Tokenizer source;
             public TokenStream result;
         };
-
 
         public override TokenStream ReusableTokenStream(string fieldName, System.IO.TextReader reader)
         {
@@ -64,8 +71,8 @@ namespace Lucene.Net.Analysis.Hebrew
                 // TODO: Apply LowerCaseFilter to NonHebrew tokens only
                 streams.result = new LowerCaseFilter(streams.result);
 
-                if (!string.IsNullOrEmpty(termsSuffix))
-                    streams.result = new AddSuffixFilter(streams.result, termsSuffix.ToCharArray());
+                if (suffixByTokenType != null && suffixByTokenType.Count > 0)
+                    streams.result = new AddSuffixFilter(streams.result, suffixByTokenType);
 
                 SetPreviousTokenStream(streams);
             }
@@ -89,8 +96,8 @@ namespace Lucene.Net.Analysis.Hebrew
             // TODO: Apply LowerCaseFilter to NonHebrew tokens only
             result = new LowerCaseFilter(result);
 
-            if (!string.IsNullOrEmpty(termsSuffix))
-                result = new AddSuffixFilter(result, termsSuffix.ToCharArray());
+            if (suffixByTokenType != null && suffixByTokenType.Count > 0)
+                result = new AddSuffixFilter(result, suffixByTokenType);
 
             return result;
         }
