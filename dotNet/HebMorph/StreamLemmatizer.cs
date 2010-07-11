@@ -69,6 +69,8 @@ namespace HebMorph
             get { return _endOffset; }
         }
 
+        public bool TolerateWhenLemmatizingStream = true;
+
         public int LemmatizeNextToken(out string nextToken, IList<Token> retTokens)
         {
             retTokens.Clear();
@@ -143,7 +145,7 @@ namespace HebMorph
                         // TODO: Treat an acronym as a noun and strip affixes accordingly?
                         retTokens.Add(new HebrewToken(nextToken, 0, HebMorph.HSpell.DMask.D_ACRONYM, nextToken, 1.0f));
                     }
-                    else if (retTokens.Count == 0)
+                    else if (TolerateWhenLemmatizingStream && retTokens.Count == 0)
                     {
                         lemmas = LemmatizeTolerant(nextToken);
                         if (lemmas != null && lemmas.Count > 0)
