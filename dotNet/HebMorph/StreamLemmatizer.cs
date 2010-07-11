@@ -30,10 +30,23 @@ namespace HebMorph
         private Tokenizer _tokenizer;
 
         public StreamLemmatizer()
+            : base()
         {
         }
 
         public StreamLemmatizer(System.IO.TextReader input)
+            : base()
+        {
+            _tokenizer = new Tokenizer(input);
+        }
+
+        public StreamLemmatizer(string hspellPath, bool loadMorphologicalData, bool allowHeHasheela)
+            : base(hspellPath, loadMorphologicalData, allowHeHasheela)
+        {
+        }
+
+        public StreamLemmatizer(System.IO.TextReader input, string hspellPath, bool loadMorphologicalData, bool allowHeHasheela)
+            : base(hspellPath, loadMorphologicalData, allowHeHasheela)
         {
             _tokenizer = new Tokenizer(input);
         }

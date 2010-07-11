@@ -38,14 +38,14 @@ namespace HebMorph
         {
         }
 
-        public Lemmatizer(string hspellPath, bool loadMorpholicData, bool allowHeHasheela)
+        public Lemmatizer(string hspellPath, bool loadMorpholicalData, bool allowHeHasheela)
         {
-            InitFromHSpellFolder(hspellPath, loadMorpholicData, allowHeHasheela);
+            InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
         }
 
-        public void InitFromHSpellFolder(string path, bool loadMorpholicData, bool allowHeHasheela)
+        public void InitFromHSpellFolder(string path, bool loadMorpholicalData, bool allowHeHasheela)
         {
-            m_dict = HSpell.Loader.LoadDictionaryFromHSpellFolder(path, loadMorpholicData);
+            m_dict = HSpell.Loader.LoadDictionaryFromHSpellFolder(path, loadMorpholicalData);
             m_prefixes = HebMorph.HSpell.LingInfo.BuildPrefixTree(allowHeHasheela);
             m_IsInitialized = true;
         }
