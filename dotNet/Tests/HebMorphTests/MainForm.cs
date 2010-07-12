@@ -161,11 +161,23 @@ namespace TestApplication
                 LoggerWriteLine("------");
             }
         }
-        
-        private void btnTestCoverage_Click(object sender, EventArgs e)
+
+        private void btnTestRadix_Click(object sender, EventArgs e)
         {
-            //DictionaryCoverageTester dct = new DictionaryCoverageTester();
-            //dct.ShowDialog();
+            DictRadix<int> r = new DictRadix<int>(); ;
+            r.AddNode("abcdef", 5);
+            r.AddNode("ab", 11);
+            r.AddNode("abcd", 115);
+            r.AddNode("aaa", 41);
+            r.AddNode("abc", 111);
+            r.AddNode("a", 101);
+            r.AddNode("bb", 22);
+
+            DictRadix<int>.RadixEnumerator en = r.GetEnumerator() as DictRadix<int>.RadixEnumerator;
+            while (en.MoveNext())
+            {
+                System.Diagnostics.Trace.WriteLine(string.Format("{0} {1}", en.CurrentKey, en.Current.ToString()));
+            }
         }
     }
 }

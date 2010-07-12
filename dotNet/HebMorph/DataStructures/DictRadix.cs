@@ -25,8 +25,103 @@ namespace HebMorph.DataStructures
     using System.Collections.Generic;
     using ToleranceFuncDelegate = HebMorph.LookupTolerators.ToleranceFuncDelegate;
 
-    public class DictRadix<T>
+    public class DictRadix<T> : IEnumerable<T>
     {
+        public class RadixEnumerator : IEnumerator<T>
+        {
+            private DictRadix<T> radix;
+            private LinkedList<DictRadix<T>.DictNode> nodesPath;
+
+            public RadixEnumerator(DictRadix<T> r)
+            {
+                this.radix = r;
+                nodesPath = new LinkedList<DictRadix<T>.DictNode>();
+                nodesPath.AddLast(radix.m_root);
+            }
+
+            #region IEnumerator Members
+            
+            object System.Collections.IEnumerator.Current
+            {
+                get { return nodesPath.Last.Value.Value; }
+            }
+
+            public string CurrentKey
+            {
+                get
+                {
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    foreach(DictRadix<T>.DictNode dn in nodesPath)
+                    {
+                        sb.Append(dn._Key);
+                    }
+                    return sb.ToString();
+                }
+            }
+
+            public bool MoveNext()
+            {
+                bool goUp = false;
+
+                while (nodesPath.Count > 0)
+                {
+                    DictRadix<T>.DictNode n = nodesPath.Last.Value;
+                    if (goUp || n.Children == null || n.Children.Length == 0)
+                    {
+                        nodesPath.RemoveLast();
+                        if (nodesPath.Count == 0) break;
+                        for (int i = 0; i < nodesPath.Last.Value.Children.Length; i++)
+                        {
+                            // Move to the next child
+                            if (nodesPath.Last.Value.Children[i] == n
+                                && i + 1 < nodesPath.Last.Value.Children.Length)
+                            {
+                                nodesPath.AddLast(nodesPath.Last.Value.Children[i + 1]);
+                                if (!object.Equals(nodesPath.Last.Value.Value, default(T)))
+                                    return true;
+                                break;
+                            }
+                        }
+                        goUp = true;
+                    }
+                    else
+                    {
+                        nodesPath.AddLast(n.Children[0]);
+                        goUp = false;
+                        if (!object.Equals(n.Children[0].Value, default(T)))
+                            return true;
+                    }
+                }
+                return false;
+            }
+
+            public void Reset()
+            {
+                nodesPath.Clear();
+                nodesPath.AddLast(radix.m_root);
+            }
+
+            #endregion
+
+            #region IEnumerator<T> Members
+
+            public T Current
+            {
+                get { return nodesPath.Last.Value.Value; }
+            }
+
+            #endregion
+
+            #region IDisposable Members
+
+            public void Dispose()
+            {
+                // Nothing to dispose of
+            }
+
+            #endregion
+        }
+
         public class DictNode
         {
             public char[] _Key;
@@ -80,16 +175,15 @@ namespace HebMorph.DataStructures
                 if (cur.Children == null)
                     return;
 
-                System.Diagnostics.Trace.WriteLine("--------------------------");
-                System.Diagnostics.Trace.WriteLine(string.Format("Processing children for word {0}", mc.Word));
+                //System.Diagnostics.Trace.WriteLine("--------------------------");
+                //System.Diagnostics.Trace.WriteLine(string.Format("Processing children for word {0}", mc.Word));
                 for (byte childPos = 0; childPos < cur.Children.Length; childPos++)
                 {
                     DictNode child = cur.Children[childPos];
-
                     DoKeyMatching(child, 0, mc);
                 }
-                System.Diagnostics.Trace.WriteLine(string.Format("Completed processing node children for word {0}", mc.Word));
-                System.Diagnostics.Trace.WriteLine("--------------------------");
+                //System.Diagnostics.Trace.WriteLine(string.Format("Completed processing node children for word {0}", mc.Word));
+                //System.Diagnostics.Trace.WriteLine("--------------------------");
             }
 
             private void DoKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc)
@@ -105,7 +199,7 @@ namespace HebMorph.DataStructures
                         byte? tret = tf(key, ref tmpKeyPos, mc.Word, ref tmpScore, node._Key[nodeKeyPos]);
                         if (tret != null)
                         {
-                            System.Diagnostics.Trace.WriteLine(string.Format("{0} tolerated a char, attempting word {1}", tf.Method.Name, mc.Word + node._Key[nodeKeyPos]));
+                            //System.Diagnostics.Trace.WriteLine(string.Format("{0} tolerated a char, attempting word {1}", tf.Method.Name, mc.Word + node._Key[nodeKeyPos]));
 
                             string consumedLetters = string.Empty;
                             if (((byte)tret > 0) && ((byte)tret <= node._Key.Length))
@@ -122,7 +216,7 @@ namespace HebMorph.DataStructures
                     if (node._Key[nodeKeyPos] != key[currentKeyPos])
                         break;
 
-                    System.Diagnostics.Trace.WriteLine(string.Format("Matched char: {0}", key[currentKeyPos]));
+                    //System.Diagnostics.Trace.WriteLine(string.Format("Matched char: {0}", key[currentKeyPos]));
                     currentKeyPos++;
                     nodeKeyPos++;
                 }
@@ -131,7 +225,7 @@ namespace HebMorph.DataStructures
                 {
                     if (currentKeyPos == key.Length)
                     {
-                        System.Diagnostics.Trace.WriteLine(string.Format("Consumed the whole key"));
+                        //System.Diagnostics.Trace.WriteLine(string.Format("Consumed the whole key"));
                         if (node.Value != null)
                             resultSet.Add(
                                 new LookupResult(mc.Word + new string(node._Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
@@ -353,7 +447,14 @@ namespace HebMorph.DataStructures
                         // We consumed both the child's key and the requested key
                         else if (n == child._Key.Length && keyLength == keyPos)
                         {
-                            // TODO: Do we allow overriding data? perhaps have compile switches for this?
+                            if (object.Equals(child.Value, default(T)))
+                            {
+                                child.Value = data;
+                            }
+                            else
+                            {
+                                // TODO: Do we allow overriding data? perhaps have compile switches for this?
+                            }
                             return;
                         }
                     }
@@ -373,5 +474,23 @@ namespace HebMorph.DataStructures
                 }
             }
         }
+
+        #region IEnumerable<T> Members
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return (IEnumerator<T>)new RadixEnumerator(this);
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return (System.Collections.IEnumerator)new RadixEnumerator(this);
+        }
+
+        #endregion
     }
 }

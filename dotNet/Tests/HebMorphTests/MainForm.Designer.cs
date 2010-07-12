@@ -33,6 +33,7 @@ namespace TestApplication
             System.Windows.Forms.Label label2;
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox2;
+            this.btnTestRadix = new System.Windows.Forms.Button();
             this.btnCheck = new System.Windows.Forms.Button();
             this.txbCheck = new System.Windows.Forms.TextBox();
             this.txbLogger = new System.Windows.Forms.TextBox();
@@ -42,7 +43,6 @@ namespace TestApplication
             this.button1 = new System.Windows.Forms.Button();
             this.btnLoadHSpellFolder = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnTestCoverage = new System.Windows.Forms.Button();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             groupBox4 = new System.Windows.Forms.GroupBox();
             label2 = new System.Windows.Forms.Label();
@@ -64,7 +64,7 @@ namespace TestApplication
             // 
             // splitContainer1.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(this.btnTestCoverage);
+            splitContainer1.Panel1.Controls.Add(this.btnTestRadix);
             splitContainer1.Panel1.Controls.Add(groupBox4);
             splitContainer1.Panel1.Controls.Add(groupBox3);
             // 
@@ -75,6 +75,16 @@ namespace TestApplication
             splitContainer1.Size = new System.Drawing.Size(907, 392);
             splitContainer1.SplitterDistance = 583;
             splitContainer1.TabIndex = 12;
+            // 
+            // btnTestRadix
+            // 
+            this.btnTestRadix.Location = new System.Drawing.Point(3, 3);
+            this.btnTestRadix.Name = "btnTestRadix";
+            this.btnTestRadix.Size = new System.Drawing.Size(145, 28);
+            this.btnTestRadix.TabIndex = 12;
+            this.btnTestRadix.Text = "Test Radix";
+            this.btnTestRadix.UseVisualStyleBackColor = true;
+            this.btnTestRadix.Click += new System.EventHandler(this.btnTestRadix_Click);
             // 
             // groupBox4
             // 
@@ -230,16 +240,6 @@ namespace TestApplication
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Dictionary viewer";
             // 
-            // btnTestCoverage
-            // 
-            this.btnTestCoverage.Location = new System.Drawing.Point(3, 3);
-            this.btnTestCoverage.Name = "btnTestCoverage";
-            this.btnTestCoverage.Size = new System.Drawing.Size(145, 28);
-            this.btnTestCoverage.TabIndex = 12;
-            this.btnTestCoverage.Text = "Test dictionary coverage";
-            this.btnTestCoverage.UseVisualStyleBackColor = true;
-            this.btnTestCoverage.Click += new System.EventHandler(this.btnTestCoverage_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -273,7 +273,7 @@ namespace TestApplication
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button btnTestCoverage;
+        private System.Windows.Forms.Button btnTestRadix;
     }
 }
 
