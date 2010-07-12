@@ -105,7 +105,7 @@ namespace HebMorph
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
-            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>();
+            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
             MorphData md = m_dict.Lookup(word);
             if (md != null)
@@ -148,7 +148,7 @@ namespace HebMorph
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
-            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>();
+            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
             byte prefLen = 0;
             int prefixMask;

@@ -24,8 +24,12 @@ namespace HebMorph.DataStructures
     using System;
     using System.Collections.Generic;
 
+    public enum SortOrder { Asc, Desc };
+
     public class RealSortedList<T> : List<T>
     {
+        protected SortOrder sortOrder = SortOrder.Asc;
+
         #region Constructors
         public RealSortedList()
             : base()
@@ -40,6 +44,24 @@ namespace HebMorph.DataStructures
         public RealSortedList(int capacity)
             : base(capacity)
         {
+        }
+
+        public RealSortedList(SortOrder _sortOrder)
+            : base()
+        {
+            this.sortOrder = _sortOrder;
+        }
+
+        public RealSortedList(IEnumerable<T> collection, SortOrder _sortOrder)
+            : base(collection)
+        {
+            this.sortOrder = _sortOrder;
+        }
+
+        public RealSortedList(int capacity, SortOrder _sortOrder)
+            : base(capacity)
+        {
+            this.sortOrder = _sortOrder;
         }
         #endregion
 
@@ -68,12 +90,13 @@ namespace HebMorph.DataStructures
                 return;
             }
 
-            int i = 0;
+            int i = 0, cmp = 0;
             Comparer<T> comparer = Comparer<T>.Default;
             List<T>.Enumerator en = GetEnumerator();
             while (en.MoveNext())
             {
-                if (comparer.Compare(en.Current, item) < 0)
+                cmp = comparer.Compare(en.Current, item);
+                if ((sortOrder == SortOrder.Desc && cmp < 0) || (sortOrder == SortOrder.Asc && cmp > 0))
                     break;
 
                 i++;
