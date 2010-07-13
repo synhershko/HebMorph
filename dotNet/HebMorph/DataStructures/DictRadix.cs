@@ -267,6 +267,9 @@ namespace HebMorph.DataStructures
                 // No children, but key is definitely a descendant
                 if (cur.Children == null)
                 {
+                    // TODO: This assumes cur has a value and therefore is a leaf, hence we branch
+                    // instead of merging keys. Is this always the case?
+
                     DictNode newChild = new DictNode();
                     newChild._Key = new char[keyLength - keyPos];
                     Array.Copy(key, keyPos, newChild._Key, 0, newChild._Key.Length);
@@ -320,13 +323,22 @@ namespace HebMorph.DataStructures
                             child._Key = childNewKey;
 
                             bridgeChild.Children = new DictNode[2];
-                            bridgeChild.Children[0] = child;
 
                             DictNode newNode = new DictNode();
                             newNode._Key = new char[keyLength - keyPos];
                             Array.Copy(key, keyPos, newNode._Key, 0, newNode._Key.Length);
                             newNode.Value = data;
-                            bridgeChild.Children[1] = newNode;
+
+                            if (child._Key[0].CompareTo(newNode._Key[0]) < 0)
+                            {
+                                bridgeChild.Children[0] = child;
+                                bridgeChild.Children[1] = newNode;
+                            }
+                            else
+                            {
+                                bridgeChild.Children[0] = newNode;
+                                bridgeChild.Children[1] = child;
+                            }
 
                             cur.Children[childPos] = bridgeChild;
 
@@ -382,9 +394,23 @@ namespace HebMorph.DataStructures
                     Array.Copy(key, keyPos, newChild._Key, 0, newChild._Key.Length);
                     newChild.Value = data;
 
-                    Array.Resize<DictNode>(ref cur.Children, cur.Children.Length + 1);
-                    cur.Children[cur.Children.Length - 1] = newChild;
+                    DictNode[] newArray = new DictNode[cur.Children.Length + 1];
+                    int curPos = 0;
+                    for (; curPos < cur.Children.Length; ++curPos)
+                    {
+                        if (newChild._Key[0].CompareTo(cur.Children[curPos]._Key[0]) < 0)
+                            break;
+                        newArray[curPos] = cur.Children[curPos];
+                    }
+                    newArray[curPos] = newChild;
+                    for (; curPos < cur.Children.Length; ++curPos)
+                    {
+                        newArray[curPos + 1] = cur.Children[curPos];
+                    }
+                    cur.Children = newArray;
+
                     m_nCount++;
+
                     return;
                 }
             }

@@ -176,6 +176,8 @@ namespace TestApplication
             r.AddNode("bb", 221);
             r.AddNode("def", 22);
             r.AddNode("deg", 33);
+            r.AddNode("deg", 33);
+            r.AddNode("cfg", 3222);
 
             DictRadix<object>.RadixEnumerator en = r.GetEnumerator() as DictRadix<object>.RadixEnumerator;
             while (en.MoveNext())
