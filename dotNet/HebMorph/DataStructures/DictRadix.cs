@@ -27,102 +27,6 @@ namespace HebMorph.DataStructures
 
     public class DictRadix<T> : IEnumerable<T>
     {
-        public class RadixEnumerator : IEnumerator<T>
-        {
-            private DictRadix<T> radix;
-            private LinkedList<DictRadix<T>.DictNode> nodesPath;
-
-            public RadixEnumerator(DictRadix<T> r)
-            {
-                this.radix = r;
-                nodesPath = new LinkedList<DictRadix<T>.DictNode>();
-                nodesPath.AddLast(radix.m_root);
-            }
-
-            #region IEnumerator Members
-            
-            object System.Collections.IEnumerator.Current
-            {
-                get { return nodesPath.Last.Value.Value; }
-            }
-
-            public string CurrentKey
-            {
-                get
-                {
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    foreach(DictRadix<T>.DictNode dn in nodesPath)
-                    {
-                        sb.Append(dn._Key);
-                    }
-                    return sb.ToString();
-                }
-            }
-
-            public bool MoveNext()
-            {
-                bool goUp = false;
-
-                while (nodesPath.Count > 0)
-                {
-                    DictRadix<T>.DictNode n = nodesPath.Last.Value;
-                    if (goUp || n.Children == null || n.Children.Length == 0)
-                    {
-                        nodesPath.RemoveLast();
-                        if (nodesPath.Count == 0) break;
-                        goUp = true;
-                        for (int i = 0; i < nodesPath.Last.Value.Children.Length; i++)
-                        {
-                            // Move to the next child
-                            if (nodesPath.Last.Value.Children[i] == n
-                                && i + 1 < nodesPath.Last.Value.Children.Length)
-                            {
-                                nodesPath.AddLast(nodesPath.Last.Value.Children[i + 1]);
-                                if (!object.Equals(nodesPath.Last.Value.Value, default(T)))
-                                    return true;
-                                goUp = false;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        nodesPath.AddLast(n.Children[0]);
-                        goUp = false;
-                        if (!object.Equals(n.Children[0].Value, default(T)))
-                            return true;
-                    }
-                }
-                return false;
-            }
-
-            public void Reset()
-            {
-                nodesPath.Clear();
-                nodesPath.AddLast(radix.m_root);
-            }
-
-            #endregion
-
-            #region IEnumerator<T> Members
-
-            public T Current
-            {
-                get { return nodesPath.Last.Value.Value; }
-            }
-
-            #endregion
-
-            #region IDisposable Members
-
-            public void Dispose()
-            {
-                // Nothing to dispose of
-            }
-
-            #endregion
-        }
-
         public class DictNode
         {
             public char[] _Key;
@@ -247,6 +151,9 @@ namespace HebMorph.DataStructures
         protected DictNode m_root;
         public DictNode RootNode { get { return m_root; } }
 
+        protected int m_nCount = 0;
+        public int Count { get { return m_nCount; } }
+
         public DictRadix()
         {
             m_root = new DictNode();
@@ -357,7 +264,7 @@ namespace HebMorph.DataStructures
             DictNode cur = m_root;
             while (cur != null)
             {
-                // No children, but key is definately a descendant
+                // No children, but key is definitely a descendant
                 if (cur.Children == null)
                 {
                     DictNode newChild = new DictNode();
@@ -367,6 +274,7 @@ namespace HebMorph.DataStructures
 
                     cur.Children = new DictNode[1];
                     cur.Children[0] = newChild;
+                    m_nCount++;
                     return;
                 }
 
@@ -422,6 +330,8 @@ namespace HebMorph.DataStructures
 
                             cur.Children[childPos] = bridgeChild;
 
+                            m_nCount++;
+
                             return;
                         }
                         // We consumed the requested key, but the there's still more chars in the child's key
@@ -442,6 +352,8 @@ namespace HebMorph.DataStructures
                             newChild.Value = data;
 
                             cur.Children[childPos] = newChild;
+                            
+                            m_nCount++;
 
                             return;
                         }
@@ -451,6 +363,7 @@ namespace HebMorph.DataStructures
                             if (object.Equals(child.Value, default(T)))
                             {
                                 child.Value = data;
+                                m_nCount++;
                             }
                             else
                             {
@@ -471,9 +384,107 @@ namespace HebMorph.DataStructures
 
                     Array.Resize<DictNode>(ref cur.Children, cur.Children.Length + 1);
                     cur.Children[cur.Children.Length - 1] = newChild;
+                    m_nCount++;
                     return;
                 }
             }
+        }
+
+        #region Enumeration support
+        public class RadixEnumerator : IEnumerator<T>
+        {
+            private DictRadix<T> radix;
+            private LinkedList<DictRadix<T>.DictNode> nodesPath;
+
+            public RadixEnumerator(DictRadix<T> r)
+            {
+                this.radix = r;
+                nodesPath = new LinkedList<DictRadix<T>.DictNode>();
+                nodesPath.AddLast(radix.m_root);
+            }
+
+            #region IEnumerator Members
+
+            object System.Collections.IEnumerator.Current
+            {
+                get { return nodesPath.Last.Value.Value; }
+            }
+
+            public string CurrentKey
+            {
+                get
+                {
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    foreach (DictRadix<T>.DictNode dn in nodesPath)
+                    {
+                        sb.Append(dn._Key);
+                    }
+                    return sb.ToString();
+                }
+            }
+
+            public bool MoveNext()
+            {
+                bool goUp = false;
+
+                while (nodesPath.Count > 0)
+                {
+                    DictRadix<T>.DictNode n = nodesPath.Last.Value;
+                    if (goUp || n.Children == null || n.Children.Length == 0)
+                    {
+                        nodesPath.RemoveLast();
+                        if (nodesPath.Count == 0) break;
+                        goUp = true;
+                        for (int i = 0; i < nodesPath.Last.Value.Children.Length; i++)
+                        {
+                            // Move to the next child
+                            if (nodesPath.Last.Value.Children[i] == n
+                                && i + 1 < nodesPath.Last.Value.Children.Length)
+                            {
+                                nodesPath.AddLast(nodesPath.Last.Value.Children[i + 1]);
+                                if (!object.Equals(nodesPath.Last.Value.Value, default(T)))
+                                    return true;
+                                goUp = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        nodesPath.AddLast(n.Children[0]);
+                        goUp = false;
+                        if (!object.Equals(n.Children[0].Value, default(T)))
+                            return true;
+                    }
+                }
+                return false;
+            }
+
+            public void Reset()
+            {
+                nodesPath.Clear();
+                nodesPath.AddLast(radix.m_root);
+            }
+
+            #endregion
+
+            #region IEnumerator<T> Members
+
+            public T Current
+            {
+                get { return nodesPath.Last.Value.Value; }
+            }
+
+            #endregion
+
+            #region IDisposable Members
+
+            public void Dispose()
+            {
+                // Nothing to dispose of
+            }
+
+            #endregion
         }
 
         #region IEnumerable<T> Members
@@ -491,6 +502,8 @@ namespace HebMorph.DataStructures
         {
             return (System.Collections.IEnumerator)new RadixEnumerator(this);
         }
+
+        #endregion
 
         #endregion
     }
