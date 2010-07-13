@@ -70,6 +70,7 @@ namespace HebMorph.DataStructures
                     {
                         nodesPath.RemoveLast();
                         if (nodesPath.Count == 0) break;
+                        goUp = true;
                         for (int i = 0; i < nodesPath.Last.Value.Children.Length; i++)
                         {
                             // Move to the next child
@@ -79,10 +80,10 @@ namespace HebMorph.DataStructures
                                 nodesPath.AddLast(nodesPath.Last.Value.Children[i + 1]);
                                 if (!object.Equals(nodesPath.Last.Value.Value, default(T)))
                                     return true;
+                                goUp = false;
                                 break;
                             }
                         }
-                        goUp = true;
                     }
                     else
                     {

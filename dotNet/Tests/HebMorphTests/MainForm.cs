@@ -164,16 +164,20 @@ namespace TestApplication
 
         private void btnTestRadix_Click(object sender, EventArgs e)
         {
-            DictRadix<int> r = new DictRadix<int>(); ;
+            DictRadix<object> r = new DictRadix<object>(); ;
             r.AddNode("abcdef", 5);
             r.AddNode("ab", 11);
             r.AddNode("abcd", 115);
             r.AddNode("aaa", 41);
             r.AddNode("abc", 111);
             r.AddNode("a", 101);
-            r.AddNode("bb", 22);
+            r.AddNode("bba", 22);
+            r.AddNode("bbc", 22);
+            r.AddNode("bb", 221);
+            r.AddNode("def", 22);
+            r.AddNode("deg", 33);
 
-            DictRadix<int>.RadixEnumerator en = r.GetEnumerator() as DictRadix<int>.RadixEnumerator;
+            DictRadix<object>.RadixEnumerator en = r.GetEnumerator() as DictRadix<object>.RadixEnumerator;
             while (en.MoveNext())
             {
                 System.Diagnostics.Trace.WriteLine(string.Format("{0} {1}", en.CurrentKey, en.Current.ToString()));
