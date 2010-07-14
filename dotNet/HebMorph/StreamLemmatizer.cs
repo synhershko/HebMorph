@@ -99,7 +99,8 @@ namespace HebMorph
                     // Ignore "words" which are actually only prefixes in a single word.
                     // This first case is easy to spot, since the prefix and the following word will be
                     // separated by a dash marked as a construct (סמיכות) by the Tokenizer
-                    if ((tokenType & Tokenizer.TokenType.Construct) > 0)
+                    if ((tokenType & Tokenizer.TokenType.Construct) > 0
+                        || (tokenType & Tokenizer.TokenType.Acronym) > 0)
                     {
                         if (IsLegalPrefix(nextToken))
                         {
@@ -118,7 +119,7 @@ namespace HebMorph
 
                         // Re-detect acronym, in case it was a false positive
                         if (nextToken.IndexOf('"') == -1)
-                            tokenType |= ~Tokenizer.TokenType.Acronym;
+                            tokenType &= ~Tokenizer.TokenType.Acronym;
                     }
 
                     // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the

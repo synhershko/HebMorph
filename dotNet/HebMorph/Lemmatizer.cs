@@ -115,6 +115,17 @@ namespace HebMorph
                     ret.AddUnique(new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f));
                 }
             }
+            else if (word.EndsWith("'")) // Try ommitting closing Geresh
+            {
+                md = m_dict.Lookup(word.Substring(0, word.Length - 1));
+                if (md != null)
+                {
+                    for (int result = 0; result < md.Lemmas.Length; result++)
+                    {
+                        ret.AddUnique(new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f));
+                    }
+                }
+            }
 
             byte prefLen = 0;
             int prefixMask;

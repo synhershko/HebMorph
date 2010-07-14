@@ -37,14 +37,29 @@ namespace HebMorph
             Acronym = 16,
         }
 
+        public static readonly char[] Geresh = new char[] { '\'' };
+        public static readonly char[] Gershayim = new char[] { '\"' };
+        public static readonly char[] CharsFollowingPrefixes = new char[] { '"', '\'', '-' };
+        public static readonly char[] LettersAcceptingGeresh = new char[] { 'ז', 'ג', 'ץ', 'צ', 'ח' };
+
+        public static bool IsOfChars(char c, char[] options)
+        {
+            foreach (char o in options)
+                if (c == o) return true;
+            return false;
+        }
+        public static bool IsHebrewLetter(char c)
+        {
+            return (c >= 1488 && c <= 1514);
+        }
+        public static bool IsNiqqudChar(char c)
+        {
+            return (c >= 1455 && c <= 1476);
+        }
+
         private System.IO.TextReader input;
         private int dataLen = 0, inputOffset = 0;
-
-        public int Offset
-        {
-            get { return inputOffset; }
-            //set { inputOffset = value; }
-        }
+        public int Offset { get { return inputOffset; } }
 
         private const int IO_BUFFER_SIZE = 4096;
         private char[] ioBuffer = new char[IO_BUFFER_SIZE];
@@ -104,7 +119,7 @@ namespace HebMorph
                     else
                         break; // Tokenize on everything else
                 }
-                else if ((c >= 1488 && c <= 1514) || (c >= 1455 && c <= 1476)) // HEBREW || NIQQUD
+                else if (IsHebrewLetter(c) || (length > 0 && IsNiqqudChar(c))) // HEBREW || (NIQQUD if not first char)
                 {
                     tokenType |= TokenType.Hebrew;
                     appendCurrentChar = true;
@@ -124,10 +139,24 @@ namespace HebMorph
 
                     appendCurrentChar = true;
                 }
-                else if ((c == '"' || c == '\'') && length > 0)
+                else if (c == '"' && length > 0)
                 {
-                    // TODO: Support שה"שםעצם...
-                    // TODO: Handle cases which are similar to Merchaot - ה'חלל הפנוי'
+                    // Tokenize if previous char wasn't part of a word
+                    if (!IsHebrewLetter(wordBuffer[length - 1]) && !IsNiqqudChar(wordBuffer[length - 1]))
+                        break;
+
+                    // TODO: Is it possible to support cases like שה"שםעצם in the tokenizer?
+                    tokenType |= TokenType.Acronym;
+                    appendCurrentChar = true;
+                }
+                else if (c == '\'' && length > 0)
+                {
+                    // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
+                    if (!IsHebrewLetter(wordBuffer[length - 1]) && !IsNiqqudChar(wordBuffer[length - 1])
+                        && wordBuffer[length - 1] != '\'')
+                        break;
+
+                    // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
                     tokenType |= TokenType.Acronym;
                     appendCurrentChar = true;
                 }
@@ -151,17 +180,31 @@ namespace HebMorph
                         // buffer overflow!
                         break;
 
-                    wordBuffer[length++] = c; // TODO: Normalize?
+                    // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
+                    if (c == '\'')
+                    {
+                        if (wordBuffer[length - 1] == c)
+                            wordBuffer[length - 1] = '"';
+                        else if (IsOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
+                            wordBuffer[length++] = c;
+                    }
+                    else
+                        wordBuffer[length++] = c; // TODO: Normalize c
                 }
             }
 
             if (wordBuffer[length - 1] == '"')
-                wordBuffer[--length] = '\0';
-            else if (wordBuffer[length - 1] == '\'')
             {
-                // TODO: Only trim the word's end if it isn't one-char in length, and doesn't end with
-                // ג, צ, ץ, ז - all letters which it may mean something for, or ה (Hashem)
                 wordBuffer[--length] = '\0';
+            }
+            // Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
+            if (length > 2 && wordBuffer[length - 1] == '\'')
+            {
+                // All letters which this Geresh may mean something for
+                if (!IsOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
+                    wordBuffer[--length] = '\0';
+                // TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
+                // TODO: Handle ה (Hashem)
             }
 
             tokenString = new string(wordBuffer, 0, length);
