@@ -20,7 +20,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  **************************************************************************/
 package hebmorph;
-
+ 
 import hebmorph.datastructures.DictRadix;
 import hebmorph.datastructures.RealSortedList;
 import hebmorph.datastructures.RealSortedList.SortOrder;
