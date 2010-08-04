@@ -19,7 +19,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  **************************************************************************/
-
 package hebmorph;
 
 public final class Reference<T>

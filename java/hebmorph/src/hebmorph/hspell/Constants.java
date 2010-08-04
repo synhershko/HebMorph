@@ -21,7 +21,6 @@
  ***************************************************************************/
 package hebmorph.hspell;
 
-
 public final class Constants
 {
 	public static final String DictionaryFile = "hebrew.wgz";

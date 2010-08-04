@@ -19,11 +19,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  **************************************************************************/
-
 package hebmorph;
 
 import hebmorph.hspell.LingInfo;
-
 
 public class HebrewToken extends Token implements Comparable
 {

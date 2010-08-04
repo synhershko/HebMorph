@@ -29,8 +29,6 @@ import hebmorph.hspell.Loader;
 import java.io.IOException;
 import java.util.List;
 
-
-
 public class Lemmatizer
 {
 	private DictRadix<MorphData> m_dict;
