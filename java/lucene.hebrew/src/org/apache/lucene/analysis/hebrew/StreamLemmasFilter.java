@@ -56,25 +56,21 @@ public class StreamLemmasFilter extends Tokenizer
 	private String previousLemma = null;
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
-	//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
 		init(input, _lemmatizer, null, false);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, boolean alwaysSaveMarkedOriginal)
-		//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
 		init(input, _lemmatizer, null, alwaysSaveMarkedOriginal);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
-	//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
 		init(input, _lemmatizer, _lemmaFilter, alwaysSaveMarkedOriginal);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
-	//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
 		init(input, _lemmatizer, _lemmaFilter, false);
 	}
