@@ -114,7 +114,7 @@ namespace HebMorph.HSpell
 
             if (bLoadMorphData)
             {
-                // Load the count of morphologic data slots required
+                // Load the count of morphological data slots required
                 string sizesFile = File.ReadAllText(path + HSpell.Constants.SizesFile);
                 int lookupLen = sizesFile.IndexOf(' ', sizesFile.IndexOf('\n'));
                 lookupLen = Convert.ToInt32(sizesFile.Substring(lookupLen + 1));
