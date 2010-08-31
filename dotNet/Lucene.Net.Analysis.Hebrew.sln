@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Hebrew", "Lucene.Net.Analysis.Hebrew\Lucene.Net.Hebrew.csproj", "{53318212-385E-457B-8E5F-DDB117032A86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuceneNetHebrewTests", "Tests\LuceneNetHebrewTests\LuceneNetHebrewTests.csproj", "{0E8A4BB0-7712-4493-AF9B-E58D3E3CFB88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HebrewEnabledSearcher", "Tests\HebrewEnabledSearcher\HebrewEnabledSearcher.csproj", "{0E8A4BB0-7712-4493-AF9B-E58D3E3CFB88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HebMorph", "HebMorph\HebMorph.csproj", "{EF21A9E0-8FEE-43CD-8D60-B3696E033FED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{855A6247-240A-476E-8563-6C061D17570E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HebMorphTests", "Tests\HebMorphTests\HebMorphTests.csproj", "{B14DF4D5-9681-4479-910B-43A100F8C50E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualHebMorph", "Tests\VisualHebMorph\VisualHebMorph.csproj", "{B14DF4D5-9681-4479-910B-43A100F8C50E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net", "..\..\..\Dev\Libraries\Lucene.Net\trunk\C#\src\Lucene.Net\Lucene.Net.csproj", "{5D4AD9BE-1FFB-41AB-9943-25737971BF57}"
 EndProject

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HebMorph", "HebMorph\HebMor
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HebMorphTests", "Tests\HebMorphTests\HebMorphTests.csproj", "{B14DF4D5-9681-4479-910B-43A100F8C50E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualHebMorph", "Tests\VisualHebMorph\VisualHebMorph.csproj", "{B14DF4D5-9681-4479-910B-43A100F8C50E}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"

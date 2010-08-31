@@ -9,7 +9,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers;
 
-namespace LuceneNetHebrewTests.Tests
+namespace HebrewEnabledSearcher.Tests
 {
     public class BasicHebrewTests
     {

@@ -1,4 +1,4 @@
-namespace LuceneNetHebrewTests
+namespace HebrewEnabledSearcher
 {
     partial class MainForm
     {
@@ -116,7 +116,7 @@ namespace LuceneNetHebrewTests
             this.Controls.Add(btnInitAnalyzer);
             this.Controls.Add(this.btnIndexAddFolder);
             this.Name = "MainForm";
-            this.Text = "Lucene.Net Hebrew Searches Tester Application";
+            this.Text = "Hebrew-enabled full-text searcher using Lucene.Net and HebMorph";
             ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

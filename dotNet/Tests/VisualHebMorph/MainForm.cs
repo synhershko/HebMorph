@@ -10,7 +10,7 @@ using System.Diagnostics;
 using HebMorph;
 using HebMorph.DataStructures;
 
-namespace TestApplication
+namespace VisualHebMorph
 {
     public partial class MainForm : Form
     {

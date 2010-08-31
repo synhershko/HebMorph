@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0E8A4BB0-7712-4493-AF9B-E58D3E3CFB88}</ProjectGuid>
+    <ProjectGuid>{B14DF4D5-9681-4479-910B-43A100F8C50E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LuceneNetHebrewTests</RootNamespace>
-    <AssemblyName>LuceneNetHebrewTests</AssemblyName>
+    <RootNamespace>VisualHebMorph</RootNamespace>
+    <AssemblyName>VisualHebMorph</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,21 +68,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SearchResult.cs" />
-    <Compile Include="Tests\BasicHebrewTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Dev\Libraries\Lucene.Net\trunk\C#\src\Lucene.Net\Lucene.Net.csproj">
-      <Project>{5D4AD9BE-1FFB-41AB-9943-25737971BF57}</Project>
-      <Name>Lucene.Net</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\HebMorph\HebMorph.csproj">
       <Project>{EF21A9E0-8FEE-43CD-8D60-B3696E033FED}</Project>
       <Name>HebMorph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Lucene.Net.Analysis.Hebrew\Lucene.Net.Hebrew.csproj">
-      <Project>{53318212-385E-457B-8E5F-DDB117032A86}</Project>
-      <Name>Lucene.Net.Hebrew</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

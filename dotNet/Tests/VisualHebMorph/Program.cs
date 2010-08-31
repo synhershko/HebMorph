@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace LuceneNetHebrewTests
+namespace VisualHebMorph
 {
     static class Program
     {

@@ -1,4 +1,4 @@
-namespace TestApplication
+namespace VisualHebMorph
 {
     partial class MainForm
     {
@@ -130,9 +130,9 @@ namespace TestApplication
             label2.AutoSize = true;
             label2.Location = new System.Drawing.Point(9, 16);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(268, 13);
+            label2.Size = new System.Drawing.Size(280, 13);
             label2.TabIndex = 9;
-            label2.Text = "Type or paste text here to run morphologic profiling for it";
+            label2.Text = "Type or paste text you wish to run morphologic profiling on";
             // 
             // groupBox3
             // 
@@ -248,7 +248,7 @@ namespace TestApplication
             this.Controls.Add(splitContainer1);
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "HebMorph Test Application";
+            this.Text = "Visual HebMorph";
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             splitContainer1.ResumeLayout(false);

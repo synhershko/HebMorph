@@ -15,7 +15,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers;
 
-namespace LuceneNetHebrewTests
+namespace HebrewEnabledSearcher
 {
     public partial class MainForm : Form
     {
