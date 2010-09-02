@@ -83,7 +83,7 @@ namespace HebMorph.Tests
             DictRadix<T>.RadixEnumerator en = d.GetEnumerator() as DictRadix<T>.RadixEnumerator;
             while (en.MoveNext())
             {
-                Assert.IsTrue(nodeText.CompareTo(en.CurrentKey) < 0);
+                Assert.IsTrue(string.Compare(nodeText, en.CurrentKey, StringComparison.Ordinal) < 0);
                 nodeText = en.CurrentKey;
                 enCount++;
             }
