@@ -107,6 +107,14 @@ namespace HebMorph.HSpell
         }
         #endregion
 
+        public static int GetWordCountInHSpellFolder(string path)
+        {
+            string sizesFile = File.ReadAllText(Path.Combine(path, HSpell.Constants.SizesFile));
+            int tmp = sizesFile.IndexOf(' ', sizesFile.IndexOf('\n'));
+            tmp = Convert.ToInt32(sizesFile.Substring(tmp + 1));
+            return tmp - 1; // hspell stores the actual word count + 1
+        }
+
         public static DictRadix<MorphData> LoadDictionaryFromHSpellFolder(string path, bool bLoadMorphData)
         {
             if (path[path.Length - 1] != Path.DirectorySeparatorChar)
@@ -115,9 +123,7 @@ namespace HebMorph.HSpell
             if (bLoadMorphData)
             {
                 // Load the count of morphological data slots required
-                string sizesFile = File.ReadAllText(path + HSpell.Constants.SizesFile);
-                int lookupLen = sizesFile.IndexOf(' ', sizesFile.IndexOf('\n'));
-                lookupLen = Convert.ToInt32(sizesFile.Substring(lookupLen + 1));
+                int lookupLen = GetWordCountInHSpellFolder(path);
                 string[] lookup = new string[lookupLen + 1];
 
                 using (GZipStream fdict = new GZipStream(File.OpenRead(path + HSpell.Constants.DictionaryFile), CompressionMode.Decompress))
