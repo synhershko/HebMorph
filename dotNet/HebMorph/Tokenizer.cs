@@ -59,7 +59,13 @@ namespace HebMorph
 
         private System.IO.TextReader input;
         private int dataLen = 0, inputOffset = 0;
-        public int Offset { get { return inputOffset; } }
+        
+        /// Both are necessary since the tokenizer does some normalization when necessary, and therefore
+        /// it isn't always possible to get correct end-offset by looking at the length of the returned token
+        /// string
+        private int tokenOffset = 0, tokenLengthInSource = 0;
+        public int Offset { get { return tokenOffset; } }
+        public int LengthInSource { get { return tokenLengthInSource; } }
 
         private const int IO_BUFFER_SIZE = 4096;
         private char[] ioBuffer = new char[IO_BUFFER_SIZE];
@@ -76,7 +82,8 @@ namespace HebMorph
         // This is a job for a normalizer, anyway
         public TokenType NextToken(out string tokenString)
         {
-            int length = 0, start = ioBufferIndex;
+            int length = 0;
+            tokenOffset = -1; // invalidate
             TokenType tokenType = 0;
             while (true)
             {
@@ -92,6 +99,7 @@ namespace HebMorph
                         else
                         {
                             tokenString = string.Empty;
+                            tokenLengthInSource = 0;
                             return 0;
                         }
                     }
@@ -175,7 +183,7 @@ namespace HebMorph
                 {
                     // Consume normally
                     if (length == 0) // mark the start of a new token
-                        start = inputOffset + ioBufferIndex - 1;
+                        tokenOffset = inputOffset + ioBufferIndex - 1;
                     else if (length == wordBuffer.Length)
                         // buffer overflow!
                         break;
@@ -208,6 +216,12 @@ namespace HebMorph
             }
 
             tokenString = new string(wordBuffer, 0, length);
+
+            if (dataLen <= 0)
+                tokenLengthInSource = inputOffset - tokenOffset;
+            else
+                tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
+
             return tokenType;
         }
 

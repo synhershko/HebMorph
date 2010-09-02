@@ -81,11 +81,12 @@ namespace HebMorph
             // Used to loop over certain noise cases
             while (true)
             {
-                _startOffset = _tokenizer.Offset;
                 tokenType = _tokenizer.NextToken(out nextToken);
                 if (tokenType == 0)
                     return 0; // EOS
-                _endOffset = _tokenizer.Offset;
+
+                _startOffset = _tokenizer.Offset;
+                _endOffset = _startOffset + _tokenizer.LengthInSource;
 
                 ++currentPos;
 

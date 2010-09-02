@@ -118,7 +118,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 return false; // EOS
 
             // Store the location of the word in the original stream
-            offsetAtt.SetOffset(_streamLemmatizer.StartOffset, _streamLemmatizer.EndOffset);
+            offsetAtt.SetOffset(CorrectOffset(_streamLemmatizer.StartOffset), CorrectOffset(_streamLemmatizer.EndOffset));
 
             // A non-Hebrew word
             if (stack.Count == 1 && !(stack[0] is HebMorph.HebrewToken))

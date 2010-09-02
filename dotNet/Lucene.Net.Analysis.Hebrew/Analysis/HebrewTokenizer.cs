@@ -95,7 +95,6 @@ namespace Lucene.Net.Analysis.Hebrew
         public override bool IncrementToken()
         {
             ClearAttributes();
-            int start = hebMorphTokenizer.Offset;
 
             string nextToken;
             HebMorph.Tokenizer.TokenType tokenType;
@@ -142,7 +141,7 @@ namespace Lucene.Net.Analysis.Hebrew
             }
             termAtt.SetTermLength(nextToken.Length);
 
-            offsetAtt.SetOffset(CorrectOffset(start), CorrectOffset(start + nextToken.Length));
+            offsetAtt.SetOffset(CorrectOffset(hebMorphTokenizer.Offset), CorrectOffset(hebMorphTokenizer.Offset + hebMorphTokenizer.LengthInSource));
 
             if ((tokenType & HebMorph.Tokenizer.TokenType.Hebrew) > 0)
             {
