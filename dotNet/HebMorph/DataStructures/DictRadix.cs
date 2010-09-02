@@ -416,6 +416,12 @@ namespace HebMorph.DataStructures
             }
         }
 
+        public void Clear()
+        {
+            m_root = new DictNode();
+            m_nCount = 0;
+        }
+
         #region Enumeration support
         public class RadixEnumerator : IEnumerator<T>
         {
