@@ -154,6 +154,9 @@ namespace HebMorph.DataStructures
         protected int m_nCount = 0;
         public int Count { get { return m_nCount; } }
 
+        private bool m_bAllowValueOverride = false;
+        public bool AllowValueOverride { get { return m_bAllowValueOverride; } set { m_bAllowValueOverride = value; } }
+
         public DictRadix()
         {
             m_root = new DictNode();
@@ -377,9 +380,10 @@ namespace HebMorph.DataStructures
                                 child.Value = data;
                                 m_nCount++;
                             }
-                            else
+                            else if (m_bAllowValueOverride)
                             {
-                                // TODO: Do we allow overriding data? perhaps have compile switches for this?
+                                // Only override data if this radix object is configured to do this
+                                child.Value = data;
                             }
                             return;
                         }
