@@ -193,7 +193,10 @@ namespace HebMorph
                     {
                         if (wordBuffer[length - 1] == c)
                             wordBuffer[length - 1] = '"';
-                        else if (IsOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
+                        /*else if (IsOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
+                            wordBuffer[length++] = c;
+                         */
+                        else
                             wordBuffer[length++] = c;
                     }
                     else
