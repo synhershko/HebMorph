@@ -37,9 +37,10 @@ namespace HebMorph
             Acronym = 16,
         }
 
-        public static readonly char[] Geresh = new char[] { '\'' };
-        public static readonly char[] Gershayim = new char[] { '\"' };
-        public static readonly char[] CharsFollowingPrefixes = new char[] { '"', '\'', '-' };
+        public static readonly char[] Geresh = new char[] { '\'', '\u05F3' };
+        public static readonly char[] Gershayim = new char[] { '"', '\u05F4' };
+        public static readonly char[] Makaf = new char[] { '-' };
+        public static readonly char[] CharsFollowingPrefixes = ConcatenateCharArrays(new char[][] { Geresh, Gershayim, Makaf });
         public static readonly char[] LettersAcceptingGeresh = new char[] { 'ז', 'ג', 'ץ', 'צ', 'ח' };
 
         public static bool IsOfChars(char c, char[] options)
@@ -48,6 +49,16 @@ namespace HebMorph
                 if (c == o) return true;
             return false;
         }
+
+        public static char[] ConcatenateCharArrays(char[][] arrays)
+        {
+            List<char> ret = new List<char>();
+            foreach (char[] a in arrays)
+                ret.AddRange(a);
+
+            return ret.ToArray();
+        }
+
         public static bool IsHebrewLetter(char c)
         {
             return (c >= 1488 && c <= 1514);
@@ -147,7 +158,7 @@ namespace HebMorph
 
                     appendCurrentChar = true;
                 }
-                else if (c == '"' && length > 0)
+                else if (IsOfChars(c, Gershayim) && length > 0)
                 {
                     // Tokenize if previous char wasn't part of a word
                     if (!IsHebrewLetter(wordBuffer[length - 1]) && !IsNiqqudChar(wordBuffer[length - 1]))
@@ -157,11 +168,11 @@ namespace HebMorph
                     tokenType |= TokenType.Acronym;
                     appendCurrentChar = true;
                 }
-                else if (c == '\'' && length > 0)
+                else if (IsOfChars(c, Geresh) && length > 0)
                 {
                     // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
                     if (!IsHebrewLetter(wordBuffer[length - 1]) && !IsNiqqudChar(wordBuffer[length - 1])
-                        && wordBuffer[length - 1] != '\'')
+                        && !IsOfChars(wordBuffer[length - 1], Geresh))
                         break;
 
                     // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
@@ -171,7 +182,7 @@ namespace HebMorph
                 else if (length > 0)
                 {
                     // Flag makaf connected words as constructs
-                    if (c == '-') // TODO: Normalize or support other types of dashes too
+                    if (IsOfChars(c, Makaf)) // TODO: Normalize or support other types of dashes too
                         tokenType |= TokenType.Construct;
                     // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
 
@@ -189,7 +200,7 @@ namespace HebMorph
                         break;
 
                     // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
-                    if (c == '\'')
+                    if (IsOfChars(c, Geresh))
                     {
                         if (wordBuffer[length - 1] == c)
                             wordBuffer[length - 1] = '"';
@@ -204,12 +215,12 @@ namespace HebMorph
                 }
             }
 
-            if (wordBuffer[length - 1] == '"')
+            if (IsOfChars(wordBuffer[length - 1], Gershayim))
             {
                 wordBuffer[--length] = '\0';
             }
             // Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-            if (length > 2 && wordBuffer[length - 1] == '\'')
+            if (length > 2 && IsOfChars(wordBuffer[length - 1], Geresh))
             {
                 // All letters which this Geresh may mean something for
                 if (!IsOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
