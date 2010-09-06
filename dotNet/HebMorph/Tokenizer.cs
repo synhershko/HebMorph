@@ -215,26 +215,31 @@ namespace HebMorph
                 }
             }
 
+            // Store token's actual length in source (regardless of misc normalizations)
+            if (dataLen <= 0)
+                tokenLengthInSource = inputOffset - tokenOffset;
+            else
+                tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
+
             if (IsOfChars(wordBuffer[length - 1], Gershayim))
             {
                 wordBuffer[--length] = '\0';
+                tokenLengthInSource--; // Don't include Gershayim in the offset calculation
             }
             // Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
             if (length > 2 && IsOfChars(wordBuffer[length - 1], Geresh))
             {
                 // All letters which this Geresh may mean something for
                 if (!IsOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
+                {
                     wordBuffer[--length] = '\0';
+                    tokenLengthInSource--; // Don't include this Geresh in the offset calculation
+                }
                 // TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
                 // TODO: Handle ה (Hashem)
             }
 
             tokenString = new string(wordBuffer, 0, length);
-
-            if (dataLen <= 0)
-                tokenLengthInSource = inputOffset - tokenOffset;
-            else
-                tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
 
             return tokenType;
         }
