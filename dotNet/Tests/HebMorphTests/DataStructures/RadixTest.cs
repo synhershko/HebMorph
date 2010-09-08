@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using HebMorph.DataStructures;
 
-namespace HebMorph.Tests
+namespace HebMorph.DataStructures.Tests
 {
     [TestClass()]
     public class RadixTest
