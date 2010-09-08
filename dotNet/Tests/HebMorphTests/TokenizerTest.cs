@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+ï»¿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -62,13 +62,13 @@ namespace HebMorph.Tests
         {
             string test;
 
-            Tokenizer t = GetTokenizer("öä''ì");
+            Tokenizer t = GetTokenizer("×¦×”''×œ");
             t.NextToken(out test);
-            Assert.AreEqual<string>("öä\"ì", test);
+            Assert.AreEqual<string>("×¦×”\"×œ", test);
 
-            t = GetTokenizer("öä\u05F3\u05F3ì");
+            t = GetTokenizer("×¦×”\u05F3\u05F3×œ");
             t.NextToken(out test);
-            Assert.AreEqual<string>("öä\"ì", test);
+            Assert.AreEqual<string>("×¦×”\"×œ", test);
         }
 
         [TestMethod()]
@@ -76,9 +76,9 @@ namespace HebMorph.Tests
         {
             string test;
 
-            Tokenizer t = GetTokenizer(@"""öáà""");
+            Tokenizer t = GetTokenizer(@"""×¦×‘×""");
             t.NextToken(out test);
-            Assert.AreEqual<string>("öáà", test);
+            Assert.AreEqual<string>("×¦×‘×", test);
             Assert.AreEqual<int>(3, t.LengthInSource);
             Assert.AreEqual<int>(1, t.Offset);
         }
