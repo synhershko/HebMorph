@@ -34,9 +34,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HSpellLoaderTest.cs" />
+    <Compile Include="HSpell\HSpellLoaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RadixTest.cs" />
+    <Compile Include="DataStructures\RadixTest.cs" />
     <Compile Include="StreamLemmatizerTest.cs" />
     <Compile Include="TokenizerTest.cs" />
   </ItemGroup>
@@ -53,6 +53,9 @@
       <Project>{53318212-385E-457B-8E5F-DDB117032A86}</Project>
       <Name>Lucene.Net.Hebrew</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Lucene\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
