@@ -33,6 +33,9 @@ namespace HebMorph.LemmaFilters
 
         public virtual IList<Token> FilterCollection(IList<Token> collection, IList<Token> preallocatedOut)
         {
+            if (!NeedsFiltering(collection))
+                return null;
+
             if (preallocatedOut == null)
                 preallocatedOut = new List<Token>();
             else
@@ -47,6 +50,7 @@ namespace HebMorph.LemmaFilters
             return preallocatedOut;
         }
 
+        abstract public bool NeedsFiltering(IList<Token> collection);
         abstract public bool IsValidToken(Token t);
     }
 }

@@ -31,12 +31,9 @@ namespace HebMorph.LemmaFilters
     /// </summary>
     public class BasicLemmaFilter : LemmaFilterBase
     {
-        public override IList<Token> FilterCollection(IList<Token> collection, IList<Token> preallocatedOut)
+        public override bool NeedsFiltering(IList<Token> collection)
         {
-            if (collection.Count > 1)
-                return base.FilterCollection(collection, preallocatedOut);
-            else
-                return null;
+            return collection.Count > 1;
         }
 
         public override bool IsValidToken(Token t)
