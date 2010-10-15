@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -74,6 +77,7 @@ public class LemmatizerTest
 						"ולדן פעיל וחבר בהנהלה בעמותת רופאים לזכויות אדם וכמו כן חבר בהנהלת ארגון לתת. ולדן זכה באות לגיון הכבוד הצרפתי (Légion d'Honneur) של ממשלת צרפת בזכות על פעילותו במסגרת רופאים לזכויות אדם לקידום שיתוף הפעולה בין פלסטינים לישראלים. האות הוענק לו על ידי שר החוץ של צרפת, ברנאר קושנר, בטקס בשגרירות צרפת בתל אביב."+
 						"נשוי לבלשנית צביה ולדן, בתו של שמעון פרס והוא משמש כרופאו האישי של פרס.";
 		//StringReader reader = new StringReader("להישרדות בהישרדות ההישרדות מהישרדות ניסיון הניסיון הביטוח  בביטוח לביטוח שביטוח מביטוחים");
+		int expectedNumberOfNonHebrewWords = 0;
 		StringReader reader = new StringReader(text);
 		m_lemmatizer = new StreamLemmatizer(reader);
         m_lemmatizer.initFromHSpellFolder(hspellPath, true, false);
@@ -91,6 +95,12 @@ public class LemmatizerTest
             if ((tokens.size() == 1) && !(tokens.get(0) instanceof HebrewToken))
             {
             	System.out.println(String.format("%s Not a Hebrew word; detected as %s", word, tokens.get(0).isNumeric() ? "Numeric" : "NonHebrew"));
+            	
+            	if (!tokens.get(0).isNumeric() && !word.isEmpty()) {
+            		expectedNumberOfNonHebrewWords--;
+            		Assert.assertTrue("Wrong number of non hebrew words. Check encoding issues.",expectedNumberOfNonHebrewWords>=0);
+            	}
+            	
                 continue;
             }
 
