@@ -23,17 +23,23 @@ package org.apache.lucene.analysis.hebrew;
 import hebmorph.StopWords;
 import hebmorph.StreamLemmatizer;
 import hebmorph.lemmafilters.LemmaFilterBase;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Set;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.hebrew.StreamLemmasFilter;
+import org.apache.lucene.store.Directory;
 
 public class MorphAnalyzer extends Analyzer
 {
+	
+	public static final String HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME="hspell-data-files";
+	
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 
@@ -73,6 +79,24 @@ public class MorphAnalyzer extends Analyzer
 		hebMorphLemmatizer.initFromHSpellFolder(HSpellDataFilesPath, true, false);
 	}
 
+	public MorphAnalyzer() throws IOException
+	{
+		this(extractHspellDataFilesToTempDirectory());
+	}
+
+	private static String extractHspellDataFilesToTempDirectory() throws IOException {
+		File tempFile = File.createTempFile(HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME, "");
+		tempFile.delete();
+		// create directory with the same name as tempFile
+		// extract META-INF/HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME to tempFile directory.
+			
+		String folder = tempFile.getAbsolutePath();
+		// makr files for deletion on process exists.
+		return folder;
+	}
+	
+
+	
 	private static class SavedStreams
 	{
 		public Tokenizer source;

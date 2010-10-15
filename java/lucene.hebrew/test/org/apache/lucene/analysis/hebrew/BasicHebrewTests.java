@@ -1,4 +1,4 @@
-﻿/**************************************************************************
+/**************************************************************************
  *   Copyright (C) 2010 by                                                 *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
  *		Ofer Fort <oferiko at gmail dot com>							   *
@@ -70,6 +70,7 @@ public class BasicHebrewTests
 	@Test
 	public void test() throws Exception
 	{
+	
 		// Warm up with exact matches...
 		assertFoundInText("בת", "בת");
 		assertFoundInText("שבתו", "שבתו");

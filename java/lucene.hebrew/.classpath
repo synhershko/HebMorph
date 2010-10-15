@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/lucene-core-2.9.3.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-queries-2.9.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/hebmorph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/java-hebmorph"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
