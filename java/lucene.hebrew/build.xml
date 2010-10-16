@@ -9,10 +9,10 @@
     <property name="build.dir" value="build/${ant.project.name}" />
     <property name="dist.dir" value="build/distribution" />
     <property name="testbuild.dir" value="build/${ant.project.name}_test" />
+    <property name="hebmorph.build.dir" value="../hebmorph/build/hebmorph"/>
     <property name="lucene-version" value="2.9.3" />
-    
-    <path id="lucene.hebrew.classpath">
-        <pathelement location="../hebmorph/${dist.dir}/hebmorph.jar"/>
+       
+    <path id="lucene.classpath">
         <pathelement location="lib/lucene-analyzers-${lucene-version}.jar"/>
         <pathelement location="lib/lucene-core-${lucene-version}.jar"/>
         <pathelement location="lib/lucene-queries-${lucene-version}.jar"/>
@@ -22,14 +22,13 @@
         <pathelement location="${testbuild.dir}" />
         <pathelement location="${dist.dir}/${ant.project.name}.jar"/>
         <pathelement location="lib/junit.jar"/>
-        <path refid="lucene.hebrew.classpath"/>
+        <path refid="lucene.classpath"/>
      </path>
   
     <target name="init">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${testbuild.dir}"/>
-        <copy file="../hebmorph/${dist.dir}/hebmorph.jar" tofile="${dist.dir}/hebmorph.jar"/>
         <copy includeemptydirs="false" todir="${build.dir}">
             <fileset dir="src" excludes="**/*.launch, **/*.java"/>
         </copy>
@@ -51,7 +50,8 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" encoding="UTF-8" debuglevel="${debuglevel}" destdir="${build.dir}" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="lucene.hebrew.classpath"/>
+            <classpath refid="lucene.classpath"/>
+            <classpath location="${hebmorph.build.dir}"/>
         </javac>
     </target>
     
@@ -59,8 +59,14 @@
     <target name="jar" depends="build">
         <jar destfile="${dist.dir}/${ant.project.name}.jar"
            basedir="${build.dir}"
-           includes="**/*.class"
-      >
+           includes="**/*.class">
+           
+        <zipfileset dir="../../hspell-data-files" prefix="hspell-data-files">
+               <include name="**/*"/>
+        </zipfileset>
+        <zipfileset dir="${hebmorph.build.dir}" >
+               <include name="**/*.class"/>
+        </zipfileset>
       </jar>
     </target>	
  

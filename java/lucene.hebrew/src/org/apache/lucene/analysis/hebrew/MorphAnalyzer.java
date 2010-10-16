@@ -46,6 +46,8 @@ public class MorphAnalyzer extends Analyzer
 	*/
 	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
 
+	private static final String DEFAULT_HSPELL_DATA_PATH = "hspell-data-files";
+
 	/**
 	 Set to true to mark tokens with a $ prefix also when there is only one lemma returned
 	 from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
@@ -66,35 +68,23 @@ public class MorphAnalyzer extends Analyzer
 	private boolean enableStopPositionIncrements = true;
 	private StreamLemmatizer hebMorphLemmatizer;
 
+	public MorphAnalyzer() throws IOException
+	{
+		this(DEFAULT_HSPELL_DATA_PATH);
+	}
+
 	public MorphAnalyzer(StreamLemmatizer hml)
 	{
 		super();
 		hebMorphLemmatizer = hml;
 	}
-
+	
 	public MorphAnalyzer(String HSpellDataFilesPath) throws IOException
 	{
 		super();
 		hebMorphLemmatizer = new StreamLemmatizer();
 		hebMorphLemmatizer.initFromHSpellFolder(HSpellDataFilesPath, true, false);
-	}
-
-	public MorphAnalyzer() throws IOException
-	{
-		this(extractHspellDataFilesToTempDirectory());
-	}
-
-	private static String extractHspellDataFilesToTempDirectory() throws IOException {
-		File tempFile = File.createTempFile(HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME, "");
-		tempFile.delete();
-		// create directory with the same name as tempFile
-		// extract META-INF/HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME to tempFile directory.
-			
-		String folder = tempFile.getAbsolutePath();
-		// makr files for deletion on process exists.
-		return folder;
-	}
-	
+	}	
 
 	
 	private static class SavedStreams

@@ -42,7 +42,6 @@ import org.junit.Test;
 public class BasicHebrewTests
 {
 	private Analyzer analyzer;
-    public static String hspellPath ="../../hspell-data-files";
 
 
 	@BeforeClass
@@ -59,7 +58,7 @@ public class BasicHebrewTests
 	@Before
 	public void setUp() throws Exception
 	{
-		 analyzer = new MorphAnalyzer(hspellPath);
+		analyzer = new MorphAnalyzer();
 	}
 
 	@After
