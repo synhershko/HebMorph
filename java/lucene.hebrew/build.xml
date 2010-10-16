@@ -10,7 +10,8 @@
     <property name="dist.dir" value="build/distribution" />
     <property name="testbuild.dir" value="build/${ant.project.name}_test" />
     <property name="hebmorph.build.dir" value="../hebmorph/build/hebmorph"/>
-    <property name="lucene-version" value="2.9.3" />
+    <!--<property name="lucene-version" value="2.9.3" />-->
+    <property name="lucene-version" value="3.0.2" />
        
     <path id="lucene.classpath">
         <pathelement location="lib/lucene-analyzers-${lucene-version}.jar"/>
