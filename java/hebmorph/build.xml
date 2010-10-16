@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="test" name="hebmorph">
+<project basedir="." default="dist" name="hebmorph">
     
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
@@ -49,23 +49,29 @@
 	   <target name="jar" depends="build">
 	    <jar destfile="${dist.dir}/${ant.project.name}.jar"
 		     basedir="${build.dir}"
-		     includes="**/*.class"
-		 />
+		     includes="**/*.class">
+        
+        <zipfileset dir="../../hspell-data-files" prefix="hspell-data-files">
+               <include name="**/*"/>
+        </zipfileset>
+
+		 </jar>
 	  </target>	
-		
-	<target name="test" depends="jar">
+	<target name="dist" depends="clean,jar,test" />	
+	<target name="test">
         <javac debug="true" encoding="UTF-8" debuglevel="${debuglevel}" destdir="${testbuild.dir}" source="${source}" target="${target}">
             <src path="test"/>
             <classpath refid="test.classpath"/>
         </javac>
         
-		  <junit failureproperty="junit.tests.failed" forkmode="perTest" printsummary="yes" haltonfailure="false" haltonerror="false" showoutput="true">
+		  <junit failureproperty="junit.tests.failed" fork="yes" forkmode="perTest" printsummary="yes" haltonfailure="false" haltonerror="false" showoutput="true">
 			  <classpath refid="test.classpath" />
 			  <classpath location="${testbuild.dir}" />
  			  <formatter type="plain" usefile="false" /> 
       	<batchtest>
           <fileset dir="${testbuild.dir}" includes="**/RegressionTestSuite.class" />
         </batchtest>
+        <jvmarg value="-DhspellPath=hspell-data-files"/>
 			  
 		  </junit>
 		  <fail if="junit.tests.failed" message="JUnit tests failed. exiting..." /> 

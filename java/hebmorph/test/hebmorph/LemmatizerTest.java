@@ -38,14 +38,18 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class LemmatizerTest
-{
-    public static DictRadix<MorphData> m_dict;
-    public static StreamLemmatizer m_lemmatizer;
-    public static String hspellPath ="../../hspell-data-files";
-
+{	
+    private static DictRadix<MorphData> m_dict;
+    private static StreamLemmatizer m_lemmatizer;
+	
+    // override default with an "hspellPath" system property or "-DhspellPath" jvm argument.
+    private static final String DEFAULT_HSPELL_PATH = "../../hspell-data-files";
+	private static String hspellPath;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
 	{
+		hspellPath = System.getProperty("hspellPath",DEFAULT_HSPELL_PATH);
 	}
 
 	@AfterClass
