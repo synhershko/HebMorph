@@ -54,6 +54,18 @@ public class Lemmatizer
 		m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
 		m_IsInitialized = true;
 	}
+	
+	public void initFromHSpellClasspath(String classpath, boolean loadMorpholicData, boolean allowHeHasheela)
+	{
+		try {
+			m_dict = Loader.loadDictionaryFromHSpellFolder(classpath, loadMorpholicData);
+		}
+		catch (IOException e) {
+			throw new IllegalStateException("Cannot find " + classpath +" in JAR file.");
+		}
+		m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
+		m_IsInitialized = true;
+	}
 
 	public boolean isLegalPrefix(String str)
 	{

@@ -38,7 +38,6 @@ import org.apache.lucene.store.Directory;
 public class MorphAnalyzer extends Analyzer
 {
 	
-	public static final String HSPELL_DATA_FILES_DEFAULT_DIRECTORY_NAME="hspell-data-files";
 	
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
@@ -46,7 +45,7 @@ public class MorphAnalyzer extends Analyzer
 	*/
 	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
 
-	private static final String DEFAULT_HSPELL_DATA_PATH = "hspell-data-files";
+	private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
 	/**
 	 Set to true to mark tokens with a $ prefix also when there is only one lemma returned
@@ -68,9 +67,11 @@ public class MorphAnalyzer extends Analyzer
 	private boolean enableStopPositionIncrements = true;
 	private StreamLemmatizer hebMorphLemmatizer;
 
-	public MorphAnalyzer() throws IOException
+	public MorphAnalyzer()
 	{
-		this(DEFAULT_HSPELL_DATA_PATH);
+		super();
+		hebMorphLemmatizer = new StreamLemmatizer();
+		hebMorphLemmatizer.initFromHSpellClasspath(DEFAULT_HSPELL_DATA_CLASSPATH, true, false);
 	}
 
 	public MorphAnalyzer(StreamLemmatizer hml)
