@@ -1,4 +1,4 @@
-﻿/**************************************************************************
+/**************************************************************************
  *   Copyright (C) 2010 by                                                 *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
  *		Ofer Fort <oferiko at gmail dot com>							   *
@@ -42,7 +42,6 @@ import org.junit.Test;
 public class BasicHebrewTests
 {
 	private Analyzer analyzer;
-    public static String hspellPath ="../../hspell-data-files";
 
 
 	@BeforeClass
@@ -59,7 +58,7 @@ public class BasicHebrewTests
 	@Before
 	public void setUp() throws Exception
 	{
-		 analyzer = new MorphAnalyzer(hspellPath);
+		analyzer = new MorphAnalyzer();
 	}
 
 	@After
@@ -70,6 +69,7 @@ public class BasicHebrewTests
 	@Test
 	public void test() throws Exception
 	{
+	
 		// Warm up with exact matches...
 		assertFoundInText("בת", "בת");
 		assertFoundInText("שבתו", "שבתו");

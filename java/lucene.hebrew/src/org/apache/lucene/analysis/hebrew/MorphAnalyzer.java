@@ -23,22 +23,29 @@ package org.apache.lucene.analysis.hebrew;
 import hebmorph.StopWords;
 import hebmorph.StreamLemmatizer;
 import hebmorph.lemmafilters.LemmaFilterBase;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Set;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.hebrew.StreamLemmasFilter;
+import org.apache.lucene.store.Directory;
 
 public class MorphAnalyzer extends Analyzer
 {
+	
+	
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 
 	*/
 	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
+
+	private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
 	/**
 	 Set to true to mark tokens with a $ prefix also when there is only one lemma returned
@@ -60,19 +67,27 @@ public class MorphAnalyzer extends Analyzer
 	private boolean enableStopPositionIncrements = true;
 	private StreamLemmatizer hebMorphLemmatizer;
 
+	public MorphAnalyzer()
+	{
+		super();
+		hebMorphLemmatizer = new StreamLemmatizer();
+		hebMorphLemmatizer.initFromHSpellClasspath(DEFAULT_HSPELL_DATA_CLASSPATH, true, false);
+	}
+
 	public MorphAnalyzer(StreamLemmatizer hml)
 	{
 		super();
 		hebMorphLemmatizer = hml;
 	}
-
+	
 	public MorphAnalyzer(String HSpellDataFilesPath) throws IOException
 	{
 		super();
 		hebMorphLemmatizer = new StreamLemmatizer();
 		hebMorphLemmatizer.initFromHSpellFolder(HSpellDataFilesPath, true, false);
-	}
+	}	
 
+	
 	private static class SavedStreams
 	{
 		public Tokenizer source;
