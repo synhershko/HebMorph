@@ -245,7 +245,7 @@ namespace HebMorph.DataStructures
             return tlc.LookupTolerant(strKey);
         }
 
-        private int GetCharArrayLength(char[] ar)
+        private static int GetCharArrayLength(char[] ar)
         {
             int i = 0;
             while (ar.Length > i && ar[i] != '\0') i++;
