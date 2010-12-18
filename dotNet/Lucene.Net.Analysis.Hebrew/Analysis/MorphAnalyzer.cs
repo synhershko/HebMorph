@@ -42,6 +42,12 @@ namespace Lucene.Net.Analysis.Hebrew
         public bool alwaysSaveMarkedOriginal = false;
 
         /// <summary>
+        /// Returns a boolean value indicating whether or not the MorphAnalyzer is ready to be used (useful
+        /// for reusing the analyzer object, and for checking if loading of auxiliary data was successful).
+        /// </summary>
+        public bool IsInitialized { get { return (hebMorphLemmatizer != null && hebMorphLemmatizer.IsInitialized); } }
+
+        /// <summary>
         /// A filter object to provide flexibility on deciding which lemmas are valid as index terms
         /// and which are not.
         /// </summary>
@@ -60,7 +66,14 @@ namespace Lucene.Net.Analysis.Hebrew
             : base()
         {
             hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
-            hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
+            try
+            {
+                hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
+            }
+            catch
+            {
+                // Nothing to do really... IsInitialized will return false to indicate failure in loading
+            }
         }
 
         private class SavedStreams

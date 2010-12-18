@@ -67,14 +67,21 @@ namespace HebrewEnabledSearcher
                     if (hspellPath == null)
                         return;
 
-                    analyzer = new MorphAnalyzer(hspellPath);
+                    MorphAnalyzer a = new MorphAnalyzer(hspellPath);
+                    if (!a.IsInitialized)
+                    {
+                        MessageBox.Show("Error while trying to create a morphological analyzer object; please check the existance of the required data files and try again");
+                        return;
+                    }
+
+                    analyzer = a;
                 }
 
                 // Recreate the index
                 IndexWriter writer = new IndexWriter(tempPath, new Lucene.Net.Analysis.SimpleAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
                 writer.Close();
-                
             }
+
             btnIndexAddFolder.Enabled = true;
             btnRunAutoTests.Enabled = true;
             btnExecuteSearch.Enabled = true;

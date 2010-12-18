@@ -40,7 +40,13 @@ namespace HebMorph
 
         public Lemmatizer(string hspellPath, bool loadMorpholicalData, bool allowHeHasheela)
         {
-            InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
+            try
+            {
+                InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
+            }
+            catch {
+                // Nothing to do really... m_IsInitialized will remain false to indicate failure in loading
+            }
         }
 
         public void InitFromHSpellFolder(string path, bool loadMorpholicalData, bool allowHeHasheela)
@@ -89,7 +95,7 @@ namespace HebMorph
         /// </summary>
         /// <param name="word">A string to remove Niqqud from</param>
         /// <returns>A new word "clean" of Niqqud chars</returns>
-        public string RemoveNiqqud(string word)
+        public static string RemoveNiqqud(string word)
         {
             int length = word.Length;
             StringBuilder sb = new StringBuilder(length);
