@@ -39,7 +39,6 @@ namespace Lucene.Net.Analysis.Hebrew
         public bool alwaysSaveMarkedOriginal;
         public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
-        private State current = null;
         private List<HebMorph.Token> stack = new List<HebMorph.Token>();
         private IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
         private int index = 0;
@@ -108,7 +107,6 @@ namespace Lucene.Net.Analysis.Hebrew
             ClearAttributes();
             index = 0;
             stack.Clear();
-            current = null;
             previousLemma = null;
 
             // Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
@@ -159,7 +157,6 @@ namespace Lucene.Net.Analysis.Hebrew
 
                 SetTermText(word + "$");
                 typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-                posIncrAtt.SetPositionIncrement(1);
                 return true;
             }
 
@@ -193,29 +190,7 @@ namespace Lucene.Net.Analysis.Hebrew
             }
 
             typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-            posIncrAtt.SetPositionIncrement(0);
 
-            current = CaptureState();
-
-            return true;
-        }
-
-        private void SetTermText(string token)
-        {
-            // Record the term string
-            if (termAtt.TermLength() < token.Length)
-                termAtt.SetTermBuffer(token);
-            else // Perform a copy to save on memory operations
-            {
-                char[] buf = termAtt.TermBuffer();
-                token.CopyTo(0, buf, 0, token.Length);
-            }
-            termAtt.SetTermLength(token.Length);
-        }
-
-        protected bool CreateHebrewToken(HebMorph.HebrewToken hebToken, State current)
-        {
-            CreateHebrewToken(hebToken);
             return true;
         }
 
@@ -239,12 +214,24 @@ namespace Lucene.Net.Analysis.Hebrew
             return true;
         }
 
+        private void SetTermText(string token)
+        {
+            // Record the term string
+            if (termAtt.TermLength() < token.Length)
+                termAtt.SetTermBuffer(token);
+            else // Perform a copy to save on memory operations
+            {
+                char[] buf = termAtt.TermBuffer();
+                token.CopyTo(0, buf, 0, token.Length);
+            }
+            termAtt.SetTermLength(token.Length);
+        }
+
         public override void Reset(System.IO.TextReader input)
         {
             base.Reset(input);
             stack.Clear();
             index = 0;
-            current = null;
             _streamLemmatizer.SetStream(input);
         }
     }
