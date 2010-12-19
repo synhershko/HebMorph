@@ -42,7 +42,7 @@ namespace Lucene.Net.Analysis.Hebrew
         private List<HebMorph.Token> stack = new List<HebMorph.Token>();
         private IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
         private int index = 0;
-        private string previousLemma = null;
+        private Dictionary<string, bool> previousLemmas = new Dictionary<string,bool>();
 
         #region Constructors
         public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer)
@@ -94,10 +94,10 @@ namespace Lucene.Net.Analysis.Hebrew
             {
                 HebMorph.HebrewToken res = stack[index++] as HebMorph.HebrewToken;
 
-                if (res == null || previousLemma == res.Lemma) // Skip multiple lemmas (we will merge morph properties later)
+                if (res == null || previousLemmas.ContainsKey(res.Lemma)) // Skip multiple lemmas (we will merge morph properties later)
                     continue;
 
-                previousLemma = res.Lemma;
+                previousLemmas.Add(res.Lemma, true);
 
                 if (CreateHebrewToken(res))
                     return true;
@@ -107,7 +107,7 @@ namespace Lucene.Net.Analysis.Hebrew
             ClearAttributes();
             index = 0;
             stack.Clear();
-            previousLemma = null;
+            previousLemmas.Clear();
 
             // Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
             // an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
