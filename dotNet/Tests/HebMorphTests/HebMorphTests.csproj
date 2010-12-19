@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="HSpell\HSpellLoaderTest.cs" />
     <Compile Include="Lucene\HebrewQueryParserTest.cs" />
+    <Compile Include="Lucene\TermPositionVectorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructures\RadixTest.cs" />
     <Compile Include="StreamLemmatizerTest.cs" />
