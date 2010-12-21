@@ -10,7 +10,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	LemmatizerTest.class
+	LemmatizerTest.class, RadixTest.class
 })
 public class RegressionTestSuite {
 

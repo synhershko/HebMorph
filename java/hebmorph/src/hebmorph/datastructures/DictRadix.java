@@ -112,7 +112,7 @@ public class DictRadix<T> implements Iterable<T>
 		private DictRadix<T> enclosingInstance;
 
 		private char[] key;
-		private List<LookupResult> resultSet = new ArrayList<LookupResult>();
+		private final List<LookupResult> resultSet = new ArrayList<LookupResult>();
 
 		public List<LookupResult> lookupTolerant(String strKey)
 		{
@@ -212,6 +212,12 @@ public class DictRadix<T> implements Iterable<T>
 			}
 		}
 	}
+
+
+    private boolean  m_bAllowValueOverride = false;
+    public boolean getAllowValueOverride() { return m_bAllowValueOverride; }
+    public void setAllowValueOverride(boolean val) { m_bAllowValueOverride = val; }
+
 
 	protected DictNode m_root;
 	public DictNode getRootNode()
@@ -472,15 +478,16 @@ public class DictRadix<T> implements Iterable<T>
 					// We consumed both the child's key and the requested key
 					else if ((n == child.getKey().length) && (keyLength == keyPos))
 					{
-						if (child.getValue().equals(null))
+						if (child.getValue() == null)
 						{
 							child.setValue(data);
 							m_nCount++;
 						}
-						else
-						{
-							// TODO: Do we allow overriding data? perhaps have compile switches for this?
-						}
+                        else if (m_bAllowValueOverride)
+                        {
+                            // Only override data if this radix object is configured to do this
+                            child.value = data;
+                        }
 						return;
 					}
 				}
@@ -530,6 +537,18 @@ public class DictRadix<T> implements Iterable<T>
 			nodesPath.addLast(radix.m_root);
 		}
 
+
+        public String getCurrentKey()
+        {
+            StringBuilder sb = new StringBuilder();
+            for(DictNode dn : nodesPath)
+            {
+                sb.append(dn.key);
+            }
+            return sb.toString();
+        }
+
+
 		/*public T getCurrent()
 		{
 			return nodesPath.getLast().getValue();
@@ -562,21 +581,17 @@ public class DictRadix<T> implements Iterable<T>
 				if (goUp || (n.getChildren() == null) || (n.getChildren().length == 0))
 				{
 					nodesPath.removeLast();
-					if (nodesPath.isEmpty())
-					{
-						return null;
-					}
+					if (nodesPath.isEmpty()) break;
 					goUp = true;
 					for (int i = 0; i < nodesPath.getLast().getChildren().length; i++)
 					{
 						// Move to the next child
-						if ((nodesPath.getLast().getChildren()[i] == n) && (i + 1 < nodesPath.getLast().getChildren().length))
+						if ((nodesPath.getLast().getChildren()[i] == n) &&
+                                (i + 1 < nodesPath.getLast().getChildren().length))
 						{
 							nodesPath.addLast(nodesPath.getLast().getChildren()[i + 1]);
-							if (!nodesPath.getLast().getValue().equals(null))
-							{
+							if (nodesPath.getLast().getValue() != null)
 								return nodesPath.getLast().getValue();
-							}
 							goUp = false;
 							break;
 						}
@@ -586,10 +601,8 @@ public class DictRadix<T> implements Iterable<T>
 				{
 					nodesPath.addLast(n.getChildren()[0]);
 					goUp = false;
-					if (!n.getChildren()[0].getValue().equals(null))
-					{
+					if (n.getChildren()[0].getValue() != null)
 						return n.getChildren()[0].getValue();
-					}
 				}
 			}
 			return null;
@@ -617,10 +630,8 @@ public class DictRadix<T> implements Iterable<T>
 						if ((nodesPath.getLast().getChildren()[i] == n) && (i + 1 < nodesPath.getLast().getChildren().length))
 						{
 							nodesPath.addLast(nodesPath.getLast().getChildren()[i + 1]);
-							if (!nodesPath.getLast().getValue().equals(null))
-							{
+							if (nodesPath.getLast().getValue() != null)
 								return true;
-							}
 							goUp = false;
 							break;
 						}
