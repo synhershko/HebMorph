@@ -93,17 +93,18 @@ public class HebrewTokenizer extends Tokenizer
 	public boolean incrementToken() throws IOException
 	{
 		clearAttributes();
-		int start = hebMorphTokenizer.getOffset();
+//		int start = hebMorphTokenizer.getOffset();
 
-		String nextToken = null;
+		Reference<String> nextToken = new Reference<String>(null);
+        String nextTokenVal = null;
 		int tokenType;
 
 		// Used to loop over certain noise cases
 		while (true)
 		{
-			Reference<String> tempRef_nextToken = new Reference<String>(nextToken);
-			tokenType = hebMorphTokenizer.nextToken(tempRef_nextToken);
-			nextToken = tempRef_nextToken.ref;
+			tokenType = hebMorphTokenizer.nextToken(nextToken);
+            nextTokenVal = nextToken.ref;
+
 			if (tokenType == 0)
 			{
 				return false; // EOS
@@ -114,7 +115,7 @@ public class HebrewTokenizer extends Tokenizer
 			// separated by a dash marked as a construct (סמיכות) by the Tokenizer
 			if ((tokenType & hebmorph.Tokenizer.TokenType.Construct) > 0)
 			{
-				if (isLegalPrefix(nextToken))
+				if (isLegalPrefix(nextToken.ref))
 				{
 					continue;
 				}
@@ -126,10 +127,10 @@ public class HebrewTokenizer extends Tokenizer
 			// are ה"שטיח", ש"המידע.
 			if ((tokenType & hebmorph.Tokenizer.TokenType.Acronym) > 0)
 			{
-				nextToken = tryStrippingPrefix(nextToken);
+				nextTokenVal = nextToken.ref = tryStrippingPrefix(nextToken.ref);
 
 				// Re-detect acronym, in case it was a false positive
-				if (nextToken.indexOf('"') == -1)
+				if (nextTokenVal.indexOf('"') == -1)
 				{
 					tokenType |= ~hebmorph.Tokenizer.TokenType.Acronym;
 				}
@@ -139,20 +140,20 @@ public class HebrewTokenizer extends Tokenizer
 		}
 
 		// Record the term string
-		if (termAtt.termLength() < nextToken.length())
+		if (termAtt.termLength() < nextTokenVal.length())
 		{
-			termAtt.setTermBuffer(nextToken);
+			termAtt.setTermBuffer(nextTokenVal);
 		}
 		else // Perform a copy to save on memory operations
 		{
-	        char[] chars = nextToken.toCharArray();
+	        char[] chars = nextTokenVal.toCharArray();
             termAtt.setTermBuffer(chars,0,chars.length);
 			//char[] buf = termAtt.termBuffer();
 			//nextToken.CopyTo(0, buf, 0, nextToken.length());
 		}
-		termAtt.setTermLength(nextToken.length());
+		termAtt.setTermLength(nextTokenVal.length());
 
-		offsetAtt.setOffset(correctOffset(start), correctOffset(start + nextToken.length()));
+		offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
 
 		if ((tokenType & hebmorph.Tokenizer.TokenType.Hebrew) > 0)
 		{
@@ -198,7 +199,8 @@ public class HebrewTokenizer extends Tokenizer
 
 	public boolean isLegalPrefix(String str)
 	{
-		if (prefixesTree.lookup(str) > 0)
+        Integer val = prefixesTree.lookup(str);
+		if (val != null && val > 0)
 		{
 			return true;
 		}

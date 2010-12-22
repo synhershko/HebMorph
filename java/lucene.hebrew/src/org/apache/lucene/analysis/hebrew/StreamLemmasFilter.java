@@ -130,7 +130,7 @@ public class StreamLemmasFilter extends Tokenizer
 		}
 
 		// Store the location of the word in the original stream
-		offsetAtt.setOffset(_streamLemmatizer.getStartOffset(), _streamLemmatizer.getEndOffset());
+		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
 
 		// A non-Hebrew word
 		if ((stack.size() == 1) && !(stack.get(0) instanceof hebmorph.HebrewToken))
@@ -219,7 +219,7 @@ public class StreamLemmasFilter extends Tokenizer
 		posIncrAtt.setPositionIncrement(0);
 
 		// TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
-            typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+        typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
 //
 //             * Morph payload

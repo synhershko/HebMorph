@@ -1,6 +1,7 @@
 
 package org.apache.lucene.analysis.hebrew;
 
+import org.apache.lucene.queryparsers.HebrewQueryParser;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -115,30 +116,5 @@ public class TermPositionVectorTest {
     {
         Assert.assertEquals(1, positions.length);
         Assert.assertEquals(pos, positions[0]);
-    }
-
-
-    static class HebrewQueryParser extends QueryParser {
-        protected static float SuffixedTermBoost = 2.0f;
-
-        public HebrewQueryParser(Version matchVersion, String f, Analyzer a)
-        {
-            super(matchVersion, f, a);
-        }
-
-        public @Override Query parse(String query) throws ParseException
-        {
-            String q = "";
-
-            for (int i = 0; i < query.length(); i++)
-            {
-                if (query.charAt(i) == '"' && i + 1 < query.length() && !Character.isWhitespace(query.charAt(i + 1)))
-                    if (i > 0 && !Character.isWhitespace(query.charAt(i - 1)))
-                        q += '\\';
-                q += query.charAt(i);
-            }
-
-            return super.parse(q);
-        }
     }
 }
