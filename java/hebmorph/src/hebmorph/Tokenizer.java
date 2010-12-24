@@ -37,10 +37,11 @@ public class Tokenizer
 		public static int Acronym = 16;
 	}
 
-	public static final char[] Geresh = new char[] { '\'' };
-	public static final char[] Gershayim = new char[] { '\"' };
-	public static final char[] CharsFollowingPrefixes = new char[] { '"', '\'', '-' };
-	public static final char[] LettersAcceptingGeresh = new char[] { 'ז', 'ג', 'ץ', 'צ', 'ח' };
+	public static final char[] Geresh = { '\'', '\u05F3' };
+	public static final char[] Gershayim = { '\"', '\u05F4' };
+    public static final char[] Makaf = { '-' };
+	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
+	public static final char[] LettersAcceptingGeresh = { 'ז', 'ג', 'ץ', 'צ', 'ח' };
 
 	public static boolean isOfChars(char c, char[] options)
 	{
@@ -50,6 +51,24 @@ public class Tokenizer
 		}
 		return false;
 	}
+
+    public static char[] concatenateCharArrays(char[] ... arrays)
+    {
+        int count = 0;
+        for(char[] a : arrays) {
+            count += a.length;
+        }
+
+        char[] ret = new char[count];
+        int offs = 0;
+        for (char[] a : arrays) {
+            System.arraycopy(a, 0, ret, offs, a.length);
+            offs += a.length;
+        }
+
+        return ret;
+    }
+
 	public static boolean isHebrewLetter(char c)
 	{
 		return ((c >= 1488) && (c <= 1514));
@@ -61,14 +80,28 @@ public class Tokenizer
 
 	private Reader input;
 	private int dataLen = 0, inputOffset = 0;
+
+
+    /// Both are necessary since the tokenizer does some normalization when necessary, and therefore
+    /// it isn't always possible to get correct end-offset by looking at the length of the returned token
+    /// string
+    private int tokenOffset = 0, tokenLengthInSource = 0;
 	public final int getOffset()
 	{
-		return inputOffset;
+		return tokenOffset;
 	}
 	public void setOffset(int offset)
 	{
-		inputOffset = offset;
+		tokenOffset = offset;
 	}
+
+    public int getLengthInSource() {
+        return tokenLengthInSource;
+    }
+    public void setLengthInSource(int length) {
+        tokenLengthInSource = length;
+    }
+
 
 	private static final int IO_BUFFER_SIZE = 4096;
 	private char[] ioBuffer = new char[IO_BUFFER_SIZE];
@@ -85,7 +118,8 @@ public class Tokenizer
 	// This is a job for a normalizer, anyway
 	public int nextToken(Reference<String> tokenString) throws IOException
 	{
-		int length = 0, start = ioBufferIndex;
+		int length = 0;
+        tokenOffset = -1; // invalidate
 		int tokenType = 0;
 		while (true)
 		{
@@ -103,6 +137,7 @@ public class Tokenizer
 					else
 					{
 						tokenString.ref = "";
+                        tokenLengthInSource = 0;
 						return 0;
 					}
 				}
@@ -154,7 +189,7 @@ public class Tokenizer
 
 				appendCurrentChar = true;
 			}
-			else if ((c == '"') && (length > 0))
+			else if (isOfChars(c, Gershayim) && (length > 0))
 			{
 				// Tokenize if previous char wasn't part of a word
 				if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1]))
@@ -166,11 +201,11 @@ public class Tokenizer
 				tokenType |= TokenType.Acronym;
 				appendCurrentChar = true;
 			}
-			else if ((c == '\'') && (length > 0))
+			else if (isOfChars(c, Geresh) && (length > 0))
 			{
 				// Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
 				if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
-						&& (wordBuffer[length - 1] != '\''))
+						&& !isOfChars(wordBuffer[length - 1], Geresh))
 				{
 					break;
 				}
@@ -182,7 +217,7 @@ public class Tokenizer
 			else if (length > 0)
 			{
 				// Flag makaf connected words as constructs
-				if (c == '-') // TODO: Normalize or support other types of dashes too
+				if (isOfChars(c, Makaf)) // TODO: Normalize or support other types of dashes too
 				{
 					tokenType |= TokenType.Construct;
 				}
@@ -197,7 +232,7 @@ public class Tokenizer
 				// Consume normally
 				if (length == 0) // mark the start of a new token
 				{
-					start = inputOffset + ioBufferIndex - 1;
+                    tokenOffset = inputOffset + ioBufferIndex - 1;
 				}
 				else if (length == wordBuffer.length)
 					// buffer overflow!
@@ -206,16 +241,18 @@ public class Tokenizer
 				}
 
 				// Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
-				if (c == '\'')
+				if (isOfChars(c, Geresh))
 				{
 					if (wordBuffer[length - 1] == c)
 					{
 						wordBuffer[length - 1] = '"';
 					}
-					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
-					{
-						wordBuffer[length++] = c;
-					}
+//					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
+//					{
+//						wordBuffer[length++] = c;
+//					}
+                    else
+                        wordBuffer[length++] = c;
 				}
 				else
 				{
@@ -224,17 +261,25 @@ public class Tokenizer
 			}
 		}
 
-		if (wordBuffer[length - 1] == '"')
+        // Store token's actual length in source (regardless of misc normalizations)
+        if (dataLen <= 0)
+            tokenLengthInSource = inputOffset - tokenOffset;
+        else
+            tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
+
+		if (isOfChars(wordBuffer[length - 1], Gershayim))
 		{
 			wordBuffer[--length] = '\0';
+            tokenLengthInSource--; // Don't include Gershayim in the offset calculation
 		}
 		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-		if ((length > 2) && (wordBuffer[length - 1] == '\''))
+		if ((length > 2) && isOfChars(wordBuffer[length - 1], Geresh))
 		{
 			// All letters which this Geresh may mean something for
 			if (!isOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
 			{
 				wordBuffer[--length] = '\0';
+                tokenLengthInSource--; // Don't include this Geresh in the offset calculation
 			}
 			// TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
 			// TODO: Handle ה (Hashem)
