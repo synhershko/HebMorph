@@ -435,7 +435,7 @@ public class DictRadix<T> implements Iterable<T>
 						System.arraycopy(key, keyPos, newNode.getKey(), 0, newNode.getKey().length);
 						newNode.setValue(data);
 
-						if ((new Character(child.getKey()[0])).compareTo(newNode.getKey()[0]) < 0)
+						if (child.getKey()[0] - newNode.getKey()[0] < 0)
 						{
 							bridgeChild.getChildren()[0] = child;
 							bridgeChild.getChildren()[1] = newNode;
@@ -505,10 +505,8 @@ public class DictRadix<T> implements Iterable<T>
 				int curPos = 0;
 				for (; curPos < cur.getChildren().length; ++curPos)
 				{
-					if ((new Character(newChild.getKey()[0])).compareTo(cur.getChildren()[curPos].getKey()[0]) < 0)
-					{
+					if(newChild.getKey()[0] - cur.getChildren()[curPos].getKey()[0] < 0)
 						break;
-					}
 					newArray[curPos] = cur.getChildren()[curPos];
 				}
 				newArray[curPos] = newChild;
@@ -524,6 +522,13 @@ public class DictRadix<T> implements Iterable<T>
 			}
 		}
 	}
+
+    public void clear()
+    {
+        m_root = new DictNode();
+        m_nCount = 0;
+    }
+
 
 	public class RadixEnumerator implements  java.util.Iterator<T>
 	{
@@ -543,7 +548,10 @@ public class DictRadix<T> implements Iterable<T>
             StringBuilder sb = new StringBuilder();
             for(DictNode dn : nodesPath)
             {
-                sb.append(dn.key);
+                if(dn.key != null)
+                    sb.append(dn.key);
+                else
+                    assert dn == radix.m_root;
             }
             return sb.toString();
         }
@@ -559,19 +567,17 @@ public class DictRadix<T> implements Iterable<T>
 			nodesPath.clear();
 			nodesPath.addLast(radix.m_root);
 		}
-
-		public String getCurrentKey()
-		{
-			StringBuilder sb = new StringBuilder();
-			for (DictRadix<T>.DictNode dn : nodesPath)
-			{
-				sb.append(dn.getKey());
-			}
-			return sb.toString();
-		}*/
+		*/
 
 		@Override
 		public T next()
+		{
+            assert nodesPath.size() > 0;
+            return nodesPath.getLast().getValue();
+		}
+
+		@Override
+		public boolean hasNext()
 		{
 			boolean goUp = false;
 
@@ -591,46 +597,6 @@ public class DictRadix<T> implements Iterable<T>
 						{
 							nodesPath.addLast(nodesPath.getLast().getChildren()[i + 1]);
 							if (nodesPath.getLast().getValue() != null)
-								return nodesPath.getLast().getValue();
-							goUp = false;
-							break;
-						}
-					}
-				}
-				else
-				{
-					nodesPath.addLast(n.getChildren()[0]);
-					goUp = false;
-					if (n.getChildren()[0].getValue() != null)
-						return n.getChildren()[0].getValue();
-				}
-			}
-			return null;
-		}
-
-		@Override
-		public boolean hasNext()
-		{
-			boolean goUp = false;
-
-			while (nodesPath.size() > 0)
-			{
-				DictRadix<T>.DictNode n = nodesPath.getLast();
-				if (goUp || (n.getChildren() == null) || (n.getChildren().length == 0))
-				{
-					nodesPath.removeLast();
-					if (nodesPath.isEmpty())
-					{
-						return false;
-					}
-					goUp = true;
-					for (int i = 0; i < nodesPath.getLast().getChildren().length; i++)
-					{
-						// Move to the next child
-						if ((nodesPath.getLast().getChildren()[i] == n) && (i + 1 < nodesPath.getLast().getChildren().length))
-						{
-							nodesPath.addLast(nodesPath.getLast().getChildren()[i + 1]);
-							if (nodesPath.getLast().getValue() != null)
 								return true;
 							goUp = false;
 							break;
@@ -641,10 +607,8 @@ public class DictRadix<T> implements Iterable<T>
 				{
 					nodesPath.addLast(n.getChildren()[0]);
 					goUp = false;
-					if (!n.getChildren()[0].getValue().equals(null))
-					{
+					if (n.getChildren()[0].getValue() != null)
 						return true;
-					}
 				}
 			}
 			return false;

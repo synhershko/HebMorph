@@ -84,16 +84,24 @@ public class RadixTest
         while(en.hasNext())
         {
             en.next();
-            assertTrue(nodeText.compareTo(en.getCurrentKey()) < 0);
+            assertTrue(cSharpStringCompare(nodeText, en.getCurrentKey()) < 0);
             nodeText = en.getCurrentKey();
             enCount++;
         }
         assertEquals(counter.val, enCount);
     }
 
-//    delegate object DataGeneratorFunc();
+
+    static private int cSharpStringCompare(String s1, String s2) {
+        if(s1 == null)
+            return s2 == null ? 0 : -1;
+        return s2 == null ? 1 : s1.compareTo(s2);
+    }
+
+
     private Random rnd = new Random();
 
+//    delegate object DataGeneratorFunc();
     static private interface DataGeneratorFunc<T> {
         public T generate();
     }
