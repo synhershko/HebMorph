@@ -10,7 +10,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	BasicHebrewTests.class
+	BasicHebrewTests.class, TermPositionVectorTest.class
 })
 public class RegressionTestSuite {
 

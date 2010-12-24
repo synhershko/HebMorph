@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
@@ -49,11 +51,10 @@ public class StreamLemmasFilter extends Tokenizer
 	private boolean alwaysSaveMarkedOriginal;
 	private LemmaFilterBase lemmaFilter = null;
 
-	private State current = null;
 	private List<Token> stack = new ArrayList<Token>();
 	private List<Token> filterCache = new ArrayList<Token>();
 	private int index = 0;
-	private String previousLemma = null;
+    private Map<String,Boolean> previousLemmas = new HashMap<String,Boolean>();
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
 	{
@@ -98,12 +99,12 @@ public class StreamLemmasFilter extends Tokenizer
 			HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
 			index++;
 
-			if ((res == null) || res.getLemma().equals(previousLemma)) // Skip multiple lemmas (we will merge morph properties later)
+            if ((res == null) || previousLemmas.containsKey(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
 			{
 				continue;
 			}
 
-			previousLemma = res.getLemma();
+            previousLemmas.put(res.getLemma(), Boolean.TRUE);
 
 			if (createHebrewToken(res))
 			{
@@ -115,8 +116,7 @@ public class StreamLemmasFilter extends Tokenizer
 		clearAttributes();
 		index = 0;
 		stack.clear();
-		current = null;
-		previousLemma = null;
+        previousLemmas.clear();
 
 		// Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
 		// an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
@@ -175,7 +175,6 @@ public class StreamLemmasFilter extends Tokenizer
 
 			setTermText(word + "$");
 			typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-			posIncrAtt.setPositionIncrement(1);
 			return true;
 		}
 
@@ -208,36 +207,11 @@ public class StreamLemmasFilter extends Tokenizer
 			setTermText(word + "$");
 		}
 
-            typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-		posIncrAtt.setPositionIncrement(0);
-
-		current = captureState();
+        typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
 		return true;
 	}
 
-	private void setTermText(String token)
-	{
-		// Record the term string
-		if (termAtt.termLength() < token.length())
-		{
-			termAtt.setTermBuffer(token);
-		}
-		else // Perform a copy to save on memory operations
-		{
-	        char[] chars = token.toCharArray();
-            termAtt.setTermBuffer(chars,0,chars.length);
-            //char[] buf = termAtt.termBuffer();
-			//token.CopyTo(0, buf, 0, token.length());
-		}
-		termAtt.setTermLength(token.length());
-	}
-
-	protected boolean createHebrewToken(HebrewToken hebToken, State current)
-	{
-		createHebrewToken(hebToken);
-		return true;
-	}
 
 	protected boolean createHebrewToken(HebrewToken hebToken)
 	{
@@ -259,13 +233,31 @@ public class StreamLemmasFilter extends Tokenizer
 		return true;
 	}
 
+
+	private void setTermText(String token)
+	{
+		// Record the term string
+		if (termAtt.termLength() < token.length())
+		{
+			termAtt.setTermBuffer(token);
+		}
+		else // Perform a copy to save on memory operations
+		{
+	        char[] chars = token.toCharArray();
+            termAtt.setTermBuffer(chars,0,chars.length);
+            //char[] buf = termAtt.termBuffer();
+			//token.CopyTo(0, buf, 0, token.length());
+		}
+		termAtt.setTermLength(token.length());
+	}
+
+    
 	@Override
 	public void reset(Reader input) throws IOException
 	{
 		super.reset(input);
 		stack.clear();
 		index = 0;
-		current = null;
 		_streamLemmatizer.SetStream(input);
 	}
 }

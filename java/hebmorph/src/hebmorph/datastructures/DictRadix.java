@@ -339,7 +339,7 @@ public class DictRadix<T> implements Iterable<T>
 		return tlc.lookupTolerant(strKey);
 	}
 
-	private int getCharArrayLength(char[] ar)
+	static private int getCharArrayLength(char[] ar)
 	{
 		int i = 0;
 		while ((ar.length > i) && (ar[i] != '\0'))

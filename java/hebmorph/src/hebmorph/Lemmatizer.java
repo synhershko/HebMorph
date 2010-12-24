@@ -61,7 +61,7 @@ public class Lemmatizer
 			m_dict = Loader.loadDictionaryFromHSpellFolder(classpath, loadMorpholicData);
 		}
 		catch (IOException e) {
-			throw new IllegalStateException("Cannot find " + classpath +" in JAR file.");
+			throw new IllegalStateException("Cannot find " + classpath +" in JAR file.", e);
 		}
 		m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
 		m_IsInitialized = true;
@@ -118,7 +118,7 @@ public class Lemmatizer
 	 @param word A string to remove Niqqud from
 	 @return A new word "clean" of Niqqud chars
 	*/
-	public String removeNiqqud(String word)
+	static public String removeNiqqud(String word)
 	{
 		int length = word.length();
 		StringBuilder sb = new StringBuilder(length);
