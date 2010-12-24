@@ -87,13 +87,14 @@ public class StreamLemmatizer extends Lemmatizer
 		// Used to loop over certain noise cases
 		while (true)
 		{
-			_startOffset = _tokenizer.getOffset();
 			tokenType = _tokenizer.nextToken(nextToken);
 			if (tokenType == 0)
 			{
 				return 0; // EOS
 			}
-			_endOffset = _tokenizer.getOffset();
+
+			_startOffset = _tokenizer.getOffset();
+			_endOffset = _tokenizer.getOffset() + _tokenizer.getLengthInSource();
 
 			++currentPos;
 
@@ -107,7 +108,8 @@ public class StreamLemmatizer extends Lemmatizer
 				// Ignore "words" which are actually only prefixes in a single word.
 				// This first case is easy to spot, since the prefix and the following word will be
 				// separated by a dash marked as a construct (סמיכות) by the Tokenizer
-				if (((tokenType & Tokenizer.TokenType.Construct) > 0) || ((tokenType & Tokenizer.TokenType.Acronym) > 0))
+				if (((tokenType & Tokenizer.TokenType.Construct) > 0)
+                    || ((tokenType & Tokenizer.TokenType.Acronym) > 0))
 				{
 					if (isLegalPrefix(nextToken.ref))
 					{
