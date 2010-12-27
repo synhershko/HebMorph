@@ -66,21 +66,22 @@ public class DictRadix<T> implements Iterable<T>
 	{
 		protected class MatchCandidate
 		{
-			public MatchCandidate(int _keyPos, String _word, float _score)
+			public MatchCandidate(byte _keyPos, String _word, float _score)
 			{
 				this.keyPos = _keyPos;
 				this.word = _word;
 				this.score = _score;
 			}
 
-			private int keyPos;
+			private byte keyPos;
 			private String word;
 			private float score = 1.0f;
-			public int getKeyPos()
+			
+			public byte getKeyPos()
 			{
 				return keyPos;
 			}
-			public void setKeyPos(int keyPos)
+			public void setKeyPos(byte keyPos)
 			{
 				this.keyPos = keyPos;
 			}
@@ -104,7 +105,7 @@ public class DictRadix<T> implements Iterable<T>
 
 		public TolerantLookupCrawler(DictRadix<T> _enclosingInstance, LookupTolerators.ToleranceFunction[] _tolFuncs)
 		{
-			enclosingInstance = _enclosingInstance;
+			this.enclosingInstance = _enclosingInstance;
 			this.toleranceFunctions = _tolFuncs;
 		}
 
@@ -120,7 +121,7 @@ public class DictRadix<T> implements Iterable<T>
 			{
 				key = strKey.toCharArray();
 				resultSet.clear();
-				lookupTolerantImpl(enclosingInstance.getRootNode(), new MatchCandidate(0, "", 1.0f));
+				lookupTolerantImpl(enclosingInstance.getRootNode(), new MatchCandidate((byte)0, "", 1.0f));
 			}
 			if (resultSet.size() > 0)
 			{
@@ -141,23 +142,23 @@ public class DictRadix<T> implements Iterable<T>
 			for (int childPos = 0; childPos < cur.getChildren().length; childPos++)
 			{
 				DictNode child = cur.getChildren()[childPos];
-				doKeyMatching(child, 0, mc);
+				doKeyMatching(child, (byte)0, mc);
 			}
 			//System.out.println(String.format("Completed processing node children for word %1$s", mc.Word));
 			//System.out.println("--------------------------");
 		}
 
-		private void doKeyMatching(DictNode node, int nodeKeyPos, MatchCandidate mc)
+		private void doKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc)
 		{
-			int currentKeyPos = mc.keyPos, startingNodeKeyPos = nodeKeyPos;
+			byte currentKeyPos = mc.keyPos, startingNodeKeyPos = nodeKeyPos;
 			while ((nodeKeyPos < node.getKey().length) && (currentKeyPos < key.length))
 			{
 				// toleration
 				for (LookupTolerators.ToleranceFunction tf : toleranceFunctions)
 				{
-					int tmpKeyPos = mc.keyPos;
+					byte tmpKeyPos = mc.keyPos;
 					float tmpScore = mc.getScore();
-					Reference<Integer> tempRefObject = new Reference<Integer>(tmpKeyPos);
+					Reference<Byte> tempRefObject = new Reference<Byte>(tmpKeyPos);
 					Reference<Float> tempRefObject2 = new Reference<Float>(tmpScore);
 					Integer tret = tf.tolerate(key, tempRefObject, mc.getWord(), tempRefObject2, node.getKey()[nodeKeyPos]);
 					tmpKeyPos = tempRefObject.ref;
@@ -178,7 +179,7 @@ public class DictRadix<T> implements Iterable<T>
 						}
 						else
 						{
-							doKeyMatching(node, (nodeKeyPos + tret), nmc);
+							doKeyMatching(node, (byte)(nodeKeyPos + tret), nmc);
 						}
 					}
 				}
@@ -213,12 +214,6 @@ public class DictRadix<T> implements Iterable<T>
 		}
 	}
 
-
-    private boolean  m_bAllowValueOverride = false;
-    public boolean getAllowValueOverride() { return m_bAllowValueOverride; }
-    public void setAllowValueOverride(boolean val) { m_bAllowValueOverride = val; }
-
-
 	protected DictNode m_root;
 	public DictNode getRootNode()
 	{
@@ -230,6 +225,10 @@ public class DictRadix<T> implements Iterable<T>
 	{
 		return m_nCount;
 	}
+	
+    private boolean  m_bAllowValueOverride = false;
+    public boolean getAllowValueOverride() { return m_bAllowValueOverride; }
+    public void setAllowValueOverride(boolean val) { m_bAllowValueOverride = val; }
 
 	public DictRadix()
 	{

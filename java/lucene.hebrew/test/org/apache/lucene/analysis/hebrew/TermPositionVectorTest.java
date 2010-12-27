@@ -31,7 +31,7 @@ import org.junit.Test;
  * @author kirillkh
  */
 public class TermPositionVectorTest {
-    static private final String DEFAULT_HSPELL_PATH = "../../hspell-data-files";
+    static private final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
     static String hspellPath;
 
     Analyzer analyzer;

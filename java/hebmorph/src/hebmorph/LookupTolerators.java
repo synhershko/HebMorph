@@ -52,12 +52,12 @@ public final class LookupTolerators
 
 	public interface ToleranceFunction
 	{
-		public Integer tolerate(char[] key, Reference<Integer> keyPos, String word, Reference<Float> score, char curChar);
+		public Integer tolerate(char[] key, Reference<Byte> keyPos, String word, Reference<Float> score, char curChar);
 	}
 
 	public static class TolerateEmKryiaYud implements ToleranceFunction
 	{
-		public Integer tolerate(char[] key, Reference<Integer> keyPos, String word, Reference<Float> score, char curChar)
+		public Integer tolerate(char[] key, Reference<Byte> keyPos, String word, Reference<Float> score, char curChar)
 		{
 			if (keyPos.ref == 0) // check this isn't the beginning of a word (no one misses Yud there)
 			{
@@ -133,7 +133,7 @@ public final class LookupTolerators
 	*/
 	public static class TolerateEmKryiaVav implements ToleranceFunction
 	{
-		public Integer tolerate(char[] key, Reference<Integer> keyPos, String word, Reference<Float> score, char curChar)
+		public Integer tolerate(char[] key, Reference<Byte> keyPos, String word, Reference<Float> score, char curChar)
 		{
             if ((curChar != HebrewCharacters.VAV) || // check current trie position
                     (keyPos.ref == 0) || (keyPos.ref + 1 == key.length) || // check this isn't the end or the beginning of a word (no one misses Vav there)
@@ -157,7 +157,7 @@ public final class LookupTolerators
 
 	public static class TolerateNonDoubledConsonantVav implements ToleranceFunction
 	{
-		public Integer tolerate(char[] key, Reference<Integer> keyPos, String word, Reference<Float> score, char curChar)
+		public Integer tolerate(char[] key, Reference<Byte> keyPos, String word, Reference<Float> score, char curChar)
 		{
 			// TODO: Here we apply the Academia's "ha-ktiv hasar ha-niqqud" rule of doubling
 			// a consonant waw in the middle a word, unless it's already next to a waw

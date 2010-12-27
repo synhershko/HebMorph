@@ -55,10 +55,12 @@ public class BasicHebrewTests
 	{
 	}
 
+	static private final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
+	
 	@Before
 	public void setUp() throws Exception
 	{
-		analyzer = new MorphAnalyzer();
+		analyzer = new MorphAnalyzer(DEFAULT_HSPELL_PATH);
 	}
 
 	@After
@@ -118,12 +120,13 @@ public class BasicHebrewTests
 
 	protected void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception
 	{
-		assertEquals(findInText(whatToIndex, whatToSearch),1);
+		System.out.println(whatToIndex);
+		assertEquals(1, findInText(whatToIndex, whatToSearch));
 	}
 
 	protected void assertNotFoundInText(String whatToIndex, String whatToSearch) throws Exception
 	{
-		assertEquals(findInText(whatToIndex, whatToSearch),0);
+		assertEquals(0, findInText(whatToIndex, whatToSearch));
 	}
 
 	protected int findInText(String whatToIndex, String whatToSearch) throws Exception

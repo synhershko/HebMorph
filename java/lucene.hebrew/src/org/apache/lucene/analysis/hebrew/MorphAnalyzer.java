@@ -43,7 +43,7 @@ public class MorphAnalyzer extends Analyzer
 	 useful for searching.
 
 	*/
-	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
+	public static final Set<String> STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
 
 	private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
