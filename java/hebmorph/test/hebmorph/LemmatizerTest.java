@@ -43,7 +43,7 @@ public class LemmatizerTest
     private static StreamLemmatizer m_lemmatizer;
 	
     // override default with an "hspellPath" system property or "-DhspellPath" jvm argument.
-    private static final String DEFAULT_HSPELL_PATH = "../../hspell-data-files";
+    private static final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
 	private static String hspellPath;
 	
 	@BeforeClass
