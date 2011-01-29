@@ -40,7 +40,7 @@ public class SimpleAnalyzer extends Analyzer
 	 useful for searching.
 
 	*/
-	public static final Set<String> STOP_WORDS_SET = StopFilter.makeStopSet(hebmorph.StopWords.BasicStopWordsSet);
+	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(hebmorph.StopWords.BasicStopWordsSet);
 	public static final DictRadix<Integer> PrefixTree = LingInfo.buildPrefixTree(false);
 
 	private boolean enableStopPositionIncrements = true;
