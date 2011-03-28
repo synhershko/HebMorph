@@ -9,6 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HebMorph</RootNamespace>
     <AssemblyName>HebMorph</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>HebMorph.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,6 +52,9 @@
     <Compile Include="StreamLemmatizer.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HebMorph.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
