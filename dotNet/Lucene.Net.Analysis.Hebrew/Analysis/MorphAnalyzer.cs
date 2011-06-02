@@ -54,7 +54,13 @@ namespace Lucene.Net.Analysis.Hebrew
         public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
         private bool enableStopPositionIncrements = true;
-        private HebMorph.StreamLemmatizer hebMorphLemmatizer;
+        private readonly HebMorph.StreamLemmatizer hebMorphLemmatizer;
+
+		public MorphAnalyzer(MorphAnalyzer other)
+			: base()
+		{
+			hebMorphLemmatizer = other.hebMorphLemmatizer;
+		}
 
         public MorphAnalyzer(HebMorph.StreamLemmatizer hml)
             : base()
