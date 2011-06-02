@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Lucene.Net;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Hebrew;
+using Lucene.Net.QueryParsers.Hebrew;
 using Lucene.Net.Store;
 using Lucene.Net.Index;
 using Lucene.Net.Documents;
@@ -24,7 +25,7 @@ namespace HebrewEnabledSearcher
             InitializeComponent();
         }
 
-        private string SelectProjectFolder(string descriptionText, string pathToCombine)
+        private static string SelectProjectFolder(string descriptionText, string pathToCombine)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             fbd.Description = descriptionText;
@@ -54,7 +55,7 @@ namespace HebrewEnabledSearcher
             new Tests.BasicHebrewTests(analyzer).Run();
         }
 
-        Analyzer analyzer;
+        MorphAnalyzer analyzer;
         string tempPath = System.IO.Path.GetTempPath() + "hebMorphIndex" + System.IO.Path.DirectorySeparatorChar;
 
         private void btnInitAnalyzer_Click(object sender, EventArgs e)
@@ -115,7 +116,6 @@ namespace HebrewEnabledSearcher
                     }
 
                     writer.Close();
-                    writer = null;
 
                     indexDirectory.Close();
                 }
@@ -127,8 +127,7 @@ namespace HebrewEnabledSearcher
             Directory indexDirectory = FSDirectory.Open(new System.IO.DirectoryInfo(tempPath));
             IndexSearcher searcher = new IndexSearcher(indexDirectory, true); // read-only=true
 
-            // TODO: QueryParser support for Hebrew terms (most concerning issue is with acronyms - mid-word quotes)
-            QueryParser qp = new QueryParser("content", analyzer);
+            QueryParser qp = new HebrewQueryParser(Lucene.Net.Util.Version.LUCENE_29, "content", analyzer);
             qp.SetDefaultOperator(QueryParser.Operator.AND);
             Query query = qp.Parse(txbSearchQuery.Text);
 

@@ -76,12 +76,11 @@ namespace HebMorph
             retTokens.Clear();
 
             int currentPos = 0;
-            Tokenizer.TokenType tokenType;
 
-            // Used to loop over certain noise cases
+        	// Used to loop over certain noise cases
             while (true)
             {
-                tokenType = _tokenizer.NextToken(out nextToken);
+                Tokenizer.TokenType tokenType = _tokenizer.NextToken(out nextToken);
                 if (tokenType == 0)
                     return 0; // EOS
 
@@ -145,7 +144,7 @@ namespace HebMorph
                     {
                         // TODO: Perform Gimatria test
                         // TODO: Treat an acronym as a noun and strip affixes accordingly?
-                        retTokens.Add(new HebrewToken(nextToken, 0, HebMorph.HSpell.DMask.D_ACRONYM, nextToken, 1.0f));
+                        retTokens.Add(new HebrewToken(nextToken, 0, DMask.D_ACRONYM, nextToken, 1.0f));
                     }
                     else if (TolerateWhenLemmatizingStream && retTokens.Count == 0)
                     {
