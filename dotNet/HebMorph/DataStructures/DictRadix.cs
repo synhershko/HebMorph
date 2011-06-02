@@ -29,7 +29,7 @@ namespace HebMorph.DataStructures
     {
         public class DictNode
         {
-            public char[] _Key;
+            public char[] Key;
             public T Value;
             public DictNode[] Children;
         }
@@ -94,23 +94,23 @@ namespace HebMorph.DataStructures
             private void DoKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc)
             {
                 byte currentKeyPos = mc.keyPos, startingNodeKeyPos = nodeKeyPos;
-                while (nodeKeyPos < node._Key.Length && currentKeyPos < key.Length)
+                while (nodeKeyPos < node.Key.Length && currentKeyPos < key.Length)
                 {
                     // toleration
                     foreach (ToleranceFuncDelegate tf in toleranceFunctions)
                     {
                         byte tmpKeyPos = mc.keyPos;
                         float tmpScore = mc.Score;
-                        byte? tret = tf(key, ref tmpKeyPos, mc.Word, ref tmpScore, node._Key[nodeKeyPos]);
+                        byte? tret = tf(key, ref tmpKeyPos, mc.Word, ref tmpScore, node.Key[nodeKeyPos]);
                         if (tret != null)
                         {
                             //System.Diagnostics.Trace.WriteLine(string.Format("{0} tolerated a char, attempting word {1}", tf.Method.Name, mc.Word + node._Key[nodeKeyPos]));
 
                             string consumedLetters = string.Empty;
-                            if (((byte)tret > 0) && ((byte)tret <= node._Key.Length))
-                                consumedLetters = new string(node._Key, nodeKeyPos, (byte)tret);
+                            if (((byte)tret > 0) && ((byte)tret <= node.Key.Length))
+                                consumedLetters = new string(node.Key, nodeKeyPos, (byte)tret);
                             MatchCandidate nmc = new MatchCandidate(tmpKeyPos, mc.Word + consumedLetters, tmpScore);
-                            if ((nodeKeyPos + (byte)tret) == node._Key.Length)
+                            if ((nodeKeyPos + (byte)tret) == node.Key.Length)
                                 LookupTolerantImpl(node, nmc);
                             else
                                 DoKeyMatching(node, (byte)(nodeKeyPos + (byte)tret), nmc);
@@ -118,7 +118,7 @@ namespace HebMorph.DataStructures
                     }
 
                     // standard key matching
-                    if (node._Key[nodeKeyPos] != key[currentKeyPos])
+                    if (node.Key[nodeKeyPos] != key[currentKeyPos])
                         break;
 
                     //System.Diagnostics.Trace.WriteLine(string.Format("Matched char: {0}", key[currentKeyPos]));
@@ -126,21 +126,21 @@ namespace HebMorph.DataStructures
                     nodeKeyPos++;
                 }
 
-                if (nodeKeyPos == node._Key.Length)
+                if (nodeKeyPos == node.Key.Length)
                 {
                     if (currentKeyPos == key.Length)
                     {
                         //System.Diagnostics.Trace.WriteLine(string.Format("Consumed the whole key"));
                         if (node.Value != null)
                             resultSet.Add(
-                                new LookupResult(mc.Word + new string(node._Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
+                                new LookupResult(mc.Word + new string(node.Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
                                 node.Value, mc.Score)
                                 );
                     }
                     else
                     {
                         MatchCandidate nmc = new MatchCandidate(currentKeyPos,
-                            mc.Word + new string(node._Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
+                            mc.Word + new string(node.Key, startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos),
                             mc.Score);
                         LookupTolerantImpl(node, nmc);
                     }
@@ -193,13 +193,13 @@ namespace HebMorph.DataStructures
                     
                     // Do key matching
                     n = 0;
-                    while (n < child._Key.Length && keyPos < keyLength && child._Key[n] == key[keyPos])
+                    while (n < child.Key.Length && keyPos < keyLength && child.Key[n] == key[keyPos])
                     {
                         keyPos++;
                         n++;
                     }
 
-                    if (n == child._Key.Length) // We consumed the child's key, and so far it matches our key
+                    if (n == child.Key.Length) // We consumed the child's key, and so far it matches our key
                     {
                         // We consumed both the child's key and the requested key, meaning we found the requested node
                         if (keyLength == keyPos)
@@ -274,8 +274,8 @@ namespace HebMorph.DataStructures
                     // instead of merging keys. Is this always the case?
 
                     DictNode newChild = new DictNode();
-                    newChild._Key = new char[keyLength - keyPos];
-                    Array.Copy(key, keyPos, newChild._Key, 0, newChild._Key.Length);
+                    newChild.Key = new char[keyLength - keyPos];
+                    Array.Copy(key, keyPos, newChild.Key, 0, newChild.Key.Length);
                     newChild.Value = data;
 
                     cur.Children = new DictNode[1];
@@ -295,7 +295,7 @@ namespace HebMorph.DataStructures
                     int n = 0;
 
                     // By definition, there is no such thing as a null _Key
-                    while (n < child._Key.Length && keyPos < keyLength && child._Key[n] == key[keyPos] && key[keyPos] != '\0')
+                    while (n < child.Key.Length && keyPos < keyLength && child.Key[n] == key[keyPos] && key[keyPos] != '\0')
                     {
                         keyPos++;
                         n++;
@@ -307,32 +307,32 @@ namespace HebMorph.DataStructures
                         bFoundChild = true;
 
                         // We consumed this child's key, but the key we are looking for isn't over yet
-                        if (n == child._Key.Length && keyLength > keyPos)
+                        if (n == child.Key.Length && keyLength > keyPos)
                         {
                             cur = child;
                             break;
                         }
                         // We consumed none of the keys
-                        else if (child._Key.Length > n && keyLength > keyPos)
+                        else if (child.Key.Length > n && keyLength > keyPos)
                         {
                             // split
                             DictNode bridgeChild = new DictNode();
-                            bridgeChild._Key = new char[n];
-                            Array.Copy(child._Key, 0, bridgeChild._Key, 0, n);
+                            bridgeChild.Key = new char[n];
+                            Array.Copy(child.Key, 0, bridgeChild.Key, 0, n);
 
-                            int childNewKeyLen = child._Key.Length - n;
+                            int childNewKeyLen = child.Key.Length - n;
                             char[] childNewKey = new char[childNewKeyLen];
-                            Array.Copy(child._Key, n, childNewKey, 0, childNewKeyLen);
-                            child._Key = childNewKey;
+                            Array.Copy(child.Key, n, childNewKey, 0, childNewKeyLen);
+                            child.Key = childNewKey;
 
                             bridgeChild.Children = new DictNode[2];
 
                             DictNode newNode = new DictNode();
-                            newNode._Key = new char[keyLength - keyPos];
-                            Array.Copy(key, keyPos, newNode._Key, 0, newNode._Key.Length);
+                            newNode.Key = new char[keyLength - keyPos];
+                            Array.Copy(key, keyPos, newNode.Key, 0, newNode.Key.Length);
                             newNode.Value = data;
 
-                            if (child._Key[0].CompareTo(newNode._Key[0]) < 0)
+                            if (child.Key[0].CompareTo(newNode.Key[0]) < 0)
                             {
                                 bridgeChild.Children[0] = child;
                                 bridgeChild.Children[1] = newNode;
@@ -350,17 +350,17 @@ namespace HebMorph.DataStructures
                             return;
                         }
                         // We consumed the requested key, but the there's still more chars in the child's key
-                        else if (child._Key.Length > n && keyLength == keyPos)
+                        else if (child.Key.Length > n && keyLength == keyPos)
                         {
                             // split
                             DictNode newChild = new DictNode();
-                            newChild._Key = new char[n];
-                            Array.Copy(child._Key, 0, newChild._Key, 0, n);
+                            newChild.Key = new char[n];
+                            Array.Copy(child.Key, 0, newChild.Key, 0, n);
 
-                            int childNewKeyLen = child._Key.Length - n;
+                            int childNewKeyLen = child.Key.Length - n;
                             char[] childNewKey = new char[childNewKeyLen];
-                            Array.Copy(child._Key, n, childNewKey, 0, childNewKeyLen);
-                            child._Key = childNewKey;
+                            Array.Copy(child.Key, n, childNewKey, 0, childNewKeyLen);
+                            child.Key = childNewKey;
 
                             newChild.Children = new DictNode[1];
                             newChild.Children[0] = child;
@@ -373,7 +373,7 @@ namespace HebMorph.DataStructures
                             return;
                         }
                         // We consumed both the child's key and the requested key
-                        else if (n == child._Key.Length && keyLength == keyPos)
+                        else if (n == child.Key.Length && keyLength == keyPos)
                         {
                             if (object.Equals(child.Value, default(T)))
                             {
@@ -394,15 +394,15 @@ namespace HebMorph.DataStructures
                 {
                     // Dead end - add a new child and return
                     DictNode newChild = new DictNode();
-                    newChild._Key = new char[keyLength - keyPos];
-                    Array.Copy(key, keyPos, newChild._Key, 0, newChild._Key.Length);
+                    newChild.Key = new char[keyLength - keyPos];
+                    Array.Copy(key, keyPos, newChild.Key, 0, newChild.Key.Length);
                     newChild.Value = data;
 
                     DictNode[] newArray = new DictNode[cur.Children.Length + 1];
                     int curPos = 0;
                     for (; curPos < cur.Children.Length; ++curPos)
                     {
-                        if (newChild._Key[0].CompareTo(cur.Children[curPos]._Key[0]) < 0)
+                        if (newChild.Key[0].CompareTo(cur.Children[curPos].Key[0]) < 0)
                             break;
                         newArray[curPos] = cur.Children[curPos];
                     }
@@ -453,7 +453,7 @@ namespace HebMorph.DataStructures
                     System.Text.StringBuilder sb = new System.Text.StringBuilder();
                     foreach (DictRadix<T>.DictNode dn in nodesPath)
                     {
-                        sb.Append(dn._Key);
+                        sb.Append(dn.Key);
                     }
                     return sb.ToString();
                 }
