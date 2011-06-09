@@ -85,7 +85,7 @@ namespace VisualHebMorph
             {
                 foreach (DictRadix<MorphData>.DictNode child in dn.Children)
                 {
-                    TreeNode tn = new TreeNode(string.Format("{0}{1}", prefix, new string(child._Key)));
+                    TreeNode tn = new TreeNode(string.Format("{0}{1}", prefix, new string(child.Key)));
                     tn.Tag = child;
                     if (child.Value != null) tn.BackColor = Color.LightBlue; // Mark Morphology data available
                     if (child.Children != null) tn.Nodes.Add("..."); // Mark nodes with children

@@ -19,10 +19,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Lucene.Net.Analysis.Hebrew
 {
     public class MorphAnalyzer : Analyzer
@@ -54,7 +50,13 @@ namespace Lucene.Net.Analysis.Hebrew
         public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
         private bool enableStopPositionIncrements = true;
-        private HebMorph.StreamLemmatizer hebMorphLemmatizer;
+        private readonly HebMorph.StreamLemmatizer hebMorphLemmatizer;
+
+		public MorphAnalyzer(MorphAnalyzer other)
+			: base()
+		{
+			hebMorphLemmatizer = other.hebMorphLemmatizer;
+		}
 
         public MorphAnalyzer(HebMorph.StreamLemmatizer hml)
             : base()
@@ -66,17 +68,10 @@ namespace Lucene.Net.Analysis.Hebrew
             : base()
         {
             hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
-            try
-            {
-                hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
-            }
-            catch
-            {
-                // Nothing to do really... IsInitialized will return false to indicate failure in loading
-            }
+            hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
         }
 
-        private class SavedStreams
+        protected class SavedStreams
         {
             public Tokenizer source;
             public TokenStream result;

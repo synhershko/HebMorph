@@ -1455,6 +1455,8 @@ namespace HebMorph.HSpell
         D_STARTBIT = 524288,
 
         D_ACRONYM = 1048576,
+
+		D_CUSTOM = 1073741824, // word was set by a custom external dictionary
     }
 
     [Flags]

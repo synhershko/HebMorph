@@ -38,18 +38,12 @@ namespace HebMorph
         {
         }
 
-        public Lemmatizer(string hspellPath, bool loadMorpholicalData, bool allowHeHasheela)
-        {
-            try
-            {
-                InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
-            }
-            catch {
-                // Nothing to do really... m_IsInitialized will remain false to indicate failure in loading
-            }
-        }
+		public Lemmatizer(string hspellPath, bool loadMorpholicalData, bool allowHeHasheela)
+		{
+			InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
+		}
 
-        public void InitFromHSpellFolder(string path, bool loadMorpholicalData, bool allowHeHasheela)
+    	public void InitFromHSpellFolder(string path, bool loadMorpholicalData, bool allowHeHasheela)
         {
             m_dict = HSpell.Loader.LoadDictionaryFromHSpellFolder(path, loadMorpholicalData);
             m_prefixes = HebMorph.HSpell.LingInfo.BuildPrefixTree(allowHeHasheela);

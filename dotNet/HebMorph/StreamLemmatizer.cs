@@ -20,8 +20,10 @@
  ***************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using HebMorph.HSpell;
 
 namespace HebMorph
 {
@@ -76,12 +78,11 @@ namespace HebMorph
             retTokens.Clear();
 
             int currentPos = 0;
-            Tokenizer.TokenType tokenType;
 
-            // Used to loop over certain noise cases
+        	// Used to loop over certain noise cases
             while (true)
             {
-                tokenType = _tokenizer.NextToken(out nextToken);
+                Tokenizer.TokenType tokenType = _tokenizer.NextToken(out nextToken);
                 if (tokenType == 0)
                     return 0; // EOS
 
@@ -126,7 +127,16 @@ namespace HebMorph
                     // TODO: Perhaps by easily identifying the prefixes above we can also rule out some of the
                     // stem ambiguities retreived later...
 
-                    IList<HebrewToken> lemmas = Lemmatize(nextToken);
+					// Support for external dictionaries, for preventing OOV words or providing synonyms
+                	string correctedWord = LookupWordCorrection(nextToken);
+					if (!string.IsNullOrEmpty(correctedWord))
+					{
+						retTokens.Add(new HebrewToken(correctedWord, 0, DMask.D_CUSTOM, correctedWord, 1.0f));
+						nextToken = correctedWord;
+						break;
+					}
+
+                	IList<HebrewToken> lemmas = Lemmatize(nextToken);
 
                     if (lemmas != null && lemmas.Count > 0)
                     {
@@ -145,7 +155,7 @@ namespace HebMorph
                     {
                         // TODO: Perform Gimatria test
                         // TODO: Treat an acronym as a noun and strip affixes accordingly?
-                        retTokens.Add(new HebrewToken(nextToken, 0, HebMorph.HSpell.DMask.D_ACRONYM, nextToken, 1.0f));
+                        retTokens.Add(new HebrewToken(nextToken, 0, DMask.D_ACRONYM, nextToken, 1.0f));
                     }
                     else if (TolerateWhenLemmatizingStream && retTokens.Count == 0)
                     {
@@ -180,5 +190,10 @@ namespace HebMorph
 
             return currentPos;
         }
+
+		protected virtual string LookupWordCorrection(string word)
+		{
+			return null;
+		}
     }
 }

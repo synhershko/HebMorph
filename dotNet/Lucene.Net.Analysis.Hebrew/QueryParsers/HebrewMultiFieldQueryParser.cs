@@ -15,14 +15,11 @@
  * limitations under the License.
  */
 
+using Lucene.Net.Search;
+using Lucene.Net.Analysis;
+
 namespace Lucene.Net.QueryParsers.Hebrew
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using Lucene.Net.Search;
-    using Lucene.Net.Analysis;
-
     public class HebrewMultiFieldQueryParser : MultiFieldQueryParser
     {
         HebrewMultiFieldQueryParser(Lucene.Net.Util.Version matchVersion, string[] fields, Analyzer analyzer)
@@ -94,7 +91,35 @@ namespace Lucene.Net.QueryParsers.Hebrew
             return bQuery;
         }
 
-        /// <summary> Parses a query which searches on the fields specified.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="matchVersion"></param>
+		/// <param name="query"></param>
+		/// <param name="fields"></param>
+		/// <param name="flags"></param>
+		/// <param name="analyzer"></param>
+		/// <param name="defaultOperator"></param>
+		/// <returns></returns>
+		public static Query Parse(Lucene.Net.Util.Version matchVersion, string query, string[] fields, BooleanClause.Occur[] flags, Analyzer analyzer, Operator defaultOperator)
+		{
+			if (fields.Length > flags.Length)
+				throw new System.ArgumentException("fields.length != flags.length");
+			BooleanQuery bQuery = new BooleanQuery();
+			for (int i = 0; i < fields.Length; i++)
+			{
+				QueryParser qp = new HebrewQueryParser(matchVersion, fields[i], analyzer);
+				qp.SetDefaultOperator(defaultOperator);
+				Query q = qp.Parse(query);
+				if (q != null && (!(q is BooleanQuery) || ((BooleanQuery) q).GetClauses().Length > 0))
+				{
+					bQuery.Add(q, flags[i]);
+				}
+			}
+			return bQuery;
+		}
+
+    	/// <summary> Parses a query which searches on the fields specified.
         /// <p/>
         /// If x fields are specified, this effectively constructs:
         /// 

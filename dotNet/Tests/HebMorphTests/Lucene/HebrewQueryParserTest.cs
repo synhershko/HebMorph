@@ -30,7 +30,7 @@ namespace HebMorph.Lucene.Tests
                 qp.Parse(@"""צה""ל");
                 Assert.Fail("Expected exception was not thrown");
             }
-            catch(ParseException ex) { }
+            catch(ParseException) { }
         }
     }
 }

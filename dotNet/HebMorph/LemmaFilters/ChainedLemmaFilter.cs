@@ -26,8 +26,8 @@ namespace HebMorph.LemmaFilters
 
     public class ChainedLemmaFilter : LemmaFilterBase
     {
-        public LinkedList<LemmaFilterBase> Filters { get { return _filters; } }
-        protected LinkedList<LemmaFilterBase> _filters = new LinkedList<LemmaFilterBase>();
+        public LinkedList<LemmaFilterBase> Filters { get { return filtersList; } }
+        protected LinkedList<LemmaFilterBase> filtersList = new LinkedList<LemmaFilterBase>();
 
         public override IList<Token> FilterCollection(IList<Token> collection, IList<Token> preallocatedOut)
         {
@@ -37,7 +37,7 @@ namespace HebMorph.LemmaFilters
                 preallocatedOut.Clear();
 
             bool filteringWasRequired = false;
-            LinkedList<LemmaFilterBase>.Enumerator en = _filters.GetEnumerator();
+            LinkedList<LemmaFilterBase>.Enumerator en = filtersList.GetEnumerator();
             while (en.MoveNext())
             {
                 LemmaFilterBase filter = en.Current;
