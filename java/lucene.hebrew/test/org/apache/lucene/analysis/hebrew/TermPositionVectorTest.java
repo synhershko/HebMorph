@@ -26,14 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- * @author kirillkh
- */
 public class TermPositionVectorTest {
-    static private final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
-    static String hspellPath;
-
     Analyzer analyzer;
     Directory indexDirectory;
     IndexSearcher searcher;
@@ -42,8 +35,7 @@ public class TermPositionVectorTest {
 	@Before
 	public void setUp() throws Exception
 	{
-        hspellPath = DEFAULT_HSPELL_PATH;
-		analyzer = new MorphAnalyzer(hspellPath);
+		analyzer = new MorphAnalyzer();
 	}
 
 	@After
@@ -54,7 +46,7 @@ public class TermPositionVectorTest {
 	@Test
 	public void storesPositionCorrectly() throws Exception
 	{
-        analyzer = new MorphAnalyzer(hspellPath);
+        analyzer = new MorphAnalyzer();
         indexDirectory = new RAMDirectory();
 
         IndexWriter writer = new IndexWriter(indexDirectory, analyzer, true, new IndexWriter.MaxFieldLength(Integer.MAX_VALUE));

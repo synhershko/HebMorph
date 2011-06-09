@@ -1,12 +1,12 @@
 package hebmorph.hspell;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 public class HspellData {
@@ -23,20 +23,20 @@ public class HspellData {
 	private final InputStream fdict;
 	private final int lookupLen;
 	
-	HspellData(String path) throws FileNotFoundException, IOException {		
-		if (path.charAt(path.length() - 1) != File.separatorChar)
+	HspellData(String url) throws FileNotFoundException, IOException {
+		if (url.charAt(url.length() - 1) != '/')
 		{
-			path += File.separatorChar;
+			url += '/';
 		}
 
 		
-		fdesc = new GZIPInputStream(getResourceStream(path + descFile));
-		fstem = new GZIPInputStream(getResourceStream(path + stemsFile));
-		fprefixes = new GZIPInputStream(getResourceStream(path + prefixesFile));
-		fdict = new GZIPInputStream(getResourceStream(path + dictionaryFile));
+		fdesc = getGzipStream(url, descFile);
+		fstem = getGzipStream(url, stemsFile);
+		fprefixes = getGzipStream(url, prefixesFile);
+		fdict = getGzipStream(url, dictionaryFile);
 		
 		// Load the count of morphologic data slots required
-		InputStream sizesStream = getResourceStream(path + sizesFile);
+		InputStream sizesStream = getResourceStream(url, sizesFile);
 		try {
 			String sizes = convertInputStreamToString(sizesStream);
 			int index = sizes.indexOf(' ', sizes.indexOf('\n'));
@@ -47,19 +47,16 @@ public class HspellData {
 		}
 	}
 
-	private static InputStream getResourceStream(String filepath) throws FileNotFoundException {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		String classpath = filepath.replace(File.separatorChar, '/');
-		InputStream stream = classLoader.getResourceAsStream(classpath);
-		if (stream == null) {
-			try {
-				stream = new FileInputStream(filepath);
-			}
-			catch (FileNotFoundException e) {
-				throw new FileNotFoundException("Cannot find " + classpath + " in classpath nor in " + new File(filepath).getAbsolutePath()); 
-			}
-		}
-		return stream;
+    private static InputStream getGzipStream(String baseUrl, String file) throws IOException {
+        return new GZIPInputStream(getResourceStream(baseUrl, file));
+    }
+
+	private static InputStream getResourceStream(String baseUrl, String file) throws IOException {
+        try {
+            return new URL(baseUrl + file).openStream();
+        } catch (MalformedURLException ex) {
+            throw new IOException("Invalid URL supplied", ex);
+        }
 	}
 	
 	void close() throws IOException {

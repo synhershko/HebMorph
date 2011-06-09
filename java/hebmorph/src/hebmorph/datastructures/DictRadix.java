@@ -214,6 +214,7 @@ public class DictRadix<T> implements Iterable<T>
 		}
 	}
 
+
 	protected DictNode m_root;
 	public DictNode getRootNode()
 	{
