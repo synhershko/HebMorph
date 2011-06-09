@@ -25,46 +25,17 @@ import hebmorph.datastructures.DictRadix;
 import hebmorph.datastructures.RealSortedList;
 import hebmorph.datastructures.RealSortedList.SortOrder;
 import hebmorph.hspell.LingInfo;
-import hebmorph.hspell.Loader;
-import java.io.IOException;
 import java.util.List;
 
 public class Lemmatizer
 {
 	private DictRadix<MorphData> m_dict;
 	private DictRadix<Integer> m_prefixes;
-	private boolean m_IsInitialized = false;
-	public boolean getIsInitialized()
-	{
-		return m_IsInitialized;
-	}
 
-	public Lemmatizer()
+	public Lemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela)
 	{
-	}
-
-	public Lemmatizer(String hspellPath, boolean loadMorpholicData, boolean allowHeHasheela) throws IOException
-	{
-		initFromHSpellFolder(hspellPath, loadMorpholicData, allowHeHasheela);
-	}
-
-	public void initFromHSpellFolder(String path, boolean loadMorpholicData, boolean allowHeHasheela) throws IOException
-	{
-		m_dict = Loader.loadDictionaryFromHSpellFolder(path, loadMorpholicData);
+        m_dict = dict;
 		m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
-		m_IsInitialized = true;
-	}
-	
-	public void initFromHSpellClasspath(String classpath, boolean loadMorpholicData, boolean allowHeHasheela)
-	{
-		try {
-			m_dict = Loader.loadDictionaryFromHSpellFolder(classpath, loadMorpholicData);
-		}
-		catch (IOException e) {
-			throw new IllegalStateException("Cannot find " + classpath +" in JAR file.", e);
-		}
-		m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
-		m_IsInitialized = true;
 	}
 
 	public boolean isLegalPrefix(String str)

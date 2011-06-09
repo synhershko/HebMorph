@@ -23,21 +23,19 @@ package hebmorph.hspell;
 
 import hebmorph.MorphData;
 import hebmorph.datastructures.DictRadix;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.net.URL;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 
 
 public class Loader
 {
+	public static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
+
 
 	private static class MorphDataLoader// implements IDisposable
 	{
@@ -102,14 +100,27 @@ public class Loader
 		}
 	}
 
-		
-	public static DictRadix<MorphData> loadDictionaryFromHSpellFolder(String path, boolean bLoadMorphData) throws IOException {
-		HspellData hspell = new HspellData(path);
+
+    public static DictRadix<MorphData> loadDictionaryFromDefaultClasspath(boolean bLoadMorphData) throws IOException {
+        return loadDictionaryFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH, bLoadMorphData);
+    }
+
+    public static DictRadix<MorphData> loadDictionaryFromClasspath(String pathInClasspath, boolean bLoadMorphData) throws IOException {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        URL url = cl.getResource(pathInClasspath);
+        if(url == null)
+            throw new FileNotFoundException("Cannot find '" + pathInClasspath + "' in classpath.");
+        return loadDictionaryFromUrl(url.toString(), bLoadMorphData);
+    }
+
+    
+	public static DictRadix<MorphData> loadDictionaryFromUrl(String url, boolean bLoadMorphData) throws IOException {
+		HspellData hspell = new HspellData(url);
 		try {
 			return loadDictionaryFromHSpellData(hspell, bLoadMorphData);
 		}
 		finally {
-			hspell.close();
+            hspell.close();
 		}
 	}
 	

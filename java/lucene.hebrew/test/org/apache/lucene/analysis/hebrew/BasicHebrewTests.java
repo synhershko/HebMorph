@@ -55,12 +55,10 @@ public class BasicHebrewTests
 	{
 	}
 
-	static private final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
-	
 	@Before
 	public void setUp() throws Exception
 	{
-		analyzer = new MorphAnalyzer(DEFAULT_HSPELL_PATH);
+		analyzer = new MorphAnalyzer();
 	}
 
 	@After

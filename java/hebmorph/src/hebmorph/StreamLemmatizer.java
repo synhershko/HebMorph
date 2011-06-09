@@ -21,6 +21,7 @@
  **************************************************************************/
 package hebmorph;
 
+import hebmorph.datastructures.DictRadix;
 import hebmorph.hspell.Constants.DMask;
 import java.io.IOException;
 import java.io.Reader;
@@ -31,29 +32,18 @@ public class StreamLemmatizer extends Lemmatizer
 {
 	private Tokenizer _tokenizer;
 
-	public StreamLemmatizer()
+	public StreamLemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela)
 	{
-		super();
+		super(dict, allowHeHasheela);
 	}
 
-	public StreamLemmatizer(Reader input)
+	public StreamLemmatizer(Reader input, DictRadix<MorphData> dict, boolean allowHeHasheela)
 	{
-		super();
+		super(dict, allowHeHasheela);
 		_tokenizer = new Tokenizer(input);
 	}
 
-	public StreamLemmatizer(String hspellPath, boolean loadMorphologicalData, boolean allowHeHasheela) throws IOException
-	{
-		super(hspellPath, loadMorphologicalData, allowHeHasheela);
-	}
-
-	public StreamLemmatizer(Reader input, String hspellPath, boolean loadMorphologicalData, boolean allowHeHasheela)throws IOException
-	{
-		super(hspellPath, loadMorphologicalData, allowHeHasheela);
-		_tokenizer = new Tokenizer(input);
-	}
-
-	public void SetStream(Reader input)
+	public void setStream(Reader input)
 	{
 		if (_tokenizer == null)
 		{

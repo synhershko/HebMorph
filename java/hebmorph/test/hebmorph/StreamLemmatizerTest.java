@@ -11,20 +11,14 @@ import static org.junit.Assert.*;
 
 public class StreamLemmatizerTest
 {
-    private static final String DEFAULT_HSPELL_PATH = "../../hspell-data-files";
-    static String hspellPath;
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
 	{
-		hspellPath = System.getProperty("hspellPath",DEFAULT_HSPELL_PATH);
 	}
 
     @Before
     public void SetUp()
     {
-        if(hspellPath == null)
-            hspellPath = DEFAULT_HSPELL_PATH;
     }
 
     @Test
@@ -35,7 +29,9 @@ public class StreamLemmatizerTest
         {
             input += "test test test test ";
         }
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input));
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input),
+                                                   // dict is not used in this test
+                                                   null , true);
 
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
