@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace HebMorph
 {
@@ -79,10 +78,10 @@ namespace HebMorph
         public int LengthInSource { get { return tokenLengthInSource; } }
 
         private const int IO_BUFFER_SIZE = 4096;
-        private char[] ioBuffer = new char[IO_BUFFER_SIZE];
+        private readonly char[] ioBuffer = new char[IO_BUFFER_SIZE];
         private int ioBufferIndex = 0;
 
-        private char[] wordBuffer = new char[HSpell.Constants.MaxWordLength];
+        private readonly char[] wordBuffer = new char[HSpell.Constants.MaxWordLength];
 
         public Tokenizer(System.IO.TextReader _input)
         {
@@ -98,26 +97,24 @@ namespace HebMorph
             TokenType tokenType = 0;
             while (true)
             {
-                if (ioBufferIndex >= dataLen)
-                {
-                    inputOffset += dataLen;
-                    dataLen = input.Read((System.Char[])ioBuffer, 0, ioBuffer.Length);
-                    if (dataLen <= 0)
-                    {
-                        dataLen = 0; // so next offset += dataLen won't decrement offset
-                        if (length > 0)
-                            break;
-                        else
-                        {
-                            tokenString = string.Empty;
-                            tokenLengthInSource = 0;
-                            return 0;
-                        }
-                    }
-                    ioBufferIndex = 0;
-                }
+				if (ioBufferIndex >= dataLen)
+				{
+					inputOffset += dataLen;
+					dataLen = input.Read(ioBuffer, 0, ioBuffer.Length);
+					if (dataLen <= 0)
+					{
+						dataLen = 0; // so next offset += dataLen won't decrement offset
+						if (length > 0)
+							break;
 
-                char c = ioBuffer[ioBufferIndex++];
+						tokenString = string.Empty;
+						tokenLengthInSource = 0;
+						return 0;
+					}
+					ioBufferIndex = 0;
+				}
+
+            	char c = ioBuffer[ioBufferIndex++];
                 bool appendCurrentChar = false;
 
                 // In case we already consumed at least one char, and started a non-Hebrew token.
@@ -131,7 +128,7 @@ namespace HebMorph
                         --ioBufferIndex;
                         break;
                     }
-                    else if (System.Char.IsLetterOrDigit(c))// TODO: break to prevent mixing of non-Hebrew and digits as well?
+                    else if (Char.IsLetterOrDigit(c))// TODO: break to prevent mixing of non-Hebrew and digits as well?
                     {
                         appendCurrentChar = true;
                     }
@@ -143,7 +140,7 @@ namespace HebMorph
                     tokenType |= TokenType.Hebrew;
                     appendCurrentChar = true;
                 }
-                else if (System.Char.IsLetterOrDigit(c))
+                else if (Char.IsLetterOrDigit(c))
                 {
                     // If met while consuming a Hebrew word, we return the current word (no such thing as mixed words)
                     if (length > 0 && (tokenType & TokenType.Hebrew) > 0)
@@ -153,7 +150,7 @@ namespace HebMorph
                     }
 
                     tokenType |= TokenType.NonHebrew;
-                    if (System.Char.IsDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
+                    if (Char.IsDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
                         tokenType |= TokenType.Numeric;
 
                     appendCurrentChar = true;
