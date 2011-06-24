@@ -33,8 +33,13 @@ namespace Lucene.Net.Analysis.Hebrew
         public static readonly System.Collections.Hashtable STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
         public static readonly HebMorph.DataStructures.DictRadix<int> PrefixTree = HebMorph.HSpell.LingInfo.BuildPrefixTree(false);
 
-        private bool enableStopPositionIncrements = true;
-        private Dictionary<string, char[]> suffixByTokenType = null;
+        protected bool enableStopPositionIncrements = true;
+        protected Dictionary<string, char[]> suffixByTokenType = null;
+
+    	public SimpleAnalyzer()
+    	{
+			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
+    	}
 
         public void RegisterSuffix(String tokenType, String suffix)
         {
@@ -55,6 +60,13 @@ namespace Lucene.Net.Analysis.Hebrew
 
         public override TokenStream ReusableTokenStream(string fieldName, System.IO.TextReader reader)
         {
+			if (overridesTokenStreamMethod)
+			{
+				// LUCENE-1678: force fallback to tokenStream() if we
+				// have been subclassed and that subclass overrides
+				// tokenStream but not reusableTokenStream
+				return TokenStream(fieldName, reader);
+			}
             SavedStreams streams = GetPreviousTokenStream() as SavedStreams;
             if (streams == null)
             {

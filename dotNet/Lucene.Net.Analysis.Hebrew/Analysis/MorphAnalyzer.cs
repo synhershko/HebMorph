@@ -56,12 +56,14 @@ namespace Lucene.Net.Analysis.Hebrew
 			: base()
 		{
 			hebMorphLemmatizer = other.hebMorphLemmatizer;
+			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
 		}
 
         public MorphAnalyzer(HebMorph.StreamLemmatizer hml)
             : base()
         {
             hebMorphLemmatizer = hml;
+			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
         }
 
         public MorphAnalyzer(string HSpellDataFilesPath)
@@ -69,6 +71,7 @@ namespace Lucene.Net.Analysis.Hebrew
         {
             hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
             hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
+			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
         }
 
         protected class SavedStreams
