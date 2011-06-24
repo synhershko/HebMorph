@@ -79,18 +79,24 @@ namespace Lucene.Net.Analysis.Hebrew
 
         public override TokenStream ReusableTokenStream(string fieldName, System.IO.TextReader reader)
         {
+			if (overridesTokenStreamMethod)
+			{
+				// LUCENE-1678: force fallback to tokenStream() if we
+				// have been subclassed and that subclass overrides
+				// tokenStream but not reusableTokenStream
+				return TokenStream(fieldName, reader);
+			}
             SavedStreams streams = GetPreviousTokenStream() as SavedStreams;
             if (streams == null)
             {
                 streams = new SavedStreams();
+				SetPreviousTokenStream(streams);
                 streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer,
                     lemmaFilter, alwaysSaveMarkedOriginal);
 
                 // This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
                 // all by itself
                 streams.result = new StopFilter(enableStopPositionIncrements, streams.source, STOP_WORDS_SET);
-
-                SetPreviousTokenStream(streams);
             }
             else
             {
