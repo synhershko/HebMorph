@@ -80,6 +80,7 @@ namespace Lucene.Net.Analysis.Hebrew
             typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
             //payAtt = (PayloadAttribute)AddAttribute(typeof(PayloadAttribute));
 
+        	this.input = input;
             this._streamLemmatizer = _lemmatizer;
             this._streamLemmatizer.SetStream(input);
             this.alwaysSaveMarkedOriginal = AlwaysSaveMarkedOriginal;

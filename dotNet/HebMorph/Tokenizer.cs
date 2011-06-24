@@ -68,7 +68,7 @@ namespace HebMorph
         }
 
         private System.IO.TextReader input;
-        private int dataLen = 0, inputOffset = 0;
+        private int dataLen, inputOffset;
         
         /// Both are necessary since the tokenizer does some normalization when necessary, and therefore
         /// it isn't always possible to get correct end-offset by looking at the length of the returned token

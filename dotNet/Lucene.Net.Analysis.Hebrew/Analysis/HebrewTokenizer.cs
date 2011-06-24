@@ -61,8 +61,9 @@ namespace Lucene.Net.Analysis.Hebrew
             offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
             //posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
             typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
-            this.hebMorphTokenizer = new HebMorph.Tokenizer(_input);
-            this.prefixesTree = _prefixesTree;
+        	input = _input;
+            hebMorphTokenizer = new HebMorph.Tokenizer(_input);
+            prefixesTree = _prefixesTree;
         }
         #endregion
 
