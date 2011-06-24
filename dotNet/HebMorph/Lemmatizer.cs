@@ -19,7 +19,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -128,14 +127,13 @@ namespace HebMorph
             }
 
             byte prefLen = 0;
-            int prefixMask;
-            while (true)
+        	while (true)
             {
                 // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
                 if (word.Length - prefLen < 2)
                     break;
 
-                prefixMask = m_prefixes.Lookup(word.Substring(0, ++prefLen));
+                int prefixMask = m_prefixes.Lookup(word.Substring(0, ++prefLen));
                 if (prefixMask == 0) // no such prefix
                     break;
 
@@ -150,9 +148,7 @@ namespace HebMorph
                 }
             }
 
-            if (ret.Count > 0)
-                return ret;
-            return null;
+            return ret;
         }
 
         public IList<HebrewToken> LemmatizeTolerant(string word)
@@ -161,10 +157,7 @@ namespace HebMorph
 
             RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
-            byte prefLen = 0;
-            int prefixMask;
-
-            List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.LookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+        	List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.LookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
             if (tolerated != null)
             {
                 foreach (DictRadix<MorphData>.LookupResult lr in tolerated)
@@ -176,14 +169,14 @@ namespace HebMorph
                 }
             }
 
-            prefLen = 0;
+            byte prefLen = 0;
             while (true)
             {
                 // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
                 if (word.Length - prefLen < 2)
                     break;
 
-                prefixMask = m_prefixes.Lookup(word.Substring(0, ++prefLen));
+                int prefixMask = m_prefixes.Lookup(word.Substring(0, ++prefLen));
                 if (prefixMask == 0) // no such prefix
                     break;
 
@@ -201,9 +194,7 @@ namespace HebMorph
                 }
             }
 
-            if (ret.Count > 0)
-                return ret;
-            return null;
+			return ret;
         }
     }
 }

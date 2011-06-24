@@ -137,8 +137,7 @@ namespace HebMorph
 					}
 
                 	IList<HebrewToken> lemmas = Lemmatize(nextToken);
-
-                    if (lemmas != null && lemmas.Count > 0)
+                    if (lemmas.Count > 0)
                     {
                         // TODO: Filter Stop Words based on morphological data (hspell 'x' identification)
                         // TODO: Check for worthy lemmas, if there are none then perform tolerant lookup and check again...
@@ -160,7 +159,7 @@ namespace HebMorph
                     else if (TolerateWhenLemmatizingStream && retTokens.Count == 0)
                     {
                         lemmas = LemmatizeTolerant(nextToken);
-                        if (lemmas != null && lemmas.Count > 0)
+                        if (lemmas.Count > 0)
                         {
                             // TODO: Keep only worthy lemmas, based on characteristics and score / confidence
 
