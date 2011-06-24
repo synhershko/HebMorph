@@ -1,45 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using HebMorph.Tests;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Lucene.Net.Documents;
-
 using Lucene.Net.Analysis.Hebrew;
 using Lucene.Net.Analysis;
-
 using Lucene.Net.Search;
-
-using Lucene.Net.Search.Spans;
-using Lucene.Net.QueryParsers;
 using Lucene.Net.QueryParsers.Hebrew;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
 
 namespace HebMorph.Lucene.Tests
 {
     [TestClass()]
-    public class TermPositionVectorTest
+    public class TermPositionVectorTest : TestBase
     {
-        static string hspellPath;
-
         Analyzer analyzer;
         Directory indexDirectory;
         IndexSearcher searcher;
-
-        [TestInitialize()]
-        public void SetUp()
-        {
-            string path = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
-            int loc = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + "dotNet" + System.IO.Path.DirectorySeparatorChar);
-            if (loc > -1)
-            {
-                path = path.Remove(loc + 1);
-                hspellPath = System.IO.Path.Combine(path, "hspell-data-files" + System.IO.Path.DirectorySeparatorChar);
-            }
-        }
 
         [TestMethod()]
         public void StoresPositionCorrectly()
@@ -47,7 +23,7 @@ namespace HebMorph.Lucene.Tests
             analyzer = new MorphAnalyzer(hspellPath);
             indexDirectory = new RAMDirectory();
             
-            IndexWriter writer = new IndexWriter(indexDirectory, analyzer, true, new IndexWriter.MaxFieldLength(int.MaxValue));
+            IndexWriter writer = new IndexWriter(indexDirectory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             string str = "קשת רשת דבשת מיץ יבשת יבלת גחלת גדר אינציקלופדיה חבר";
             Document doc = new Document();
@@ -102,7 +78,7 @@ namespace HebMorph.Lucene.Tests
             }
         }
 
-        private void AssertSinglePositionExists(int[] positions, int pos)
+        private static void AssertSinglePositionExists(int[] positions, int pos)
         {
             Assert.AreEqual<int>(1, positions.Length);
             Assert.AreEqual<int>(pos, positions[0]);
