@@ -5,11 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0E8A4BB0-7712-4493-AF9B-E58D3E3CFB88}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{EF21A9E0-8FEE-43CD-8D60-B3696E033FED}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HebrewEnabledSearcher</RootNamespace>
-    <AssemblyName>HebrewEnabledSearcher</AssemblyName>
+    <RootNamespace>HebMorph</RootNamespace>
+    <AssemblyName>HebMorph</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>HebMorph.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -36,7 +38,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -53,60 +55,29 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusyObject.cs" />
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="HebrewToken.cs" />
+    <Compile Include="LemmaFilters\BasicLemmaFilter.cs" />
+    <Compile Include="LemmaFilters\ChainedLemmaFilter.cs" />
+    <Compile Include="LemmaFilters\LemmaFilterBase.cs" />
+    <Compile Include="LookupTolerators.cs" />
+    <Compile Include="MorphData.cs" />
+    <Compile Include="StopWords.cs" />
+    <Compile Include="HSpell\Loader.cs" />
+    <Compile Include="DataStructures\DictRadix.cs" />
+    <Compile Include="HSpell\Constants.cs" />
+    <Compile Include="HSpell\LingInfo.cs" />
+    <Compile Include="Lemmatizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="MainForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="SearchResult.cs" />
-    <Compile Include="Tests\BasicHebrewTests.cs" />
+    <Compile Include="DataStructures\RealSortedList.cs" />
+    <Compile Include="StreamLemmatizer.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Tokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\Dev\Libraries\Lucene.Net\trunk\C#\src\Lucene.Net\Lucene.Net.csproj">
-      <Project>{5D4AD9BE-1FFB-41AB-9943-25737971BF57}</Project>
-      <Name>Lucene.Net</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\HebMorph\HebMorph.csproj">
-      <Project>{EF21A9E0-8FEE-43CD-8D60-B3696E033FED}</Project>
-      <Name>HebMorph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Lucene.Net.Analysis.Hebrew\Lucene.Net.Hebrew.csproj">
-      <Project>{53318212-385E-457B-8E5F-DDB117032A86}</Project>
-      <Name>Lucene.Net.Hebrew</Name>
-    </ProjectReference>
+    <None Include="HebMorph.snk" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -133,4 +104,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>
