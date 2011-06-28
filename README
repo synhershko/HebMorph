@@ -1,21 +1,11 @@
-This is an open-source effort for making Hebrew properly searchable by various IR software libraries, while maintaining decent recall, precision and relevancy in retrievals. All code and files are released under the GNU General Public License version 2.
+This is an open-source effort for making Hebrew properly searchable by various IR software libraries, while maintaining decent recall, precision and relevancy in retrievals. All code and files are released under the GNU Affero General Public License version 3.
 
-HebMorph is copyright (C) 2010, Itamar Syn-Hershko.
-HebMorph currently relies on Hspell, copyright (C) 2000-2010, Nadav Har'El and Dan Kenigsberg (http://hspell.ivrix.org.il/).
+HebMorph is copyright (C) 2010-2011, Itamar Syn-Hershko.
+HebMorph currently relies on Hspell, copyright (C) 2000-2011, Nadav Har'El and Dan Kenigsberg (http://hspell.ivrix.org.il/).
 
-/*************************
-
-NOTE: HebMorph is looking for a better name, as it is not just a morphological tool, but rather an umbrella project of a much wider mission.
-
-**************************/
-
-It is released to the public licensed under the GNU General Public License
-(GPL). See the COPYING file included in this distribution for the whole text
-of the GNU General Public License version 2. Note that not only the programs in the distribution, but also the
-dictionary files and the generated word lists, are licensed under the GPL.
+It is released to the public licensed under the GNU Affero General Public License v3. See the LICENSE file included in this distribution. Note that not only the programs in the distribution, but also the
+dictionary files and the generated word lists, are licensed under the AGPL.
 There is no warranty of any kind for the contents of this distribution.
-
-This code should be considered as pre-alpha, and is likely to change dramatically in the next few weeks / months.
 
 The first code release includes:
 -=-=-=-=-=-=-=-=-=-=-=-=-=
