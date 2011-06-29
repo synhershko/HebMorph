@@ -23,6 +23,7 @@ package hebmorph;
 
 import static org.junit.Assert.fail;
 import hebmorph.datastructures.DictRadix;
+import hebmorph.hspell.Loader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class LemmatizerTest
     private static StreamLemmatizer m_lemmatizer;
 	
     // override default with an "hspellPath" system property or "-DhspellPath" jvm argument.
-    private static final String DEFAULT_HSPELL_PATH = "../hspell-data-files";
+    private static final String DEFAULT_HSPELL_PATH = "hspell-data-files";
 	private static String hspellPath;
 	
 	@BeforeClass
@@ -83,8 +84,8 @@ public class LemmatizerTest
 		//StringReader reader = new StringReader("להישרדות בהישרדות ההישרדות מהישרדות ניסיון הניסיון הביטוח  בביטוח לביטוח שביטוח מביטוחים");
 		int expectedNumberOfNonHebrewWords = 0;
 		StringReader reader = new StringReader(text);
-		m_lemmatizer = new StreamLemmatizer(reader);
-        m_lemmatizer.initFromHSpellFolder(hspellPath, true, false);
+        DictRadix<MorphData> dict = Loader.loadDictionaryFromDefaultClasspath(true);
+		m_lemmatizer = new StreamLemmatizer(reader, dict, false);
 
         String word = "";
         List<Token> tokens = new ArrayList<Token>();

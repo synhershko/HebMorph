@@ -85,7 +85,7 @@ public class StreamLemmasFilter extends Tokenizer
 		//payAtt = (PayloadAttribute)AddAttribute(typeof(PayloadAttribute));
 
 		_streamLemmatizer = _lemmatizer;
-		_streamLemmatizer.SetStream(input);
+		_streamLemmatizer.setStream(input);
 		this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
 		lemmaFilter = _lemmaFilter;
 	}
@@ -258,6 +258,6 @@ public class StreamLemmasFilter extends Tokenizer
 		super.reset(input);
 		stack.clear();
 		index = 0;
-		_streamLemmatizer.SetStream(input);
+		_streamLemmatizer.setStream(input);
 	}
 }
