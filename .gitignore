@@ -11,3 +11,4 @@ bin
 *.suo
 ~$*
 *.user
+dotnet/packages/*
