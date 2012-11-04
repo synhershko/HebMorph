@@ -26,7 +26,7 @@ namespace Lucene.Net.Analysis.Hebrew
         /// <summary>An unmodifiable set containing some common Hebrew words that are usually not
         /// useful for searching.
         /// </summary>
-        public static readonly System.Collections.Hashtable STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
+        public static readonly System.Collections.Generic.ISet<string> STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
 
         /// <summary>
         /// Set to true to mark tokens with a $ prefix also when there is only one lemma returned
@@ -56,14 +56,14 @@ namespace Lucene.Net.Analysis.Hebrew
 			: base()
 		{
 			hebMorphLemmatizer = other.hebMorphLemmatizer;
-			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
+			SetOverridesTokenStreamMethod<MorphAnalyzer>();
 		}
 
         public MorphAnalyzer(HebMorph.StreamLemmatizer hml)
             : base()
         {
             hebMorphLemmatizer = hml;
-			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
+			SetOverridesTokenStreamMethod <MorphAnalyzer>();
         }
 
         public MorphAnalyzer(string HSpellDataFilesPath)
@@ -71,7 +71,7 @@ namespace Lucene.Net.Analysis.Hebrew
         {
             hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
             hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
-			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
+			SetOverridesTokenStreamMethod<MorphAnalyzer>();
         }
 
         protected class SavedStreams
@@ -89,11 +89,11 @@ namespace Lucene.Net.Analysis.Hebrew
 				// tokenStream but not reusableTokenStream
 				return TokenStream(fieldName, reader);
 			}
-            SavedStreams streams = GetPreviousTokenStream() as SavedStreams;
+            SavedStreams streams = PreviousTokenStream as SavedStreams;
             if (streams == null)
             {
                 streams = new SavedStreams();
-				SetPreviousTokenStream(streams);
+				PreviousTokenStream = streams;
                 streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer,
                     lemmaFilter, alwaysSaveMarkedOriginal);
 

@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Lucene.Net.Analysis.Hebrew
 {
@@ -30,7 +29,7 @@ namespace Lucene.Net.Analysis.Hebrew
         /// <summary>An unmodifiable set containing some common Hebrew words that are usually not
         /// useful for searching.
         /// </summary>
-        public static readonly System.Collections.Hashtable STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
+        public static readonly ISet<String> STOP_WORDS_SET = StopFilter.MakeStopSet(HebMorph.StopWords.BasicStopWordsSet);
         public static readonly HebMorph.DataStructures.DictRadix<int> PrefixTree = HebMorph.HSpell.LingInfo.BuildPrefixTree(false);
 
         protected bool enableStopPositionIncrements = true;
@@ -38,7 +37,7 @@ namespace Lucene.Net.Analysis.Hebrew
 
     	public SimpleAnalyzer()
     	{
-			SetOverridesTokenStreamMethod(typeof(MorphAnalyzer));
+			SetOverridesTokenStreamMethod<MorphAnalyzer>();
     	}
 
         public void RegisterSuffix(String tokenType, String suffix)
@@ -67,7 +66,7 @@ namespace Lucene.Net.Analysis.Hebrew
 				// tokenStream but not reusableTokenStream
 				return TokenStream(fieldName, reader);
 			}
-            SavedStreams streams = GetPreviousTokenStream() as SavedStreams;
+            SavedStreams streams = PreviousTokenStream as SavedStreams;
             if (streams == null)
             {
                 streams = new SavedStreams();
@@ -86,7 +85,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 if (suffixByTokenType != null && suffixByTokenType.Count > 0)
                     streams.result = new AddSuffixFilter(streams.result, suffixByTokenType);
 
-                SetPreviousTokenStream(streams);
+                PreviousTokenStream = streams;
             }
             else
             {

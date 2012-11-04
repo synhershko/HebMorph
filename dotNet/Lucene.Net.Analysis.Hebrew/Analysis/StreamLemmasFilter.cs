@@ -30,19 +30,19 @@ namespace Lucene.Net.Analysis.Hebrew
     {
         private HebMorph.StreamLemmatizer _streamLemmatizer;
 
-        private TermAttribute termAtt;
-        private OffsetAttribute offsetAtt;
-        private PositionIncrementAttribute posIncrAtt;
-        private TypeAttribute typeAtt;
+        private ITermAttribute termAtt;
+        private IOffsetAttribute offsetAtt;
+        private IPositionIncrementAttribute posIncrAtt;
+        private ITypeAttribute typeAtt;
         //protected PayloadAttribute payAtt;
 
         public bool alwaysSaveMarkedOriginal;
         public HebMorph.LemmaFilters.LemmaFilterBase lemmaFilter = null;
 
-        private List<HebMorph.Token> stack = new List<HebMorph.Token>();
-        private IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
+        private readonly List<HebMorph.Token> stack = new List<HebMorph.Token>();
+        private readonly IList<HebMorph.Token> filterCache = new List<HebMorph.Token>();
         private int index = 0;
-        private Dictionary<string, bool> previousLemmas = new Dictionary<string,bool>();
+        private readonly Dictionary<string, bool> previousLemmas = new Dictionary<string,bool>();
 
         #region Constructors
         public StreamLemmasFilter(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer)
@@ -74,10 +74,10 @@ namespace Lucene.Net.Analysis.Hebrew
         private void Init(System.IO.TextReader input, HebMorph.StreamLemmatizer _lemmatizer,
             HebMorph.LemmaFilters.LemmaFilterBase _lemmaFilter, bool AlwaysSaveMarkedOriginal)
         {
-            termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
-            offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
-            posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
-            typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
+			termAtt = AddAttribute <ITermAttribute>();
+	        offsetAtt = AddAttribute<IOffsetAttribute>();
+	        posIncrAtt = AddAttribute<IPositionIncrementAttribute>();
+			typeAtt = AddAttribute <ITypeAttribute>();
             //payAtt = (PayloadAttribute)AddAttribute(typeof(PayloadAttribute));
 
         	this.input = input;
@@ -126,10 +126,10 @@ namespace Lucene.Net.Analysis.Hebrew
 
                 HebMorph.Token tkn = stack[0];
                 if (tkn.IsNumeric)
-                    typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
+                    typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric);
                 else
                 {
-                    typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
+                    typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew);
 
                     // Applying LowerCaseFilter for Non-Hebrew terms
                     char[] buffer = termAtt.TermBuffer();
@@ -157,7 +157,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 // SetPositionIncrement(0)
 
                 SetTermText(word + "$");
-                typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+                typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew);
                 return true;
             }
 
@@ -170,7 +170,7 @@ namespace Lucene.Net.Analysis.Hebrew
                 if (!alwaysSaveMarkedOriginal && hebToken.Lemma.Equals(word.Substring(hebToken.PrefixLength)))
                 {
                     CreateHebrewToken(hebToken);
-                    posIncrAtt.SetPositionIncrement(1);
+                    posIncrAtt.PositionIncrement = 1;
                     stack.Clear();
                     return true;
                 }
@@ -190,18 +190,18 @@ namespace Lucene.Net.Analysis.Hebrew
                 SetTermText(word + "$");
             }
 
-            typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+            typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew);
 
             return true;
         }
 
         protected virtual bool CreateHebrewToken(HebMorph.HebrewToken hebToken)
         {
-            SetTermText(hebToken.Lemma == null ? hebToken.Text.Substring(hebToken.PrefixLength) : hebToken.Lemma);
-            posIncrAtt.SetPositionIncrement(0);
+            SetTermText(hebToken.Lemma ?? hebToken.Text.Substring(hebToken.PrefixLength));
+            posIncrAtt.PositionIncrement = 0;
 
             // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
-            typeAtt.SetType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+            typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew);
 
             /*
              * Morph payload

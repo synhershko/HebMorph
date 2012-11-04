@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
 using Lucene.Net.Search;
 using Lucene.Net.Analysis;
 
@@ -27,7 +28,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
         {
         }
 
-        HebrewMultiFieldQueryParser(Lucene.Net.Util.Version matchVersion, string[] fields, Analyzer analyzer, System.Collections.IDictionary boosts)
+		HebrewMultiFieldQueryParser(Lucene.Net.Util.Version matchVersion, string[] fields, Analyzer analyzer, IDictionary<string, float> boosts)
             : base(matchVersion, fields, analyzer, boosts)
         {
         }
@@ -74,7 +75,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
         /// <summary>             if the length of the fields array differs from the length of
         /// the flags array
         /// </summary>
-        public new static Query Parse(Lucene.Net.Util.Version matchVersion, string query, string[] fields, BooleanClause.Occur[] flags, Analyzer analyzer)
+        public new static Query Parse(Lucene.Net.Util.Version matchVersion, string query, string[] fields, Occur[] flags, Analyzer analyzer)
         {
             if (fields.Length > flags.Length)
                 throw new System.ArgumentException("fields.length != flags.length");
@@ -101,7 +102,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
 		/// <param name="analyzer"></param>
 		/// <param name="defaultOperator"></param>
 		/// <returns></returns>
-		public static Query Parse(Lucene.Net.Util.Version matchVersion, string query, string[] fields, BooleanClause.Occur[] flags, Analyzer analyzer, Operator defaultOperator)
+		public static Query Parse(Lucene.Net.Util.Version matchVersion, string query, string[] fields, Occur[] flags, Analyzer analyzer, Operator defaultOperator)
 		{
 			if (fields.Length > flags.Length)
 				throw new System.ArgumentException("fields.length != flags.length");
@@ -109,7 +110,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
 			for (int i = 0; i < fields.Length; i++)
 			{
 				QueryParser qp = new HebrewQueryParser(matchVersion, fields[i], analyzer);
-				qp.SetDefaultOperator(defaultOperator);
+				qp.DefaultOperator = defaultOperator;
 				Query q = qp.Parse(query);
 				if (q != null && (!(q is BooleanQuery) || ((BooleanQuery) q).GetClauses().Length > 0))
 				{
@@ -157,7 +158,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
                 Query q = qp.Parse(queries[i]);
                 if (q != null && (!(q is BooleanQuery) || ((BooleanQuery)q).GetClauses().Length > 0))
                 {
-                    bQuery.Add(q, BooleanClause.Occur.SHOULD);
+                    bQuery.Add(q, Occur.SHOULD);
                 }
             }
             return bQuery;
@@ -205,7 +206,7 @@ namespace Lucene.Net.QueryParsers.Hebrew
         /// <throws>  IllegalArgumentException </throws>
         /// <summary>             if the length of the queries, fields, and flags array differ
         /// </summary>
-        public new static Query Parse(Lucene.Net.Util.Version matchVersion, string[] queries, string[] fields, BooleanClause.Occur[] flags, Analyzer analyzer)
+        public new static Query Parse(Lucene.Net.Util.Version matchVersion, string[] queries, string[] fields, Occur[] flags, Analyzer analyzer)
         {
             if (!(queries.Length == fields.Length && queries.Length == flags.Length))
                 throw new System.ArgumentException("queries, fields, and flags array have have different length");

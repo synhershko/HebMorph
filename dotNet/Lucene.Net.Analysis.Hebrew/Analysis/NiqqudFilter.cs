@@ -19,11 +19,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Lucene.Net.Search;
 using Lucene.Net.Analysis.Tokenattributes;
 
 namespace Lucene.Net.Analysis.Hebrew
@@ -33,10 +28,10 @@ namespace Lucene.Net.Analysis.Hebrew
         public NiqqudFilter(TokenStream input)
             : base(input)
         {
-            termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
+			termAtt = AddAttribute<ITermAttribute>();
         }
 
-        private TermAttribute termAtt;
+        private readonly ITermAttribute termAtt;
 
         public override bool IncrementToken()
         {

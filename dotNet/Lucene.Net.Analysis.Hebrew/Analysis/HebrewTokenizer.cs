@@ -19,11 +19,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Lucene.Net.Util;
 using Lucene.Net.Analysis.Tokenattributes;
 
 namespace Lucene.Net.Analysis.Hebrew
@@ -37,10 +32,10 @@ namespace Lucene.Net.Analysis.Hebrew
         private HebMorph.Tokenizer hebMorphTokenizer;
         private HebMorph.DataStructures.DictRadix<int> prefixesTree;
 
-        private TermAttribute termAtt;
-        private OffsetAttribute offsetAtt;
+        private ITermAttribute termAtt;
+        private IOffsetAttribute offsetAtt;
         //private PositionIncrementAttribute posIncrAtt;
-        private TypeAttribute typeAtt;
+        private ITypeAttribute typeAtt;
 
         #region Constructors
         public HebrewTokenizer(System.IO.TextReader _input)
@@ -57,10 +52,10 @@ namespace Lucene.Net.Analysis.Hebrew
 
         private void Init(System.IO.TextReader _input, HebMorph.DataStructures.DictRadix<int> _prefixesTree)
         {
-            termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
-            offsetAtt = (OffsetAttribute)AddAttribute(typeof(OffsetAttribute));
+			termAtt = AddAttribute <ITermAttribute>();
+			offsetAtt = AddAttribute <IOffsetAttribute>();
             //posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
-            typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
+			typeAtt = AddAttribute <ITypeAttribute>();
         	input = _input;
             hebMorphTokenizer = new HebMorph.Tokenizer(_input);
             prefixesTree = _prefixesTree;
@@ -147,18 +142,18 @@ namespace Lucene.Net.Analysis.Hebrew
             if ((tokenType & HebMorph.Tokenizer.TokenType.Hebrew) > 0)
             {
                 if ((tokenType & HebMorph.Tokenizer.TokenType.Acronym) > 0)
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
+                    typeAtt.Type = TokenTypeSignature(TOKEN_TYPES.Acronym);
                 if ((tokenType & HebMorph.Tokenizer.TokenType.Construct) > 0)
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Construct));
+                    typeAtt.Type = TokenTypeSignature(TOKEN_TYPES.Construct);
                 else
-                    typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+                    typeAtt.Type = TokenTypeSignature(TOKEN_TYPES.Hebrew);
             }
             else if ((tokenType & HebMorph.Tokenizer.TokenType.Numeric) > 0)
             {
-                typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Numeric));
+                typeAtt.Type = TokenTypeSignature(TOKEN_TYPES.Numeric);
             }
             else
-                typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.NonHebrew));
+                typeAtt.Type = TokenTypeSignature(TOKEN_TYPES.NonHebrew);
 
             return true;
         }

@@ -29,16 +29,16 @@ namespace Lucene.Net.Analysis
 {
     public class AddSuffixFilter : TokenFilter
     {
-        private TermAttribute termAtt;
-        private TypeAttribute typeAtt;
+        private readonly ITermAttribute termAtt;
+        private readonly ITypeAttribute typeAtt;
 
         public Dictionary<string, char[]> suffixByTokenType = null;
 
         public AddSuffixFilter(TokenStream input, Dictionary<string, char[]> _suffixByTokenType)
             : base(input)
         {
-            termAtt = (TermAttribute)AddAttribute(typeof(TermAttribute));
-            typeAtt = (TypeAttribute)AddAttribute(typeof(TypeAttribute));
+			termAtt = AddAttribute <ITermAttribute>();
+			typeAtt = AddAttribute <ITypeAttribute>();
             this.suffixByTokenType = _suffixByTokenType;
         }
 
@@ -52,7 +52,7 @@ namespace Lucene.Net.Analysis
                 return true;
 
             char[] suffix;
-            if (!suffixByTokenType.TryGetValue(typeAtt.Type(), out suffix))
+            if (!suffixByTokenType.TryGetValue(typeAtt.Type, out suffix))
                 return true;
 
             char[] buffer = termAtt.TermBuffer();
