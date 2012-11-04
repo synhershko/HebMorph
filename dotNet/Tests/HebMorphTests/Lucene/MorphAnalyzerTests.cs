@@ -15,7 +15,7 @@ namespace HebMorph.Lucene.Tests
 	public class HtmlStandardAnalyzer : StandardAnalyzer
 	{
 		public HtmlStandardAnalyzer()
-			: base(Version.LUCENE_29)
+			: base(Version.LUCENE_30)
 		{
 		}
 

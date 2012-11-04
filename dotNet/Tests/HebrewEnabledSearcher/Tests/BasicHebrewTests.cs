@@ -110,7 +110,7 @@ namespace HebrewEnabledSearcher.Tests
             IndexSearcher searcher = new IndexSearcher(d, true); // read-only=true
             QueryParser qp = new QueryParser(Lucene.Net.Util.Version.LUCENE_29, "content", analyzer);
             Query query = qp.Parse(whatToSearch);
-            ScoreDoc[] hits = searcher.Search(query, null, 1000).scoreDocs;
+            var hits = searcher.Search(query, null, 1000).ScoreDocs;
 
             Assert(hits.Length == 1);
 

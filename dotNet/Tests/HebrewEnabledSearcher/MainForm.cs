@@ -79,7 +79,7 @@ namespace HebrewEnabledSearcher
                 }
 
                 // Recreate the index
-                IndexWriter writer = new IndexWriter(tempPath, new Lucene.Net.Analysis.SimpleAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
+                IndexWriter writer = new IndexWriter(FSDirectory.Open(tempPath), new Lucene.Net.Analysis.SimpleAnalyzer(), true, new IndexWriter.MaxFieldLength(10));
                 writer.Close();
             }
 
@@ -107,8 +107,8 @@ namespace HebrewEnabledSearcher
                         Document doc = new Document();
                         string text = System.IO.File.ReadAllText(f);
                         string title = f.Substring(f.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1).Replace(".txt", "");
-                        Fieldable titleField = new Field("title", title, Field.Store.YES, Field.Index.ANALYZED);
-                        titleField.SetBoost(5.0f);
+                        Field titleField = new Field("title", title, Field.Store.YES, Field.Index.ANALYZED);
+                        titleField.Boost = 5.0f;
                         doc.Add(titleField);
                         doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
                         doc.Add(new Field("path", f, Field.Store.YES, Field.Index.NO));
@@ -128,18 +128,18 @@ namespace HebrewEnabledSearcher
             IndexSearcher searcher = new IndexSearcher(indexDirectory, true); // read-only=true
 
             QueryParser qp = new HebrewQueryParser(Lucene.Net.Util.Version.LUCENE_29, "content", analyzer);
-            qp.SetDefaultOperator(QueryParser.Operator.AND);
+            qp.DefaultOperator = QueryParser.Operator.AND;
             Query query = qp.Parse(txbSearchQuery.Text);
 
-            ScoreDoc[] hits = searcher.Search(query, null, 1000).scoreDocs;
+            ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
 
             // Iterate through the results:
-            BindingList<SearchResult> l = new BindingList<SearchResult>();
+            var l = new BindingList<SearchResult>();
             for (int i = 0; i < hits.Length; i++)
             {
-                Document hitDoc = searcher.Doc(hits[i].doc);
-                SearchResult sr = new SearchResult(hitDoc.GetField("title").StringValue(),
-                    hitDoc.GetField("path").StringValue(), hits[i].score);
+                Document hitDoc = searcher.Doc(hits[i].Doc);
+                var sr = new SearchResult(hitDoc.GetField("title").StringValue,
+                    hitDoc.GetField("path").StringValue, hits[i].Score);
                 l.Add(sr);
             }
 
