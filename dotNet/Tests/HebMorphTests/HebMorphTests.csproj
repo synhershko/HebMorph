@@ -61,9 +61,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Lucene.Net.Contrib">
-      <HintPath>..\..\SharedLibs\Lucene.Net.Contrib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -74,6 +71,7 @@
   <ItemGroup>
     <Compile Include="ErrorCorrectionTests.cs" />
     <Compile Include="HSpell\HSpellLoaderTest.cs" />
+    <Compile Include="HTMLStripCharFilter.cs" />
     <Compile Include="Lucene\HebrewQueryParserTest.cs" />
     <Compile Include="Lucene\MorphAnalyzerTests.cs" />
     <Compile Include="Lucene\TermPositionVectorTest.cs" />
