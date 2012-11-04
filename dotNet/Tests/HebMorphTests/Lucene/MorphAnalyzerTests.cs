@@ -7,7 +7,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using Version = Lucene.Net.Util.Version;
 
 namespace HebMorph.Lucene.Tests
@@ -50,15 +50,14 @@ namespace HebMorph.Lucene.Tests
 		}
 	}
 
-	[TestClass]
 	public class MorphAnalyzerTests : TestBase
 	{
-		[TestMethod]
+		[Fact]
 		public void CompareTokenization()
 		{
 			const string str = @"test1 testlink test2 test3";
 
-			PerFieldAnalyzerWrapper pfaw = new PerFieldAnalyzerWrapper(new StandardAnalyzer());
+			PerFieldAnalyzerWrapper pfaw = new PerFieldAnalyzerWrapper(new StandardAnalyzer(Version.LUCENE_30));
 			pfaw.AddAnalyzer("Morph", new MorphAnalyzer(hspellPath));
 			Directory indexDirectory = new RAMDirectory();
 			IndexWriter writer = new IndexWriter(indexDirectory, pfaw, true, IndexWriter.MaxFieldLength.UNLIMITED);
@@ -72,7 +71,7 @@ namespace HebMorph.Lucene.Tests
 			CompareTermData(indexDirectory, str);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void CompareHtmlTokenization()
 		{
 			const string str = @"test1 <a href=""foo"">testlink</a> test2 test3";
@@ -94,7 +93,7 @@ namespace HebMorph.Lucene.Tests
 		private static void CompareTermData(Directory dir, string str)
 		{
 			IndexSearcher searcher = new IndexSearcher(dir, true);
-			TermFreqVector[] tf = searcher.GetIndexReader().GetTermFreqVectors(0);
+			var tf = searcher.IndexReader.GetTermFreqVectors(0);
 
 			TermPositionVector tpMorph = (TermPositionVector)tf[0];
 			TermPositionVector tpSimple = (TermPositionVector)tf[1];
@@ -104,15 +103,15 @@ namespace HebMorph.Lucene.Tests
 				int[] posMorph = tpMorph.GetTermPositions(i);
 				int[] posSimple = tpSimple.GetTermPositions(i);
 				for (int j = 0; j < posSimple.Length; j++)
-					Assert.AreEqual(posSimple[j], posMorph[j]);
+					Assert.Equal(posSimple[j], posMorph[j]);
 
 				TermVectorOffsetInfo[] offMorph = tpMorph.GetOffsets(i);
 				TermVectorOffsetInfo[] offSimple = tpSimple.GetOffsets(i);
 				for (int j = 0; j < offSimple.Length; j++)
 				{
-					Console.WriteLine(str.Substring(offSimple[j].GetStartOffset(), offSimple[j].GetEndOffset() - offSimple[j].GetStartOffset()));
-					Assert.AreEqual(offSimple[j].GetStartOffset(), offMorph[j].GetStartOffset());
-					Assert.AreEqual(offSimple[j].GetEndOffset(), offMorph[j].GetEndOffset());
+					Console.WriteLine(str.Substring(offSimple[j].StartOffset, offSimple[j].EndOffset - offSimple[j].StartOffset));
+					Assert.Equal(offSimple[j].StartOffset, offMorph[j].StartOffset);
+					Assert.Equal(offSimple[j].EndOffset, offMorph[j].EndOffset);
 				}
 			}
 		}

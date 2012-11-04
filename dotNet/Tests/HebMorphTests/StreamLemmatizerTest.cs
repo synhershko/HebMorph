@@ -1,16 +1,12 @@
-﻿using Lucene.Net.Analysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
+using Xunit;
 
 namespace HebMorph.Tests
 {
-    [TestClass()]
     public class StreamLemmatizerTest : TestBase
     {
-        [TestMethod]
+		[Fact]
         public void IncrementsOffsetCorrectly()
         {
             string input = string.Empty;
@@ -25,8 +21,8 @@ namespace HebMorph.Tests
             int previousOffest = -5;
             while (sl.LemmatizeNextToken(out token, results) > 0)
             {
-                Assert.AreEqual<int>(previousOffest, sl.StartOffset - 5);
-                Assert.AreEqual<int>(4, sl.EndOffset - sl.StartOffset);
+                Assert.Equal(previousOffest, sl.StartOffset - 5);
+                Assert.Equal(4, sl.EndOffset - sl.StartOffset);
                 previousOffest = sl.StartOffset;
             }
         }

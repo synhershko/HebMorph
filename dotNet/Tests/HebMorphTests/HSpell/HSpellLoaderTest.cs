@@ -1,18 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using HebMorph.DataStructures;
+using Xunit;
 
 namespace HebMorph.HSpell.Tests
 {
-    [TestClass()]
     public class HSpellLoaderTest
     {
         static string hspellPath;
 
-        [TestInitialize()]
-        public void SetUp()
-        {
-            string path = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
+	    public HSpellLoaderTest()
+	    {
+			string path = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
             int loc = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + "dotNet" + System.IO.Path.DirectorySeparatorChar);
             if (loc > -1)
             {
@@ -21,12 +19,12 @@ namespace HebMorph.HSpell.Tests
             }
         }
 
-        [TestMethod()]
+        [Fact]
         public void VerifyAllWordsAreLoaded()
         {
             int WordsCount = HSpell.Loader.GetWordCountInHSpellFolder(hspellPath);
             DictRadix<MorphData> d = HSpell.Loader.LoadDictionaryFromHSpellFolder(hspellPath, true);
-            Assert.AreEqual<int>(WordsCount, d.Count); // Compare expected words count with the cached counter
+            Assert.Equal(WordsCount, d.Count); // Compare expected words count with the cached counter
 
             // Verify the cached counter equals to the count of elements retrieved by actual enumeration,
             // and that the nodes are alphabetically sorted
@@ -35,11 +33,11 @@ namespace HebMorph.HSpell.Tests
             DictRadix<MorphData>.RadixEnumerator en = d.GetEnumerator() as DictRadix<MorphData>.RadixEnumerator;
             while (en.MoveNext())
             {
-                Assert.IsTrue(string.Compare(nodeText, en.CurrentKey, StringComparison.Ordinal) < 0);
+                Assert.True(string.Compare(nodeText, en.CurrentKey, StringComparison.Ordinal) < 0);
                 nodeText = en.CurrentKey;
                 enCount++;
             }
-            Assert.AreEqual<int>(WordsCount, enCount); // Compare expected words count with count yielded by iteration
+            Assert.Equal(WordsCount, enCount); // Compare expected words count with count yielded by iteration
         }
     }
 }

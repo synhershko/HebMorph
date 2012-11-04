@@ -1,4 +1,5 @@
-﻿using HebMorph.Tests;
+﻿using System.Collections.Generic;
+using HebMorph.Tests;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Lucene.Net.Documents;
@@ -6,18 +7,17 @@ using Lucene.Net.Analysis.Hebrew;
 using Lucene.Net.Analysis;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers.Hebrew;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace HebMorph.Lucene.Tests
 {
-    [TestClass()]
     public class TermPositionVectorTest : TestBase
     {
         Analyzer analyzer;
         Directory indexDirectory;
         IndexSearcher searcher;
 
-        [TestMethod()]
+		[Fact]
         public void StoresPositionCorrectly()
         {
             analyzer = new MorphAnalyzer(hspellPath);
@@ -43,23 +43,22 @@ namespace HebMorph.Lucene.Tests
 
         private void RunQuery(string query, int expectedPosition)
         {
-            HebrewQueryParser hqp =
-                new HebrewQueryParser(global::Lucene.Net.Util.Version.LUCENE_29, "Text", analyzer);
+            var hqp = new HebrewQueryParser(global::Lucene.Net.Util.Version.LUCENE_29, "Text", analyzer);
 
             Query q = hqp.Parse(query);
 
             TopDocs td = searcher.Search(q, 10000);
 
-            int num = td.scoreDocs[0].doc;
-            TermFreqVector tf = searcher.GetIndexReader().GetTermFreqVectors(num)[0];
-            TermPositionVector tp = (TermPositionVector)tf;
+            int num = td.ScoreDocs[0].Doc;
+            var tf = searcher.IndexReader.GetTermFreqVectors(num)[0];
+            var tp = (TermPositionVector)tf;
 
-            System.Collections.Hashtable trms_list = new System.Collections.Hashtable();
+	        var trms_list = new SortedSet<Term>();
             q.ExtractTerms(trms_list);
-            foreach (Term t in trms_list.Values)
+            foreach (var t in trms_list)
             {
-                int[] pos = tp.GetTermPositions(tp.IndexOf(t.Text()));
-                TermVectorOffsetInfo[] off = tp.GetOffsets(tp.IndexOf(t.Text()));
+                int[] pos = tp.GetTermPositions(tp.IndexOf(t.Text));
+                TermVectorOffsetInfo[] off = tp.GetOffsets(tp.IndexOf(t.Text));
                 AssertSinglePositionExists(pos, expectedPosition);
 
                 /*
@@ -80,8 +79,8 @@ namespace HebMorph.Lucene.Tests
 
         private static void AssertSinglePositionExists(int[] positions, int pos)
         {
-            Assert.AreEqual<int>(1, positions.Length);
-            Assert.AreEqual<int>(pos, positions[0]);
+            Assert.Equal(1, positions.Length);
+            Assert.Equal(pos, positions[0]);
         }
     }
 }

@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+﻿
+using Xunit;
 using global::Lucene.Net.QueryParsers;
 using global::Lucene.Net.QueryParsers.Hebrew;
 using LuceneUtil = global::Lucene.Net.Util;
 
 namespace HebMorph.Lucene.Tests
 {
-    [TestClass()]
     public class HebrewQueryParserTest
     {
-        [TestMethod()]
+        [Fact]
         public void ParsesAcronymsCorrectly()
         {
-            QueryParser qp = new HebrewQueryParser(LuceneUtil.Version.LUCENE_29, "f", new global::Lucene.Net.Analysis.Hebrew.SimpleAnalyzer());
+            QueryParser qp = new HebrewQueryParser(LuceneUtil.Version.LUCENE_30, "f", new global::Lucene.Net.Analysis.Hebrew.SimpleAnalyzer());
             qp.Parse(@"צה""ל");
             qp.Parse(@"""צהל""");
             qp.Parse(@"כל הכבוד לצה""ל");
@@ -25,7 +24,7 @@ namespace HebMorph.Lucene.Tests
             {
                 qp.Parse(@"צה""""ל");
                 qp.Parse(@"""צה""ל");
-                Assert.Fail("Expected exception was not thrown");
+                Assert.True(false, "Expected exception was not thrown");
             }
             catch(ParseException) { }
         }

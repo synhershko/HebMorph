@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace HebMorph.Tests
+﻿namespace HebMorph.Tests
 {
-	[TestClass]
 	public abstract class TestBase
 	{
 		protected static string hspellPath;
 
-		[TestInitialize]
-		public virtual void SetUp()
+		protected TestBase()
 		{
 			string path = System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location);
 			int loc = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + "dotNet" + System.IO.Path.DirectorySeparatorChar);

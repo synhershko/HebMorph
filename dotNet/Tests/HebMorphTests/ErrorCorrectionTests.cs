@@ -19,23 +19,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace HebMorph.Tests
 {
-	[TestClass]
 	public class ErrorCorrectionTests : TestBase
 	{
-		private HebMorph.Lemmatizer _lemmatizer;
+		private readonly HebMorph.Lemmatizer _lemmatizer;
 
-		[TestInitialize]
-		public override void SetUp()
+		public ErrorCorrectionTests() : base()
 		{
-			base.SetUp();
 			_lemmatizer = new Lemmatizer(hspellPath, true, false);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void SimpleAHVICases()
 		{
 			// AssertWord("פינגוין", "פינגווין"); // TODO
@@ -43,10 +40,10 @@ namespace HebMorph.Tests
 
 		public void AssertWord(string word, string expectedWord)
 		{
-			Assert.IsTrue(_lemmatizer.Lemmatize(expectedWord).Count > 0); // make sure the expected word is legal
+			Assert.True(_lemmatizer.Lemmatize(expectedWord).Count > 0); // make sure the expected word is legal
 			var results = _lemmatizer.LemmatizeTolerant(word);
-			Assert.IsTrue(results.Count > 0);
-			Assert.AreEqual(expectedWord, results[0].Text);
+			Assert.True(results.Count > 0);
+			Assert.Equal(expectedWord, results[0].Text);
 		}
 	}
 }
