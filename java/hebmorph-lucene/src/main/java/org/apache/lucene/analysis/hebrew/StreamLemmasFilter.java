@@ -34,10 +34,7 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StreamLemmasFilter extends Tokenizer
 {
@@ -52,10 +49,10 @@ public class StreamLemmasFilter extends Tokenizer
 	private boolean alwaysSaveMarkedOriginal;
 	private LemmaFilterBase lemmaFilter = null;
 
-	private List<Token> stack = new ArrayList<Token>();
-	private List<Token> filterCache = new ArrayList<Token>();
+	private final List<Token> stack = new ArrayList<Token>();
+	private final List<Token> filterCache = new ArrayList<Token>();
 	private int index = 0;
-    private Map<String,Boolean> previousLemmas = new HashMap<String,Boolean>();
+    private final Set<String> previousLemmas = new HashSet<String>();
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
 	{
@@ -100,17 +97,11 @@ public class StreamLemmasFilter extends Tokenizer
 			HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
 			index++;
 
-            if ((res == null) || previousLemmas.containsKey(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
-			{
+            if ((res == null) || !previousLemmas.add(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
 				continue;
-			}
-
-            previousLemmas.put(res.getLemma(), Boolean.TRUE);
 
 			if (createHebrewToken(res))
-			{
 				return true;
-			}
 		}
 
 		// Reset state
