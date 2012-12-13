@@ -23,96 +23,125 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.hspell.LingInfo;
 
-public class HebrewToken extends Token implements Comparable
+public class HebrewToken extends Token implements Comparable<Token>
 {
-	public HebrewToken(String _word, int _prefixLength, Integer _mask, String _lemma, float _score)
-	{
-		super(_word);
-		prefixLength = _prefixLength;
-		setMask(_mask);
-		if (_lemma == null)
-		{
-			lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
-		}
-		else
-		{
-			lemma = _lemma;
-		}
-		setScore(_score);
-	}
+    private static final long serialVersionUID = -5809495040446607703L;
 
-	private float score = 1.0f;
-	private int prefixLength;
-	private Integer mask;
-	private String lemma;
+    public HebrewToken(String _word, int _prefixLength, Integer _mask, String _lemma, float _score) {
+        super(_word);
+        prefixLength = _prefixLength;
+        setMask(_mask);
+        if (_lemma == null)
+        {
+            lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
+        }
+        else
+        {
+            lemma = _lemma;
+        }
+        setScore(_score);
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		HebrewToken o = (HebrewToken)((obj instanceof HebrewToken) ? obj : null);
-            if (o == null) return false;
+    private float score = 1.0f;
+    private int prefixLength;
+    private Integer mask;
+    private String lemma;
 
-		// TODO: In places where Equals returns true while being called from the sorted results list,
-		// but this.Score < o.Score, we probably should somehow update the score for this object...
-            return ((prefixLength == o.prefixLength)
-                && (getMask() == o.getMask())
-                && getText().equals(o.getText())
-                && (lemma == o.lemma));
-	}
+    /* (non-Javadoc)
+      * @see java.lang.Object#equals(java.lang.Object)
+      */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof HebrewToken)) {
+            return false;
+        }
+        HebrewToken other = (HebrewToken) obj;
+        if (lemma == null) {
+            if (other.lemma != null) {
+                return false;
+            }
+        } else if (!lemma.equals(other.lemma)) {
+            return false;
+        }
+        if (mask == null) {
+            if (other.mask != null) {
+                return false;
+            }
+        } else if (!mask.equals(other.mask)) {
+            return false;
+        }
+        if (prefixLength != other.prefixLength) {
+            return false;
+        }
+        if (Float.floatToIntBits(score) != Float.floatToIntBits(other.score)) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		return super.hashCode(); //TODO
-	}
+    /* (non-Javadoc)
+      * @see java.lang.Object#hashCode()
+      */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((lemma == null) ? 0 : lemma.hashCode());
+        result = prime * result + ((mask == null) ? 0 : mask.hashCode());
+        result = prime * result + prefixLength;
+        result = prime * result + Float.floatToIntBits(score);
+        return result;
+    }
 
-	@Override
-	public String toString()
-	{
-		return String.format("\t%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
-	}
+    @Override
+    public String toString()
+    {
+        return String.format("\t%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
+    }
 
-	public final int compareTo(Object obj)
-	{
-		HebrewToken o = (HebrewToken)((obj instanceof HebrewToken) ? obj : null);
-        if (o == null) return -1;
+    public final int compareTo(Token token)
+    {
+        HebrewToken other = (HebrewToken)((token instanceof HebrewToken) ? token : null);
+        if (other == null) return -1;
 
-        if (getScore() == o.getScore())
-            return 0;
-        else if (getScore() > o.getScore())
-            return 1;
-        return -1;
-	}
+        return ((Float)getScore()).compareTo(other.getScore());
+    }
 
-	public void setScore(float score)
-	{
-		this.score = score;
-	}
+    public void setScore(float score)
+    {
+        this.score = score;
+    }
 
-	public float getScore()
-	{
-		return score;
-	}
+    public float getScore()
+    {
+        return score;
+    }
 
-	public void setMask(Integer mask)
-	{
-		this.mask = mask;
-	}
+    public void setMask(Integer mask)
+    {
+        this.mask = mask;
+    }
 
-	public Integer getMask()
-	{
-		return mask;
-	}
+    public Integer getMask()
+    {
+        return mask;
+    }
 
-	public int getPrefixLength()
-	{
-		return prefixLength;
-	}
+    public int getPrefixLength()
+    {
+        return prefixLength;
+    }
 
-	public String getLemma()
-	{
-		return lemma;
-	}
+    public String getLemma()
+    {
+        return lemma;
+    }
 
 
 }

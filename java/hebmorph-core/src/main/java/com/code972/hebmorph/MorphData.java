@@ -21,6 +21,8 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import java.util.Arrays;
+
 public class MorphData
 {
 	private Integer[] descFlags;
@@ -57,33 +59,33 @@ public class MorphData
 		return descFlags;
 	}
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		MorphData o = (MorphData)((obj instanceof MorphData) ? obj : null);
-		if (o == null)
-		{
-			return false;
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MorphData other = (MorphData) obj;
+        if (!Arrays.equals(descFlags, other.descFlags))
+            return false;
+        if (!Arrays.equals(lemmas, other.lemmas))
+            return false;
+        return true;
+    }
 
-		if (getDescFlags().length != o.getDescFlags().length)
-		{
-			return false;
-		}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(descFlags);
+        result = prime * result + Arrays.hashCode(lemmas);
+        return result;
+    }
 
-		for (int i = 0; i < getDescFlags().length; i++)
-		{
-			if ((getDescFlags()[i] != o.getDescFlags()[i]) || !getLemmas()[i].equals(o.getLemmas()[i]))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return getDescFlags().hashCode() * getLemmas().hashCode();
-	}
+    @Override
+    public String toString() {
+        return "{ prefix="+prefixes+" lemmas="+Arrays.asList(lemmas)+"}";
+    }
 }

@@ -42,15 +42,15 @@ public class Loader
 		private InputStream fdesc, fstem;
 
 		private int bufPos = 0;
-		private int[] buf = new int[5];
+		private final int[] buf = new int[5];
 
-		public MorphDataLoader(InputStream fdesc, InputStream fstem)
+		public MorphDataLoader(final InputStream fdesc, final InputStream fstem)
 		{
 			this.fdesc = fdesc;
 			this.fstem = fstem;
 		}
 		
-		private java.util.ArrayList<Integer> wordMasks = new java.util.ArrayList<Integer>();
+		private final java.util.ArrayList<Integer> wordMasks = new java.util.ArrayList<Integer>();
 		public final Integer[] readDescFile() throws IOException
 		{
 			while ((buf[bufPos] = fdesc.read()) > -1)
@@ -76,7 +76,7 @@ public class Loader
 		}
 
 		// Note: What HSpell call "stems", which we define as lemmas
-		private java.util.ArrayList<Integer> wordStems = new java.util.ArrayList<Integer>();
+		private final java.util.ArrayList<Integer> wordStems = new java.util.ArrayList<Integer>();
 		public final List<Integer> readStemFile() throws IOException
 		{
 			wordStems.clear();
@@ -106,8 +106,8 @@ public class Loader
     }
 
     public static DictRadix<MorphData> loadDictionaryFromClasspath(String pathInClasspath, boolean bLoadMorphData) throws IOException {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL url = cl.getResource(pathInClasspath);
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        final URL url = cl.getResource(pathInClasspath);
         if(url == null)
             throw new FileNotFoundException("Cannot find '" + pathInClasspath + "' in classpath.");
         return loadDictionaryFromUrl(url.toString(), bLoadMorphData);
@@ -115,7 +115,7 @@ public class Loader
 
     
 	public static DictRadix<MorphData> loadDictionaryFromUrl(String url, boolean bLoadMorphData) throws IOException {
-		HspellData hspell = new HspellData(url);
+		final HspellData hspell = new HspellData(url);
 		try {
 			return loadDictionaryFromHSpellData(hspell, bLoadMorphData);
 		}
@@ -126,14 +126,14 @@ public class Loader
 	
 	private static DictRadix<MorphData> loadDictionaryFromHSpellData(HspellData hspell, boolean bLoadMorphData) throws IOException
 	{
-		InputStream fdict = hspell.getDictionaryStream();
-		InputStream fprefixes = hspell.getPrefixesStream();
-		InputStream fstem = hspell.getStemStream();
-		InputStream fdesc = hspell.getDescriptionStream();
+		final InputStream fdict = hspell.getDictionaryStream();
+		final InputStream fprefixes = hspell.getPrefixesStream();
+		final InputStream fstem = hspell.getStemStream();
+		final InputStream fdesc = hspell.getDescriptionStream();
 		
 		if (bLoadMorphData)
 		{
-			String[] lookup = new String[hspell.getLookupLength()+ 1];
+			final String[] lookup = new String[hspell.getLookupLength()+ 1];
 			{
 			char[] sbuf = new char[Constants.MaxWordLength];
 			int c = 0, n, slen = 0, i = 0;
@@ -158,9 +158,8 @@ public class Loader
 			}
 			}
 			
-			MorphDataLoader dataLoader = new MorphDataLoader(fdesc,fstem);
-			DictRadix<MorphData> ret = new DictRadix<MorphData>();
-
+			final MorphDataLoader dataLoader = new MorphDataLoader(fdesc,fstem);
+			final DictRadix<MorphData> ret = new DictRadix<MorphData>();
 			for (int i = 0; lookup[i] != null; i++)
 			{
 				MorphData data = new MorphData();
@@ -195,7 +194,7 @@ public class Loader
 
 			DictRadix<MorphData> ret = new DictRadix<MorphData>();
 
-			char[] sbuf = new char[Constants.MaxWordLength];
+			final char[] sbuf = new char[Constants.MaxWordLength];
 			int c = 0, n, slen = 0;
 			while ((c = fdict.read()) > -1)
 			{

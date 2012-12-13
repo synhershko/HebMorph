@@ -68,7 +68,7 @@ public class HebrewTokenizer extends Tokenizer
 		prefixesTree = _prefixesTree;
 	}
 
-	public class TOKEN_TYPES
+	public static interface TOKEN_TYPES
 	{
 		public static final int Hebrew = 0;
 		public static final int NonHebrew = 1;
@@ -87,7 +87,7 @@ public class HebrewTokenizer extends Tokenizer
 		null
 	};
 
-	public static String TokenTypeSignature(int tokenType)
+	public static String tokenTypeSignature(int tokenType)
 	{
 		return TOKEN_TYPE_SIGNATURES[tokenType];
 	}
@@ -96,7 +96,6 @@ public class HebrewTokenizer extends Tokenizer
 	public boolean incrementToken() throws IOException
 	{
 		clearAttributes();
-//		int start = hebMorphTokenizer.getOffset();
 
 		Reference<String> nextToken = new Reference<String>(null);
         String nextTokenVal = null;
@@ -162,24 +161,24 @@ public class HebrewTokenizer extends Tokenizer
 		{
 			if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0)
 			{
-				typeAtt.setType(TokenTypeSignature(TOKEN_TYPES.Acronym));
+				typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Acronym));
 			}
 			if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0)
 			{
-				typeAtt.setType(TokenTypeSignature(TOKEN_TYPES.Construct));
+				typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Construct));
 			}
 			else
 			{
-				typeAtt.setType(TokenTypeSignature(TOKEN_TYPES.Hebrew));
+				typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Hebrew));
 			}
 		}
 		else if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Numeric) > 0)
 		{
-			typeAtt.setType(TokenTypeSignature(TOKEN_TYPES.Numeric));
+			typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Numeric));
 		}
 		else
 		{
-			typeAtt.setType(TokenTypeSignature(TOKEN_TYPES.NonHebrew));
+			typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.NonHebrew));
 		}
 
 		return true;

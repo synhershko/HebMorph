@@ -23,6 +23,8 @@ package com.code972.hebmorph;
 
 public class Token
 {
+    private static final long serialVersionUID = 6619399351938583614L;
+
 	private String text;
 	private boolean isNumeric = false;
 
@@ -56,4 +58,49 @@ public class Token
 	{
 		this.isNumeric = isNumeric;
 	}
+
+    /* (non-Javadoc)
+      * @see java.lang.Object#hashCode()
+      */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (isNumeric ? 1231 : 1237);
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+      * @see java.lang.Object#equals(java.lang.Object)
+      */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Token)) {
+            return false;
+        }
+        Token other = (Token) obj;
+        if (isNumeric != other.isNumeric) {
+            return false;
+        }
+        if (text == null) {
+            if (other.text != null) {
+                return false;
+            }
+        } else if (!text.equals(other.text)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("\t%s isNumeric:(%b)", text , isNumeric);
+    }
 }

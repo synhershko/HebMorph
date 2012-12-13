@@ -141,11 +141,11 @@ public class StreamLemmasFilter extends Tokenizer
 			Token tkn = stack.get(0);
 			if (tkn.isNumeric())
 			{
-				typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
+				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
 			}
 			else
 			{
-				typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
+				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
 
 				// Applying LowerCaseFilter for Non-Hebrew terms
 				char[] buffer = termAtt.termBuffer();
@@ -175,7 +175,7 @@ public class StreamLemmasFilter extends Tokenizer
 			// SetPositionIncrement(0)
 
 			setTermText(word + "$");
-			typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+			typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 			return true;
 		}
 
@@ -208,7 +208,7 @@ public class StreamLemmasFilter extends Tokenizer
 			setTermText(word + "$");
 		}
 
-        typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
 		return true;
 	}
@@ -220,7 +220,7 @@ public class StreamLemmasFilter extends Tokenizer
 		posIncrAtt.setPositionIncrement(0);
 
 		// TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
-        typeAtt.setType(HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
 //
 //             * Morph payload

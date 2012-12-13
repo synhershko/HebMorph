@@ -52,7 +52,7 @@ public class BasicLemmaFilter extends LemmaFilterBase
 	{
 		if (t instanceof HebrewToken)
 		{
-			HebrewToken ht = (HebrewToken)((t instanceof HebrewToken) ? t : null);
+			HebrewToken ht = (HebrewToken)t;
 
 			// Pose a minimum score limit for words
 			if (ht.getScore() < 0.7f)

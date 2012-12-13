@@ -56,10 +56,15 @@ public class DictRadix<T> implements Iterable<T>
 		{
 			this.key = key;
 		}
-		public char[] getKey()
+		public final char[] getKey()
 		{
 			return key;
 		}
+
+        @Override
+        public String toString() {
+            return "[ value="+value+"; childrens="+children.length+" ]";
+        }
 	}
 
 	protected class TolerantLookupCrawler
