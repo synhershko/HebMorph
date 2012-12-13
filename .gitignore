@@ -12,3 +12,8 @@ bin
 ~$*
 *.user
 dotnet/packages/*
+build/
+workspace.xml
+tasks.xml
+java/*/target/
+*.java~
