@@ -103,26 +103,20 @@ public class DictRadix<T> implements Iterable<T>
 			}
 		}
 
-		public TolerantLookupCrawler(DictRadix<T> _enclosingInstance, LookupTolerators.ToleranceFunction[] _tolFuncs)
+		public TolerantLookupCrawler(LookupTolerators.ToleranceFunction[] _tolFuncs)
 		{
-			this.enclosingInstance = _enclosingInstance;
 			this.toleranceFunctions = _tolFuncs;
 		}
 
 		private LookupTolerators.ToleranceFunction[] toleranceFunctions;
-		private DictRadix<T> enclosingInstance;
 
 		private char[] key;
-		private final List<LookupResult> resultSet = new ArrayList<LookupResult>();
 
 		public List<LookupResult> lookupTolerant(String strKey)
 		{
-			synchronized (resultSet)
-			{
-				key = strKey.toCharArray();
-				resultSet.clear();
-				lookupTolerantImpl(enclosingInstance.getRootNode(), new MatchCandidate((byte)0, "", 1.0f));
-			}
+            final List<LookupResult> resultSet = new ArrayList<LookupResult>();
+            key = strKey.toCharArray();
+            lookupTolerantImpl(getRootNode(), new MatchCandidate((byte)0, "", 1.0f), resultSet);
 			if (resultSet.size() > 0)
 			{
 				return resultSet;
@@ -130,7 +124,7 @@ public class DictRadix<T> implements Iterable<T>
 			return null;
 		}
 
-		private void lookupTolerantImpl(DictNode cur, MatchCandidate mc)
+		private void lookupTolerantImpl(DictNode cur, MatchCandidate mc, List<LookupResult> resultSet)
 		{
 			if (cur.getChildren() == null)
 			{
@@ -142,13 +136,13 @@ public class DictRadix<T> implements Iterable<T>
 			for (int childPos = 0; childPos < cur.getChildren().length; childPos++)
 			{
 				DictNode child = cur.getChildren()[childPos];
-				doKeyMatching(child, (byte)0, mc);
+				doKeyMatching(child, (byte)0, mc, resultSet);
 			}
 			//System.out.println(String.format("Completed processing node children for word %1$s", mc.Word));
 			//System.out.println("--------------------------");
 		}
 
-		private void doKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc)
+		private void doKeyMatching(DictNode node, byte nodeKeyPos, MatchCandidate mc, List<LookupResult> resultSet)
 		{
 			byte currentKeyPos = mc.keyPos, startingNodeKeyPos = nodeKeyPos;
 			while ((nodeKeyPos < node.getKey().length) && (currentKeyPos < key.length))
@@ -175,11 +169,11 @@ public class DictRadix<T> implements Iterable<T>
 						MatchCandidate nmc = new MatchCandidate(tmpKeyPos, mc.getWord() + consumedLetters, tmpScore);
 						if ((nodeKeyPos + tret) == node.getKey().length)
 						{
-							lookupTolerantImpl(node, nmc);
+							lookupTolerantImpl(node, nmc, resultSet);
 						}
 						else
 						{
-							doKeyMatching(node, (byte)(nodeKeyPos + tret), nmc);
+							doKeyMatching(node, (byte)(nodeKeyPos + tret), nmc, resultSet);
 						}
 					}
 				}
@@ -208,7 +202,7 @@ public class DictRadix<T> implements Iterable<T>
 				else
 				{
 					MatchCandidate nmc = new MatchCandidate(currentKeyPos, mc.getWord() + new String(node.getKey(), startingNodeKeyPos, nodeKeyPos - startingNodeKeyPos), mc.getScore());
-					lookupTolerantImpl(node, nmc);
+					lookupTolerantImpl(node, nmc, resultSet);
 				}
 			}
 		}
@@ -257,7 +251,7 @@ public class DictRadix<T> implements Iterable<T>
 	 @param key
 	 @return
 	*/
-	private DictNode lookupImpl(char[] key)
+	private final DictNode lookupImpl(char[] key)
 	{
 		int keyPos = 0, n;
 		int keyLength = getCharArrayLength(key);
@@ -341,7 +335,7 @@ public class DictRadix<T> implements Iterable<T>
 
 	public List<LookupResult> lookupTolerant(String strKey, LookupTolerators.ToleranceFunction[] tolFuncs)
 	{
-		TolerantLookupCrawler tlc = new TolerantLookupCrawler(this, tolFuncs);
+		TolerantLookupCrawler tlc = new TolerantLookupCrawler(tolFuncs);
 		return tlc.lookupTolerant(strKey);
 	}
 
@@ -555,19 +549,6 @@ public class DictRadix<T> implements Iterable<T>
             }
             return sb.toString();
         }
-
-
-		/*public T getCurrent()
-		{
-			return nodesPath.getLast().getValue();
-		}
-
-		public void Reset()
-		{
-			nodesPath.clear();
-			nodesPath.addLast(radix.m_root);
-		}
-		*/
 
 		@Override
 		public T next()
