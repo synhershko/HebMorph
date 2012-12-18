@@ -64,6 +64,7 @@ public class MorphAnalyzer extends Analyzer
 
 	private boolean enableStopPositionIncrements = true;
 	private StreamLemmatizer hebMorphLemmatizer;
+    private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
     public MorphAnalyzer(DictRadix<MorphData> dict) {
         hebMorphLemmatizer = new StreamLemmatizer(dict, false);
@@ -74,7 +75,7 @@ public class MorphAnalyzer extends Analyzer
      */
 	public MorphAnalyzer()
 	{
-        this(loadFromClasspath(Loader.DEFAULT_HSPELL_DATA_CLASSPATH));
+        this(loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
 	}
 
     /**
@@ -109,7 +110,7 @@ public class MorphAnalyzer extends Analyzer
 
     static private DictRadix<MorphData> loadFromPath(File path) {
         try {
-            return Loader.loadDictionaryFromUrl(path.toURI().toURL().toString(), true);
+            return Loader.loadDictionaryFromHSpellData(path, true);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to read data", ex);
         }
