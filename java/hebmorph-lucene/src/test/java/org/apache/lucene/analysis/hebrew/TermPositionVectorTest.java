@@ -1,20 +1,12 @@
 
 package org.apache.lucene.analysis.hebrew;
 
-import org.apache.lucene.queryparsers.HebrewQueryParser;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermFreqVector;
-import org.apache.lucene.index.TermPositionVector;
-import org.apache.lucene.index.TermVectorOffsetInfo;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparsers.HebrewQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -26,30 +18,31 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TermPositionVectorTest {
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+public class TermPositionVectorTest extends TestBase {
     Analyzer analyzer;
     Directory indexDirectory;
     IndexSearcher searcher;
 
-
 	@Before
-	public void setUp() throws Exception
-	{
-		analyzer = new MorphAnalyzer();
+	public void setUp() throws Exception {
+		analyzer = new MorphAnalyzer(getDictionary());
 	}
 
 	@After
-	public void tearDown() throws Exception
-	{
+	public void tearDown() throws Exception {
 	}
 
 	@Test
-	public void storesPositionCorrectly() throws Exception
-	{
-        analyzer = new MorphAnalyzer();
+	public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriter writer = new IndexWriter(indexDirectory, analyzer, true, new IndexWriter.MaxFieldLength(Integer.MAX_VALUE));
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        IndexWriter writer = new IndexWriter(indexDirectory, config);
 
         String str = "קשת רשת דבשת מיץ יבשת יבלת גחלת גדר אינציקלופדיה חבר";
         Document doc = new Document();
@@ -57,7 +50,8 @@ public class TermPositionVectorTest {
         writer.addDocument(doc);
         writer.close();
 
-        searcher = new IndexSearcher(indexDirectory, true);
+        final IndexReader reader = IndexReader.open(indexDirectory);
+        searcher = new IndexSearcher(reader);
 
         runQuery("\"קשת\"", 0);
         runQuery("\"אינציקלופדיה\"", 8);
@@ -70,7 +64,7 @@ public class TermPositionVectorTest {
     private void runQuery(String query, int expectedPosition) throws ParseException, IOException
     {
         HebrewQueryParser hqp =
-            new HebrewQueryParser(Version.LUCENE_29, "Text", analyzer);
+            new HebrewQueryParser(Version.LUCENE_36, "Text", analyzer);
 
         Query q = hqp.parse(query);
 

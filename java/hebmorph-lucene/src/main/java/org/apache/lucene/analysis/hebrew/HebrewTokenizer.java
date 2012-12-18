@@ -50,11 +50,13 @@ public class HebrewTokenizer extends Tokenizer
 
 	public HebrewTokenizer(Reader _input)//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
+        super(_input);
 		init(_input, LingInfo.buildPrefixTree(false));
 	}
 
 	public HebrewTokenizer(Reader _input, DictRadix<Integer> _prefixesTree)//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
 	{
+        super(_input);
 		init(_input, _prefixesTree);
 	}
 

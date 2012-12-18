@@ -21,11 +21,12 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import static org.junit.Assert.assertEquals;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -33,14 +34,11 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
-public class BasicHebrewTests
-{
+import static org.junit.Assert.assertEquals;
+
+public class BasicHebrewTests extends TestBase {
 	private Analyzer analyzer;
 
 
@@ -56,14 +54,12 @@ public class BasicHebrewTests
 	}
 
 	@Before
-	public void setUp() throws Exception
-	{
-		analyzer = new MorphAnalyzer();
+	public void setUp() throws Exception {
+		analyzer = new MorphAnalyzer(getDictionary());
 	}
 
 	@After
-	public void tearDown() throws Exception
-	{
+	public void tearDown() throws Exception {
 	}
 
 	@Test
@@ -129,17 +125,18 @@ public class BasicHebrewTests
 
 	protected int findInText(String whatToIndex, String whatToSearch) throws Exception
 	{
-		Directory d = new RAMDirectory();
+		final Directory d = new RAMDirectory();
 
-		IndexWriter writer = new IndexWriter(d, analyzer, true, new IndexWriter.MaxFieldLength(10000));
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+		IndexWriter writer = new IndexWriter(d, config);
 		Document doc = new Document();
 		doc.add(new Field("content", whatToIndex, Field.Store.YES, Field.Index.ANALYZED));
 		writer.addDocument(doc);
 		writer.close();
-		writer = null;
 
-		IndexSearcher searcher = new IndexSearcher(d, true); // read-only=true
-		QueryParser qp = new QueryParser(Version.LUCENE_29, "content", analyzer);
+		IndexSearcher searcher = new IndexSearcher(IndexReader.open(d));
+		QueryParser qp = new QueryParser(Version.LUCENE_36, "content", analyzer);
 		Query query = qp.parse(whatToSearch);
 		ScoreDoc[] hits = searcher.search(query, null, 1000).scoreDocs;
 

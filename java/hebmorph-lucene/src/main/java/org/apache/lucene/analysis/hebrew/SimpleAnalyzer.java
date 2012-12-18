@@ -25,6 +25,7 @@ import com.code972.hebmorph.StopWords;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -79,10 +80,10 @@ public class SimpleAnalyzer extends Analyzer
 			streams.result = new NiqqudFilter(streams.source);
 
 			// TODO: should we ignoreCase in StopFilter?
-			streams.result = new StopFilter(enableStopPositionIncrements, streams.result, STOP_WORDS_SET);
+			streams.result = new StopFilter(Version.LUCENE_36, streams.result, STOP_WORDS_SET);
 
 			// TODO: Apply LowerCaseFilter to NonHebrew tokens only
-			streams.result = new LowerCaseFilter(streams.result);
+			streams.result = new LowerCaseFilter(Version.LUCENE_36, streams.result);
 
 			if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
 			{
@@ -107,10 +108,10 @@ public class SimpleAnalyzer extends Analyzer
 		result = new NiqqudFilter(result);
 
 		// TODO: should we ignoreCase in StopFilter?
-		result = new StopFilter(enableStopPositionIncrements, result, STOP_WORDS_SET);
+		result = new StopFilter(Version.LUCENE_36, result, STOP_WORDS_SET);
 
 		// TODO: Apply LowerCaseFilter to NonHebrew tokens only
-		result = new LowerCaseFilter(result);
+		result = new LowerCaseFilter(Version.LUCENE_36, result);
 
 		if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
 		{

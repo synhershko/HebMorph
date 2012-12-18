@@ -56,21 +56,25 @@ public class StreamLemmasFilter extends Tokenizer
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
 	{
+        super(input);
 		init(input, _lemmatizer, null, false);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, boolean alwaysSaveMarkedOriginal)
 	{
+        super(input);
 		init(input, _lemmatizer, null, alwaysSaveMarkedOriginal);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
 	{
+        super(input);
 		init(input, _lemmatizer, _lemmaFilter, alwaysSaveMarkedOriginal);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
 	{
+        super(input);
 		init(input, _lemmatizer, _lemmaFilter, false);
 	}
 
@@ -89,7 +93,7 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
 	@Override
-	public boolean incrementToken() throws IOException
+	public final boolean incrementToken() throws IOException
 	{
 		// Index all unique lemmas at the same position
 		while (index < stack.size())

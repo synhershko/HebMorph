@@ -124,7 +124,7 @@ public class MorphAnalyzer extends Analyzer
 	}
 
 	@Override
-	public TokenStream reusableTokenStream(String fieldName, Reader reader) throws java.io.IOException
+	public final TokenStream reusableTokenStream(String fieldName, Reader reader) throws java.io.IOException
 	{
 		Object tempVar = getPreviousTokenStream();
 		SavedStreams streams = (SavedStreams)((tempVar instanceof SavedStreams) ? tempVar : null);
@@ -135,7 +135,7 @@ public class MorphAnalyzer extends Analyzer
 
 			// This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
 			// all by itself
-			streams.result = new StopFilter(enableStopPositionIncrements, streams.source, STOP_WORDS_SET);
+			streams.result = new StopFilter(Version.LUCENE_36, streams.source, STOP_WORDS_SET);
 
 			setPreviousTokenStream(streams);
 		}
@@ -147,13 +147,13 @@ public class MorphAnalyzer extends Analyzer
 	}
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader)
+	public final TokenStream tokenStream(String fieldName, Reader reader)
 	{
 		TokenStream result = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
 
 		// This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
 		// all by itself
-		result = new StopFilter(enableStopPositionIncrements, result, STOP_WORDS_SET);
+		result = new StopFilter(Version.LUCENE_36, result, STOP_WORDS_SET);
 
 		return result;
 	}
