@@ -87,7 +87,7 @@ public class Lemmatizer
 	*/
 	static public String removeNiqqud(String word)
 	{
-		int length = word.length();
+		final int length = word.length();
 		StringBuilder sb = new StringBuilder(length);
 		for (int i = 0; i < length; i++)
 		{
@@ -103,7 +103,7 @@ public class Lemmatizer
 	{
 		// TODO: Verify word to be non-empty and contain Hebrew characters?
 
-		RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
 		MorphData md = m_dict.lookup(word);
 		if (md != null)
@@ -153,19 +153,14 @@ public class Lemmatizer
 				}
 			}
 		}
-
-		if (ret.size() > 0)
-		{
-			return ret;
-		}
-		return null;
+		return ret;
 	}
 
 	public List<HebrewToken> lemmatizeTolerant(String word)
 	{
 		// TODO: Verify word to be non-empty and contain Hebrew characters?
 
-		RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
 		int prefLen = 0;
 		Integer prefixMask;
@@ -212,11 +207,6 @@ public class Lemmatizer
 				}
 			}
 		}
-
-		if (ret.size() > 0)
-		{
-			return ret;
-		}
-		return null;
+        return ret;
 	}
 }
