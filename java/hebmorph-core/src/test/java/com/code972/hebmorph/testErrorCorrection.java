@@ -17,16 +17,19 @@ public class testErrorCorrection extends TestBase {
     }
 
     @Test
-    public void SimpleAHVICases()
-    {
-        // AssertWord("פינגוין", "פינגווין"); // TODO
+    public void SimpleAHVICases() {
+        //AssertWord("שלחן", "שולחן");
+        AssertWord("אמא", "אימא");
+        AssertWord("אנצקלופדיה", "אנציקלופדיה");
+        AssertWord("אינציקלופדיה", "אנציקלופדיה");
+        AssertWord("פינגוין", "פינגווין");
     }
 
-    private void AssertWord(String word, String expectedWord)
-    {
+    private void AssertWord(String word, String expectedWord) {
+        System.out.println("Testing " + word + " -> " + expectedWord);
         assertTrue(_lemmatizer.lemmatize(expectedWord).size() > 0); // make sure the expected word is legal
         List<HebrewToken> results = _lemmatizer.lemmatizeTolerant(word);
         assertTrue(results.size() > 0);
-        assertEquals(expectedWord, results.get(0).getText());
+        assertEquals(expectedWord, results.get(0).getLemma());
     }
 }
