@@ -24,7 +24,7 @@ public class MorphData
 {
 	private Integer[] descFlags;
 	private String[] lemmas;
-	private int prefixes;
+	private short prefixes;
 
 	public void setLemmas(String[] lemmas)
 	{
@@ -36,7 +36,7 @@ public class MorphData
 		return lemmas;
 	}
 
-	public void setPrefixes(int prefixes)
+	public void setPrefixes(short prefixes)
 	{
 		this.prefixes = prefixes;
 	}
