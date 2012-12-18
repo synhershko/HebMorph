@@ -26,6 +26,7 @@ import com.code972.hebmorph.hspell.Loader;
 import junit.framework.Assert;
 import org.junit.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ public class LemmatizerTest
 		Assert.fail("Not yet implemented");
 	}
 
+    @Test
 	public void testLemmatizer() throws IOException
 	{
 		String text = "רפאל ולדן הוא פרופסור לרפואה ישראלי, מלמד באוניברסיטת תל אביב, סגן מנהל בית החולים שיבא ופעיל חברתי. מתמחה בכירוגיה כללית ובכלי דם."+
@@ -77,7 +79,7 @@ public class LemmatizerTest
 		int expectedNumberOfNonHebrewWords = 0;
 		StringReader reader = new StringReader(text);
         //DictRadix<MorphData> dict = Loader.loadDictionaryFromDefaultClasspath(true);
-        DictRadix<MorphData> dict = Loader.loadDictionaryFromUrl(DEFAULT_HSPELL_PATH, true);
+        DictRadix<MorphData> dict = Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
 		m_lemmatizer = new StreamLemmatizer(reader, dict, false);
 
         String word = "";

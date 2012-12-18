@@ -1,11 +1,13 @@
-package com.code972.hebmorph;
+package com.code972.hebmorph.datastructures;
 
-import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.datastructures.DictRadix.RadixEnumerator;
+import org.junit.Test;
+
 import java.util.Random;
 import java.util.UUID;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RadixTest
 {

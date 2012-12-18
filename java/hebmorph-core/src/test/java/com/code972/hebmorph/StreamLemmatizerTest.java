@@ -1,7 +1,5 @@
 package com.code972.hebmorph;
 
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.Loader;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,7 +12,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class StreamLemmatizerTest
+public class StreamLemmatizerTest extends TestBase
 {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
@@ -52,11 +50,8 @@ public class StreamLemmatizerTest
     @Test
     public void testHebrewWords() throws IOException
     {
-        final String DEFAULT_HSPELL_PATH = "file:///home/synhershko/code/oscode/HebMorph/hspell-data-files";
-        DictRadix<MorphData> dict = Loader.loadDictionaryFromUrl(DEFAULT_HSPELL_PATH, true);
-
-        final String input = "יבגני";
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input), dict , false);
+        final String input = "שלום";
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input), getDictionary(), false);
 
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
