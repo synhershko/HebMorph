@@ -144,7 +144,7 @@ public class StreamLemmatizer extends Lemmatizer
 				{
 					// TODO: Perform Gimatria test
 					// TODO: Treat an acronym as a noun and strip affixes accordingly?
-					retTokens.add(new HebrewToken(nextToken.ref, 0, DMask.D_ACRONYM, nextToken.ref, 1.0f));
+					retTokens.add(new HebrewToken(nextToken.ref, (byte)0, DMask.D_ACRONYM, nextToken.ref, 1.0f));
 				}
 				else if (tolerateWhenLemmatizingStream && retTokens.isEmpty())
 				{

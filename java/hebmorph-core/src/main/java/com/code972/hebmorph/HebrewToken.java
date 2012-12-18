@@ -24,7 +24,7 @@ public class HebrewToken extends Token implements Comparable<Token>
 {
     private static final long serialVersionUID = -5809495040446607703L;
 
-    public HebrewToken(String _word, int _prefixLength, Integer _mask, String _lemma, float _score) {
+    public HebrewToken(String _word, byte  _prefixLength, Integer _mask, String _lemma, float _score) {
         super(_word);
         prefixLength = _prefixLength;
         setMask(_mask);
@@ -40,7 +40,7 @@ public class HebrewToken extends Token implements Comparable<Token>
     }
 
     private float score = 1.0f;
-    private int prefixLength;
+    private byte prefixLength;
     private Integer mask;
     private String lemma;
 
@@ -130,7 +130,7 @@ public class HebrewToken extends Token implements Comparable<Token>
         return mask;
     }
 
-    public int getPrefixLength()
+    public byte getPrefixLength()
     {
         return prefixLength;
     }
@@ -139,6 +139,4 @@ public class HebrewToken extends Token implements Comparable<Token>
     {
         return lemma;
     }
-
-
 }

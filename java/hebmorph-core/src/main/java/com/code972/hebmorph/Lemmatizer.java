@@ -110,7 +110,7 @@ public class Lemmatizer
 		{
 			for (int result = 0; result < md.getLemmas().length; result++)
 			{
-				ret.addUnique(new HebrewToken(word, 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+				ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
 			}
 		}
 		else if (word.endsWith("'")) // Try ommitting closing Geresh
@@ -120,12 +120,12 @@ public class Lemmatizer
 			{
 				for (int result = 0; result < md.getLemmas().length; result++)
 				{
-					ret.addUnique(new HebrewToken(word, 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+					ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
 				}
 			}
 		}
 
-		int prefLen = 0;
+		byte prefLen = 0;
 		Integer prefixMask;
 		while (true)
 		{
@@ -162,7 +162,7 @@ public class Lemmatizer
 
 		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
-		int prefLen = 0;
+		byte prefLen = 0;
 		Integer prefixMask;
 
 		List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
@@ -172,7 +172,7 @@ public class Lemmatizer
 			{
 				for (int result = 0; result < lr.getData().getLemmas().length; result++)
 				{
-					ret.addUnique(new HebrewToken(lr.getWord(), 0, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore()));
+					ret.addUnique(new HebrewToken(lr.getWord(), (byte)0, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore()));
 				}
 			}
 		}
@@ -182,9 +182,7 @@ public class Lemmatizer
 		{
 			// Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
 			if (word.length() - prefLen < 2)
-			{
 				break;
-			}
 
 			prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
 			if ((prefixMask ==null) || (prefixMask == 0)) // no such prefix
