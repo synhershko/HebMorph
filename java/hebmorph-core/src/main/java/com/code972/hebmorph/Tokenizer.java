@@ -1,23 +1,20 @@
-/**************************************************************************
- *   Copyright (C) 2010 by                                                 *
+/***************************************************************************
+ *   Copyright (C) 2010-2013 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com>							   *
- *                                                                         *
- *   Distributed under the GNU General Public License, Version 2.0.        *
+ *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation (v2).                                    *
+ *   it under the terms of the GNU Affero General Public License           *
+ *   version 3, as published by the Free Software Foundation.              *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
+ *   GNU Affero General Public License for more details.                   *
  *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
+ *   You should have received a copy of the GNU Affero General Public      *
+ *   License along with this program; if not, see                          *
+ *   <http://www.gnu.org/licenses/>.                                       *
  **************************************************************************/
 package com.code972.hebmorph;
 
@@ -107,7 +104,7 @@ public class Tokenizer
 	private char[] ioBuffer = new char[IO_BUFFER_SIZE];
 	private int ioBufferIndex = 0;
 
-	private char[] wordBuffer = new char[Constants.MaxWordLength];
+	private final char[] wordBuffer = new char[Constants.MaxWordLength];
 
 	public Tokenizer(Reader _input)
 	{
