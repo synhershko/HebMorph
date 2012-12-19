@@ -1,10 +1,17 @@
 package com.code972.hebmorph;
 
-import java.io.StringReader;
+import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.analysis.CharReader;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
+import org.junit.Test;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class TokenizerTest
 {
@@ -30,6 +37,54 @@ public class TokenizerTest
             assertEquals(expectedOffsets[curPos++], t.getOffset());
             assertEquals(4, t.getLengthInSource());
         }
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyWithAnotherReader() throws IOException {
+        int[] expectedOffsets = { 0, 5, 10, 15 };
+        int curPos = 0;
+
+        Tokenizer t = new Tokenizer(
+                        new HTMLStripCharFilter(CharReader.get(new StringReader("test <a href=\"foo\">test</a> test test")))
+        );
+
+        Reference<String> ref = new Reference<String>("");
+        while (true)
+        {
+            int token_type = t.nextToken(ref);
+            if (token_type == 0)
+                break;
+
+            assertEquals(expectedOffsets[curPos++], t.getOffset());
+            assertEquals(4, t.getLengthInSource());
+        }
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyWithAnotherReader2() throws IOException {
+        String input = "test1 <a href=\"foo\">testlink</a> test2 test3";
+
+        CharFilter filter = new HTMLStripCharFilter(CharReader.get(new StringReader(input)));
+        Tokenizer t = new Tokenizer(filter);
+
+        Reference<String> token = new Reference<String>("");
+        List<Token> results = new ArrayList<Token>();
+
+        t.nextToken(token);
+        assertEquals(0, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(20, filter.correctOffset(t.getOffset()));
+        assertEquals(8, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(33, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(39, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
     }
 
     @Test

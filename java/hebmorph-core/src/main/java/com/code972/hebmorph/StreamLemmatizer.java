@@ -64,19 +64,16 @@ public class StreamLemmatizer extends Lemmatizer
 
 	private boolean tolerateWhenLemmatizingStream = true;
 
-	public int getLemmatizeNextToken(Reference<String> nextToken, List<Token> retTokens) throws IOException
-	{
+	public int getLemmatizeNextToken(Reference<String> nextToken, List<Token> retTokens) throws IOException {
 		retTokens.clear();
 
 		int currentPos = 0;
 		int tokenType;
 
 		// Used to loop over certain noise cases
-		while (true)
-		{
+		while (true) {
 			tokenType = _tokenizer.nextToken(nextToken);
-			if (tokenType == 0)
-			{
+			if (tokenType == 0) {
 				return 0; // EOS
 			}
 
@@ -85,8 +82,7 @@ public class StreamLemmatizer extends Lemmatizer
 
 			++currentPos;
 
-			if ((tokenType & Tokenizer.TokenType.Hebrew) > 0)
-			{
+			if ((tokenType & Tokenizer.TokenType.Hebrew) > 0) {
 				// Right now we are blindly removing all Niqqud characters. Later we will try and make some
 				// use of Niqqud for some cases. We do this before everything else to allow for a correct
 				// identification of prefixes.

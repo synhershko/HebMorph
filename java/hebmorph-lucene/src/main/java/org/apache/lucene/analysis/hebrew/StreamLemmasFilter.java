@@ -92,11 +92,9 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
 	@Override
-	public final boolean incrementToken() throws IOException
-	{
+	public final boolean incrementToken() throws IOException {
 		// Index all unique lemmas at the same position
-		while (index < stack.size())
-		{
+		while (index < stack.size()) {
 			HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
 			index++;
 

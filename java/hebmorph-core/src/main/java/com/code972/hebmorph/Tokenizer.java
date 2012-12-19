@@ -22,11 +22,8 @@ import com.code972.hebmorph.hspell.Constants;
 import java.io.IOException;
 import java.io.Reader;
 
-public class Tokenizer
-{
-
-	public static class TokenType
-	{
+public class Tokenizer {
+	public static class TokenType {
 		public static int Hebrew = 1;
 		public static int NonHebrew = 2;
 		public static int Numeric = 4;
@@ -42,15 +39,13 @@ public class Tokenizer
 
 	public static boolean isOfChars(char c, char[] options)
 	{
-		for (char o : options)
-		{
+		for (char o : options) {
 			if (c == o) return true;
 		}
 		return false;
 	}
 
-    public static char[] concatenateCharArrays(char[] ... arrays)
-    {
+    public static char[] concatenateCharArrays(char[] ... arrays) {
         int count = 0;
         for(char[] a : arrays) {
             count += a.length;
@@ -118,21 +113,15 @@ public class Tokenizer
 		int length = 0;
         tokenOffset = -1; // invalidate
 		int tokenType = 0;
-		while (true)
-		{
-			if (ioBufferIndex >= dataLen)
-			{
+		while (true) {
+			if (ioBufferIndex >= dataLen) {
 				inputOffset += dataLen;
 				dataLen = input.read(ioBuffer, 0, ioBuffer.length);
-				if (dataLen <= 0)
-				{
+				if (dataLen <= 0) {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
-					if (length > 0)
-					{
+					if (length > 0) {
 						break;
-					}
-					else
-					{
+					} else {
 						tokenString.ref = "";
                         tokenLengthInSource = 0;
 						return 0;
@@ -147,15 +136,12 @@ public class Tokenizer
 			// In case we already consumed at least one char, and started a non-Hebrew token.
 			// Since tokenizing non-Hebrew characters correctly is out of scope for this implementation,
 			// we will consume all non-spaces and non-panctuation and return them as-is.
-			if ((length > 0) && ((tokenType & TokenType.NonHebrew) > 0))
-			{
+			if ((length > 0) && ((tokenType & TokenType.NonHebrew) > 0)) {
 				// No such thing as mixed words; return the current word and go back
-				if (((c >= 1488) && (c <= 1514)) || ((c >= 1455) && (c <= 1476))) // HEBREW || NIQQUD
-				{
+				if (((c >= 1488) && (c <= 1514)) || ((c >= 1455) && (c <= 1476))) { // HEBREW || NIQQUD
 					--ioBufferIndex;
 					break;
-				}
-				else if (Character.isLetterOrDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
+				} else if (Character.isLetterOrDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
 				{
 					appendCurrentChar = true;
 				}
