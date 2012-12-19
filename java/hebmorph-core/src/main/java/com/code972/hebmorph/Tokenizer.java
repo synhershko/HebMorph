@@ -108,8 +108,7 @@ public class Tokenizer {
 
 	// Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
 	// This is a job for a normalizer, anyway
-	public int nextToken(Reference<String> tokenString) throws IOException
-	{
+	public int nextToken(Reference<String> tokenString) throws IOException {
 		int length = 0;
         tokenOffset = -1; // invalidate
 		int tokenType = 0;
@@ -133,85 +132,54 @@ public class Tokenizer {
 			char c = ioBuffer[ioBufferIndex++];
 			boolean appendCurrentChar = false;
 
-			// In case we already consumed at least one char, and started a non-Hebrew token.
-			// Since tokenizing non-Hebrew characters correctly is out of scope for this implementation,
-			// we will consume all non-spaces and non-panctuation and return them as-is.
-			if ((length > 0) && ((tokenType & TokenType.NonHebrew) > 0)) {
-				// No such thing as mixed words; return the current word and go back
-				if (((c >= 1488) && (c <= 1514)) || ((c >= 1455) && (c <= 1476))) { // HEBREW || NIQQUD
-					--ioBufferIndex;
-					break;
-				} else if (Character.isLetterOrDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
-				{
-					appendCurrentChar = true;
-				}
-				else
-				{
-					break; // Tokenize on everything else
-				}
-			}
-			else if (isHebrewLetter(c) || ((length > 0) && isNiqqudChar(c))) // HEBREW || (NIQQUD if not first char)
-			{
-				tokenType |= TokenType.Hebrew;
-				appendCurrentChar = true;
-			}
-			else if (Character.isLetterOrDigit(c))
-			{
-				// If met while consuming a Hebrew word, we return the current word (no such thing as mixed words)
-				if ((length > 0) && ((tokenType & TokenType.Hebrew) > 0))
-				{
-					--ioBufferIndex;
-					break;
-				}
+            if (length == 0) { // first char, figure out what it is
+                if (isHebrewLetter(c)) {
+                    tokenType |= TokenType.Hebrew;
+                    appendCurrentChar = true;
+                } else if (Character.isLetterOrDigit(c)) {
+                    tokenType |= TokenType.NonHebrew;
+                    if (Character.isDigit(c))
+                        tokenType |= TokenType.Numeric;
 
-				tokenType |= TokenType.NonHebrew;
-				if (Character.isDigit(c)) // TODO: break to prevent mixing of non-Hebrew and digits as well?
-				{
-					tokenType |= TokenType.Numeric;
-				}
+                    appendCurrentChar = true;
+                }
+                // Everything else will be ignored
+            } else { // we should consume every letter or digit, and tokenize on everything else
+                if (isHebrewLetter(c) || isNiqqudChar(c)) {
+                    appendCurrentChar = true;
+                } else if (Character.isLetterOrDigit(c)) {
+                    // TODO
+                    appendCurrentChar = true;
+                } else if (isOfChars(c, Gershayim)) {
+                    // Tokenize if previous char wasn't part of a word
+                    if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1]))
+                        break;
 
-				appendCurrentChar = true;
-			}
-			else if (isOfChars(c, Gershayim) && (length > 0))
-			{
-				// Tokenize if previous char wasn't part of a word
-				if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1]))
-				{
-					break;
-				}
+                    // TODO: Is it possible to support cases like שה"שםעצם in the tokenizer?
+                    tokenType |= TokenType.Acronym;
+                    appendCurrentChar = true;
+                } else if (isOfChars(c, Geresh)) {
+                    // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
+                    if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
+                            && !isOfChars(wordBuffer[length - 1], Geresh))
+                        break;
 
-				// TODO: Is it possible to support cases like שה"שםעצם in the tokenizer?
-				tokenType |= TokenType.Acronym;
-				appendCurrentChar = true;
-			}
-			else if (isOfChars(c, Geresh) && (length > 0))
-			{
-				// Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
-				if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
-						&& !isOfChars(wordBuffer[length - 1], Geresh))
-				{
-					break;
-				}
+                    // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
+                    tokenType |= TokenType.Acronym;
+                    appendCurrentChar = true;
+                } else {
+                    // Flag makaf connected words as constructs
+                    if (isOfChars(c, Makaf)) {
+                        tokenType |= TokenType.Construct;
+                    }
+                    // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
 
-				// TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
-				tokenType |= TokenType.Acronym;
-				appendCurrentChar = true;
-			}
-			else if (length > 0)
-			{
-				// Flag makaf connected words as constructs
-				if (isOfChars(c, Makaf)) // TODO: Normalize or support other types of dashes too
-				{
-					tokenType |= TokenType.Construct;
-				}
-				// TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
+                    // at non-Letter w/ chars
+                    break; // return 'em
+                }
+            }
 
-				// at non-Letter w/ chars
-				break; // return 'em
-			}
-
-			if (appendCurrentChar)
-			{
+			if (appendCurrentChar) {
 				// Consume normally
 				if (length == 0) // mark the start of a new token
 				{
@@ -272,8 +240,7 @@ public class Tokenizer {
 		return tokenType;
 	}
 
-	public final void reset(Reader _input)
-	{
+	public final void reset(Reader _input) {
 		input = _input;
 		inputOffset = 0;
 		dataLen = 0;

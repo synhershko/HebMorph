@@ -13,11 +13,56 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TokenizerTest
-{
-    private Tokenizer getTokenizer(String input) throws FileNotFoundException
-    {
+public class TokenizerTest {
+    private Tokenizer getTokenizer(String input) throws FileNotFoundException {
         return new Tokenizer(new StringReader(input));
+    }
+
+    private void assertTokenizesTo(String stream, String token) throws IOException {
+        assertTokenizesTo(stream, new String[] { token });
+    }
+
+    private void assertTokenizesTo(String stream, String[] tokens) throws IOException {
+        Reference<String> test = new Reference<String>("");
+        Tokenizer t = getTokenizer(stream);
+
+        int i = 0;
+        while (t.nextToken(test) > 0) {
+            assertEquals(tokens[i++], test.ref);
+        }
+        assertEquals(tokens.length, i);
+    }
+
+    @Test
+    public void tokenizesCorrectly() throws IOException {
+        assertTokenizesTo("בדיקה", "בדיקה");
+        assertTokenizesTo("בדיקה.", "בדיקה");
+        assertTokenizesTo("בדיקה..", "בדיקה");
+
+        assertTokenizesTo("בדיקה שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה.שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה. שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה,שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה+שניה", new String[] {"בדיקה", "שניה"});
+
+        assertTokenizesTo("בדיקה\"", "בדיקה");
+
+        assertTokenizesTo("\u05AAבדיקה", "בדיקה"); // ignores leading niqqud (invalid case)
+        assertTokenizesTo("\u05AAבדיקה..", "בדיקה");
+        assertTokenizesTo("ב\u05B0דיקה", "ב\u05B0דיקה"); // doesn't strip Niqqud
+        //assertTokenizesTo("ב\u05A0דיקה", "ב\u05A0דיקה"); // ignores Taamei Mikra
+
+        //assertTokenizesTo("ץבדיקה", "בדיקה");
+
+        assertTokenizesTo("שלומי999", "שלומי999");
+        assertTokenizesTo("שלומיabc", "שלומיabc");
+
+        //assertTokenizesTo("בלונים$", "בלונים$");
+
+        // Gershayim unification
+        assertTokenizesTo("צה\"ל", "צה\"ל");
+        assertTokenizesTo("צה''ל", "צה\"ל");
+        assertTokenizesTo("צה\u05F3\u05F3ל", "צה\"ל");
     }
 
     @Test
@@ -113,22 +158,7 @@ public class TokenizerTest
     }
 
     @Test
-    public void UnifiesGershayimCorrectly() throws FileNotFoundException, IOException
-    {
-        Reference<String> test = new Reference<String>("");
-
-        Tokenizer t = getTokenizer("צה''ל");
-        t.nextToken(test);
-        assertEquals("צה\"ל", test.ref);
-
-        t = getTokenizer("צה\u05F3\u05F3ל");
-        t.nextToken(test);
-        assertEquals("צה\"ל", test.ref);
-    }
-
-    @Test
-    public void DiscardsSurroundingGershayim() throws FileNotFoundException, IOException
-    {
+    public void DiscardsSurroundingGershayim() throws FileNotFoundException, IOException {
         Reference<String> test = new Reference<String>("");
 
         Tokenizer t = getTokenizer("\"צבא\"");
