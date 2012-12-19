@@ -63,6 +63,13 @@ public class StreamLemmatizer extends Lemmatizer
 
 	private boolean tolerateWhenLemmatizingStream = true;
 
+    public Character getSuffixForExactMatch() {
+        return _tokenizer.getSuffixForExactMatch();
+    }
+    public void setSuffixForExactMatch(Character suffixForExactMatch) {
+        this._tokenizer.setSuffixForExactMatch(suffixForExactMatch);
+    }
+
 	public int getLemmatizeNextToken(Reference<String> nextToken, List<Token> retTokens) throws IOException {
 		retTokens.clear();
 
@@ -99,6 +106,13 @@ public class StreamLemmatizer extends Lemmatizer
 						continue;
 					}
 				}
+
+                // An exact match request was identified
+                // Returning an with an empty stack will force consumer to use the tokenized word,
+                // available through the Reference passed to this method
+                if ((tokenType & Tokenizer.TokenType.Exact) > 0) {
+                    break;
+                }
 
 				// This second case is a bit more complex. We take a risk of splitting a valid acronym or
 				// abbrevated word into two, so we send it to an external function to analyze the word, and

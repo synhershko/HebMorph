@@ -19,16 +19,30 @@ public class TokenizerTest {
     }
 
     private void assertTokenizesTo(String stream, String token) throws IOException {
-        assertTokenizesTo(stream, new String[] { token });
+        assertTokenizesTo(stream, token, 0);
+    }
+
+    private void assertTokenizesTo(String stream, String token, int tokenType) throws IOException {
+        assertTokenizesTo(stream, new String[] { token }, tokenType == 0 ? null : new int[] {tokenType});
     }
 
     private void assertTokenizesTo(String stream, String[] tokens) throws IOException {
+        assertTokenizesTo(stream, tokens, null);
+    }
+
+    private void assertTokenizesTo(String stream, String[] tokens, int[] tokenTypes) throws IOException {
+        assert tokenTypes == null || tokens.length == tokenTypes.length;
+
         Reference<String> test = new Reference<String>("");
         Tokenizer t = getTokenizer(stream);
+        t.setSuffixForExactMatch('$');
 
-        int i = 0;
-        while (t.nextToken(test) > 0) {
-            assertEquals(tokens[i++], test.ref);
+        int i = 0, tokenType;
+        while ((tokenType = t.nextToken(test)) > 0) {
+            assertEquals(tokens[i], test.ref);
+            if (tokenTypes != null)
+                assertEquals(tokenTypes[i], tokenType);
+            i++;
         }
         assertEquals(tokens.length, i);
     }
@@ -57,7 +71,7 @@ public class TokenizerTest {
         assertTokenizesTo("שלומי999", "שלומי999");
         assertTokenizesTo("שלומיabc", "שלומיabc");
 
-        //assertTokenizesTo("בלונים$", "בלונים$");
+        assertTokenizesTo("בלונים$", "בלונים", Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact);
 
         // Gershayim unification
         assertTokenizesTo("צה\"ל", "צה\"ל");

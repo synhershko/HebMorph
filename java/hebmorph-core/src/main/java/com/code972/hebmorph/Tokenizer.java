@@ -23,12 +23,15 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class Tokenizer {
-	public static class TokenType {
+
+    public static class TokenType {
 		public static int Hebrew = 1;
 		public static int NonHebrew = 2;
 		public static int Numeric = 4;
-		public static int Construct = 8;
-		public static int Acronym = 16;
+        public static int Mixed = 8;
+		public static int Construct = 16;
+		public static int Acronym = 32;
+        public static int Exact = 64;
 	}
 
 	public static final char[] Geresh = { '\'', '\u05F3' };
@@ -98,8 +101,15 @@ public class Tokenizer {
         tokenLengthInSource = length;
     }
 
+    private Character suffixForExactMatch = null;
+    public Character getSuffixForExactMatch() {
+        return suffixForExactMatch;
+    }
+    public void setSuffixForExactMatch(Character suffixForExactMatch) {
+        this.suffixForExactMatch = suffixForExactMatch;
+    }
 
-	private static final int IO_BUFFER_SIZE = 4096;
+    private static final int IO_BUFFER_SIZE = 4096;
 	private char[] ioBuffer = new char[IO_BUFFER_SIZE];
 	private int ioBufferIndex = 0;
 
@@ -177,8 +187,10 @@ public class Tokenizer {
                     // Flag makaf connected words as constructs
                     if (isOfChars(c, Makaf)) {
                         tokenType |= TokenType.Construct;
+                        // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
+                    } else if (suffixForExactMatch != null && suffixForExactMatch.equals(c)) {
+                        tokenType |= TokenType.Exact;
                     }
-                    // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
 
                     // at non-Letter w/ chars
                     break; // return 'em
