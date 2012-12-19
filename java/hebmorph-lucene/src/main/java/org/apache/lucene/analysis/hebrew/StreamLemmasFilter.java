@@ -113,10 +113,9 @@ public class StreamLemmasFilter extends Tokenizer
 
 		// Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
 		// an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
-		String word = ""; // to hold the original word from the stream
-		Reference<String> tempRefObject = new Reference<String>(word);
+		final Reference<String> tempRefObject = new Reference<String>("");
 		boolean tempVar = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack) == 0;
-        word = tempRefObject.ref;
+        final String word = tempRefObject.ref;
 		if (tempVar)
 			return false; // EOS
 

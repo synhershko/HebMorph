@@ -40,8 +40,7 @@ public class StreamLemmatizer extends Lemmatizer
 		_tokenizer = new Tokenizer(input);
 	}
 
-	public void setStream(Reader input)
-	{
+	public void setStream(Reader input) {
 		if (_tokenizer == null)
 		{
 			_tokenizer = new Tokenizer(input);

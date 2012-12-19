@@ -63,9 +63,7 @@ public class BasicHebrewTests extends TestBase {
 	}
 
 	@Test
-	public void test() throws Exception
-	{
-	
+	public void test() throws Exception {
 		// Warm up with exact matches...
 		assertFoundInText("בת", "בת");
 		assertFoundInText("שבתו", "שבתו");
