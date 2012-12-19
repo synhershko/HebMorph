@@ -65,6 +65,10 @@ public class Tokenizer {
 	{
 		return ((c >= 1488) && (c <= 1514));
 	}
+    public static boolean isFinalHebrewLetter(char c)
+    {
+        return (c == 1507 || c == 1498 || c == 1501 || c == 1509 || c == 1503);
+    }
 	public static boolean isNiqqudChar(char c)
 	{
 		return ((c >= 1455) && (c <= 1476));
@@ -134,8 +138,10 @@ public class Tokenizer {
 
             if (length == 0) { // first char, figure out what it is
                 if (isHebrewLetter(c)) {
-                    tokenType |= TokenType.Hebrew;
-                    appendCurrentChar = true;
+                    if (!isFinalHebrewLetter(c)) {
+                        tokenType |= TokenType.Hebrew;
+                        appendCurrentChar = true;
+                    }
                 } else if (Character.isLetterOrDigit(c)) {
                     tokenType |= TokenType.NonHebrew;
                     if (Character.isDigit(c))

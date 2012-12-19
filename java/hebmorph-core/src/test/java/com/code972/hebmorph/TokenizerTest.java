@@ -52,7 +52,7 @@ public class TokenizerTest {
         assertTokenizesTo("ב\u05B0דיקה", "ב\u05B0דיקה"); // doesn't strip Niqqud
         //assertTokenizesTo("ב\u05A0דיקה", "ב\u05A0דיקה"); // ignores Taamei Mikra
 
-        //assertTokenizesTo("ץבדיקה", "בדיקה");
+        assertTokenizesTo("ץבדיקה", "בדיקה");
 
         assertTokenizesTo("שלומי999", "שלומי999");
         assertTokenizesTo("שלומיabc", "שלומיabc");
