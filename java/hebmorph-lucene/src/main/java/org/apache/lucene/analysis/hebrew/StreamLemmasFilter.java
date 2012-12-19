@@ -80,11 +80,10 @@ public class StreamLemmasFilter extends Tokenizer
 
 	private void init(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
 	{
-		termAtt = (TermAttribute)addAttribute(TermAttribute.class);
-		offsetAtt = (OffsetAttribute)addAttribute(OffsetAttribute.class);
-		posIncrAtt = (PositionIncrementAttribute)addAttribute(PositionIncrementAttribute.class);
-		typeAtt = (TypeAttribute)addAttribute(TypeAttribute.class);
-		//payAtt = (PayloadAttribute)AddAttribute(typeof(PayloadAttribute));
+		termAtt = addAttribute(TermAttribute.class);
+		offsetAtt = addAttribute(OffsetAttribute.class);
+		posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+		typeAtt = addAttribute(TypeAttribute.class);
 
 		_streamLemmatizer = _lemmatizer;
 		_streamLemmatizer.setStream(input);
@@ -119,27 +118,21 @@ public class StreamLemmasFilter extends Tokenizer
 		String word = ""; // to hold the original word from the stream
 		Reference<String> tempRefObject = new Reference<String>(word);
 		boolean tempVar = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack) == 0;
-			word = tempRefObject.ref;
+        word = tempRefObject.ref;
 		if (tempVar)
-		{
 			return false; // EOS
-		}
 
 		// Store the location of the word in the original stream
 		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
 
 		// A non-Hebrew word
-		if ((stack.size() == 1) && !(stack.get(0) instanceof HebrewToken))
-		{
+		if ((stack.size() == 1) && !(stack.get(0) instanceof HebrewToken)) {
 			setTermText(word);
 
 			Token tkn = stack.get(0);
-			if (tkn.isNumeric())
-			{
+			if (tkn.isNumeric()) {
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
-			}
-			else
-			{
+			} else {
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
 
 				// Applying LowerCaseFilter for Non-Hebrew terms
@@ -157,15 +150,13 @@ public class StreamLemmasFilter extends Tokenizer
 
 		// If we arrived here, we hit a Hebrew word
 		// Do some filtering if requested...
-		if ((lemmaFilter != null) && (lemmaFilter.filterCollection(stack, filterCache) != null))
-		{
+		if ((lemmaFilter != null) && (lemmaFilter.filterCollection(stack, filterCache) != null)) {
 			stack.clear();
 			stack.addAll(filterCache);
 		}
 
 		// OOV case -- for now store word as-is and return true
-		if (stack.isEmpty())
-		{
+		if (stack.isEmpty()) {
 			// TODO: To allow for more advanced uses, fill stack with processed tokens and
 			// SetPositionIncrement(0)
 
@@ -175,21 +166,16 @@ public class StreamLemmasFilter extends Tokenizer
 		}
 
 		// If only one lemma was returned for this word
-		if (stack.size() == 1)
-		{
+		if (stack.size() == 1) {
 			HebrewToken hebToken = (HebrewToken)((stack.get(0) instanceof HebrewToken) ? stack.get(0) : null);
 
 			// Index the lemma alone if it exactly matches the word minus prefixes
-			if (!alwaysSaveMarkedOriginal && hebToken.getLemma().equals(word.substring(hebToken.getPrefixLength())))
-			{
+			if (!alwaysSaveMarkedOriginal && hebToken.getLemma().equals(word.substring(hebToken.getPrefixLength()))) {
 				createHebrewToken(hebToken);
 				posIncrAtt.setPositionIncrement(1);
 				stack.clear();
 				return true;
-			}
-			// Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
-			else
-			{
+			} else { // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
 				// DILEMMA: Does indexing word.Substring(hebToken.PrefixLength) + "$" make more or less sense?
 				// For now this is kept the way it is below to support duality of SimpleAnalyzer and MorphAnalyzer
 				setTermText(word + "$");
@@ -198,8 +184,7 @@ public class StreamLemmasFilter extends Tokenizer
 
 		// More than one lemma exist. Mark and store the original term to increase precision, while all
 		// lemmas will be popped out of the stack and get stored at the next call to IncrementToken.
-		else
-		{
+		else {
 			setTermText(word + "$");
 		}
 
@@ -209,8 +194,7 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
 
-	protected boolean createHebrewToken(HebrewToken hebToken)
-	{
+	protected boolean createHebrewToken(HebrewToken hebToken) {
 		setTermText(hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma());
 		posIncrAtt.setPositionIncrement(0);
 
@@ -230,15 +214,11 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
 
-	private void setTermText(String token)
-	{
+	private void setTermText(String token) {
 		// Record the term string
-		if (termAtt.termLength() < token.length())
-		{
+		if (termAtt.termLength() < token.length()) {
 			termAtt.setTermBuffer(token);
-		}
-		else // Perform a copy to save on memory operations
-		{
+		} else { // Perform a copy to save on memory operations
 	        char[] chars = token.toCharArray();
             termAtt.setTermBuffer(chars,0,chars.length);
             //char[] buf = termAtt.termBuffer();
@@ -249,8 +229,7 @@ public class StreamLemmasFilter extends Tokenizer
 
     
 	@Override
-	public void reset(Reader input) throws IOException
-	{
+	public void reset(Reader input) throws IOException {
 		super.reset(input);
 		stack.clear();
 		index = 0;

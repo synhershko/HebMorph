@@ -62,39 +62,36 @@ public class MorphAnalyzer extends Analyzer
 	*/
 	public LemmaFilterBase lemmaFilter = null;
 
-	private boolean enableStopPositionIncrements = true;
-	private StreamLemmatizer hebMorphLemmatizer;
+	private final StreamLemmatizer hebMorphLemmatizer;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
-    public MorphAnalyzer(DictRadix<MorphData> dict) {
+    public MorphAnalyzer(final DictRadix<MorphData> dict) {
         hebMorphLemmatizer = new StreamLemmatizer(dict, false);
     }
 
     /**
      * Initializes using data files at the default location on the classpath.
      */
-	public MorphAnalyzer()
-	{
+	public MorphAnalyzer() {
         this(loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
 	}
 
     /**
      * Initializes using data files at the specified location on the classpath.
      */
-    public MorphAnalyzer(String hspellClasspath) {
+    public MorphAnalyzer(final String hspellClasspath) {
         this(loadFromClasspath(hspellClasspath));
     }
 
     /**
      * Initializes using data files at the specified location (hspellPath must be a directory).
      */
-    public MorphAnalyzer(File hspellPath) {
+    public MorphAnalyzer(final File hspellPath) {
         this(loadFromPath(hspellPath));
     }
 
 
-	public MorphAnalyzer(StreamLemmatizer hml)
-	{
+	public MorphAnalyzer(final StreamLemmatizer hml) {
 		super();
 		hebMorphLemmatizer = hml;
 	}
@@ -117,8 +114,7 @@ public class MorphAnalyzer extends Analyzer
     }
 
 	
-	private static class SavedStreams
-	{
+	private static class SavedStreams {
 		public Tokenizer source;
 		public TokenStream result;
 	}
