@@ -85,41 +85,31 @@ public class Lemmatizer
 	 @param word A string to remove Niqqud from
 	 @return A new word "clean" of Niqqud chars
 	*/
-	static public String removeNiqqud(String word)
+	static public String removeNiqqud(final String word)
 	{
 		final int length = word.length();
-		StringBuilder sb = new StringBuilder(length);
-		for (int i = 0; i < length; i++)
-		{
-			if ((word.charAt(i) < 1455) || (word.charAt(i) > 1476)) // current position is not a Niqqud character
-			{
+		final StringBuilder sb = new StringBuilder(length);
+		for (int i = 0; i < length; i++) {
+			if ((word.charAt(i) < 1455) || (word.charAt(i) > 1476)) { // current position is not a Niqqud character
 				sb.append(word.charAt(i));
 			}
 		}
 		return sb.toString();
 	}
 
-	public List<HebrewToken> lemmatize(String word)
+	public List<HebrewToken> lemmatize(final String word)
 	{
-		// TODO: Verify word to be non-empty and contain Hebrew characters?
-
 		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
 		MorphData md = m_dict.lookup(word);
-		if (md != null)
-		{
-			for (int result = 0; result < md.getLemmas().length; result++)
-			{
+		if (md != null) {
+			for (int result = 0; result < md.getLemmas().length; result++) {
 				ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
 			}
-		}
-		else if (word.endsWith("'")) // Try ommitting closing Geresh
-		{
+		} else if (word.endsWith("'")) { // Try ommitting closing Geresh
 			md = m_dict.lookup(word.substring(0, word.length() - 1));
-			if (md != null)
-			{
-				for (int result = 0; result < md.getLemmas().length; result++)
-				{
+			if (md != null) {
+				for (int result = 0; result < md.getLemmas().length; result++) {
 					ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
 				}
 			}
@@ -127,27 +117,19 @@ public class Lemmatizer
 
 		byte prefLen = 0;
 		Integer prefixMask;
-		while (true)
-		{
+		while (true) {
 			// Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
 			if (word.length() - prefLen < 2)
-			{
 				break;
-			}
 
 			prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
 			if ((prefixMask== null) ||  (prefixMask== 0)) // no such prefix
-			{
 				break;
-			}
 
 			md = m_dict.lookup(word.substring(prefLen));
-			if ((md != null) && ((md.getPrefixes() & prefixMask) > 0))
-			{
-				for (int result = 0; result < md.getLemmas().length; result++)
-				{
-					if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0)
-					{
+			if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
+				for (int result = 0; result < md.getLemmas().length; result++) {
+					if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
 						ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[result], md.getLemmas()[result], 0.9f));
 					}
 				}
