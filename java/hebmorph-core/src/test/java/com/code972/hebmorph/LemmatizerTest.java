@@ -22,29 +22,20 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.Loader;
 import junit.framework.Assert;
 import org.junit.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LemmatizerTest
-{	
+public class LemmatizerTest extends TestBase {
     private static DictRadix<MorphData> m_dict;
     private static StreamLemmatizer m_lemmatizer;
-	
-    // override default with an "hspellPath" system property or "-DhspellPath" jvm argument.
-    private static final String DEFAULT_HSPELL_PATH = "file:///home/synhershko/code/oscode/HebMorph/hspell-data-files";
-	private static String hspellPath;
-	
+
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{
-		hspellPath = System.getProperty("hspellPath", DEFAULT_HSPELL_PATH);
+	public static void setUpBeforeClass() throws Exception {
 	}
 
 	@AfterClass
@@ -78,9 +69,7 @@ public class LemmatizerTest
 		//StringReader reader = new StringReader("להישרדות בהישרדות ההישרדות מהישרדות ניסיון הניסיון הביטוח  בביטוח לביטוח שביטוח מביטוחים");
 		int expectedNumberOfNonHebrewWords = 0;
 		StringReader reader = new StringReader(text);
-        //DictRadix<MorphData> dict = Loader.loadDictionaryFromDefaultClasspath(true);
-        DictRadix<MorphData> dict = Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
-		m_lemmatizer = new StreamLemmatizer(reader, dict, false);
+		m_lemmatizer = new StreamLemmatizer(reader, getDictionary(), false);
 
         String word = "";
         List<Token> tokens = new ArrayList<Token>();
