@@ -3,6 +3,7 @@ package com.code972.hebmorph;
 import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.CharReader;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -14,8 +15,12 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class TokenizerTest {
-    private Tokenizer getTokenizer(String input) throws FileNotFoundException {
-        return new Tokenizer(new StringReader(input));
+
+    private final Tokenizer tokenizer = new Tokenizer();
+
+    @Before
+    public void setUp() throws Exception {
+        tokenizer.setSuffixForExactMatch('$');
     }
 
     private void assertTokenizesTo(String stream, String token) throws IOException {
@@ -34,11 +39,10 @@ public class TokenizerTest {
         assert tokenTypes == null || tokens.length == tokenTypes.length;
 
         Reference<String> test = new Reference<String>("");
-        Tokenizer t = getTokenizer(stream);
-        t.setSuffixForExactMatch('$');
+        tokenizer.reset(new StringReader(stream));
 
         int i = 0, tokenType;
-        while ((tokenType = t.nextToken(test)) > 0) {
+        while ((tokenType = tokenizer.nextToken(test)) > 0) {
             assertEquals(tokens[i], test.ref);
             if (tokenTypes != null)
                 assertEquals(tokenTypes[i], tokenType);
@@ -80,21 +84,45 @@ public class TokenizerTest {
     }
 
     @Test
+    public void tokenizesWithExceptions() throws IOException {
+        tokenizesCorrectly();
+
+        assertTokenizesTo("C++", "C");
+        tokenizer.addSpecialCase("C++");
+        assertTokenizesTo("C++", "C++");
+        assertTokenizesTo("C++x0", new String[] { "C", "x0" });
+
+        assertTokenizesTo("B+++", "B");
+        tokenizer.addSpecialCase("B+++");
+        assertTokenizesTo("B+++", "B+++");
+        assertTokenizesTo("B+++x0", new String[] { "B", "x0" });
+
+
+        assertTokenizesTo("שלום+", "שלום");
+        tokenizer.addSpecialCase("שלום+");
+        assertTokenizesTo("שלום+", "שלום+");
+        assertTokenizesTo("שלום", "שלום");
+        assertTokenizesTo("שלום+בדיקה", new String[] { "שלום", "בדיקה" });
+
+        tokenizesCorrectly();
+    }
+
+    @Test
     public void incrementsOffsetCorrectly() throws FileNotFoundException, IOException
     {
         int[] expectedOffsets = { 0, 5, 10, 15 };
         int curPos = 0;
 
         Reference<String> token = new Reference<String>("");
-        Tokenizer t = getTokenizer("test test test test");
+        tokenizer.reset(new StringReader("test test test test"));
         while (true)
         {
-            int token_type = t.nextToken(token);
+            int token_type = tokenizer.nextToken(token);
             if (token_type == 0)
                 break;
 
-            assertEquals(expectedOffsets[curPos++], t.getOffset());
-            assertEquals(4, t.getLengthInSource());
+            assertEquals(expectedOffsets[curPos++], tokenizer.getOffset());
+            assertEquals(4, tokenizer.getLengthInSource());
         }
     }
 
@@ -157,17 +185,17 @@ public class TokenizerTest {
             input += "test test test test ";
         }
 
-        Tokenizer t = getTokenizer(input);
+        tokenizer.reset(new StringReader(input));
         int previousOffest = -5;
         while (true)
         {
-            int token_type = t.nextToken(token);
+            int token_type = tokenizer.nextToken(token);
             if (token_type == 0)
                 break;
 
-            assertEquals(previousOffest, t.getOffset() - 5);
-            assertEquals(4, t.getLengthInSource());
-            previousOffest = t.getOffset();
+            assertEquals(previousOffest, tokenizer.getOffset() - 5);
+            assertEquals(4, tokenizer.getLengthInSource());
+            previousOffest = tokenizer.getOffset();
         }
     }
 
@@ -175,10 +203,10 @@ public class TokenizerTest {
     public void DiscardsSurroundingGershayim() throws FileNotFoundException, IOException {
         Reference<String> test = new Reference<String>("");
 
-        Tokenizer t = getTokenizer("\"צבא\"");
-        t.nextToken(test);
+        tokenizer.reset(new StringReader("\"צבא\""));
+        tokenizer.nextToken(test);
         assertEquals("צבא", test.ref);
-        assertEquals(3, t.getLengthInSource());
-        assertEquals(1, t.getOffset());
+        assertEquals(3, tokenizer.getLengthInSource());
+        assertEquals(1, tokenizer.getOffset());
     }
 }

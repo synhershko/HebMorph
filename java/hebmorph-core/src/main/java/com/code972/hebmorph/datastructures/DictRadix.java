@@ -246,8 +246,7 @@ public class DictRadix<T> implements Iterable<T>
 		return lookup(key.toCharArray(), allowPartial);
 	}
 
-	public T lookup(final char[] key, final boolean allowPartial)
-	{
+	public T lookup(final char[] key, final boolean allowPartial) throws IllegalArgumentException {
 		final DictNode dn = lookupImpl(key, allowPartial);
 		if (dn == null)
 			return null;

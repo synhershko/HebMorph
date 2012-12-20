@@ -18,9 +18,12 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants;
+
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 
 public class Tokenizer {
 
@@ -32,6 +35,7 @@ public class Tokenizer {
 		public static int Construct = 16;
 		public static int Acronym = 32;
         public static int Exact = 64;
+        public static int Custom = 128;
 	}
 
 	public static final char[] Geresh = { '\'', '\u05F3' };
@@ -80,7 +84,6 @@ public class Tokenizer {
 	private Reader input;
 	private int dataLen = 0, inputOffset = 0;
 
-
     /// Both are necessary since the tokenizer does some normalization when necessary, and therefore
     /// it isn't always possible to get correct end-offset by looking at the length of the returned token
     /// string
@@ -109,23 +112,41 @@ public class Tokenizer {
         this.suffixForExactMatch = suffixForExactMatch;
     }
 
+    private final DictRadix<Byte> specialCases = new DictRadix<Byte>();
+    private static final Byte dummyData = new Byte((byte)0);
+    public void addSpecialCase(final String token) {
+        specialCases.addNode(token, dummyData);
+    }
+
     private static final int IO_BUFFER_SIZE = 4096;
 	private char[] ioBuffer = new char[IO_BUFFER_SIZE];
 	private int ioBufferIndex = 0;
 
 	private final char[] wordBuffer = new char[Constants.MaxWordLength];
 
-	public Tokenizer(Reader _input)
-	{
+    public Tokenizer() {
+        this(null);
+    }
+	public Tokenizer(Reader _input) {
 		input = _input;
 	}
+
+    private boolean isRecognizedException(final String prefix) {
+        try {
+            specialCases.lookup(prefix, true);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 
 	// Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
 	// This is a job for a normalizer, anyway
 	public int nextToken(Reference<String> tokenString) throws IOException {
-		int length = 0;
+		byte length = 0;
         tokenOffset = -1; // invalidate
 		int tokenType = 0;
+        byte startedDoingCustomToken = -1;
 		while (true) {
 			if (ioBufferIndex >= dataLen) {
 				inputOffset += dataLen;
@@ -133,6 +154,18 @@ public class Tokenizer {
 				if (dataLen <= 0) {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
 					if (length > 0) {
+                        if ((tokenType & TokenType.Custom) > 0) {
+                            Byte b = null;
+                            try {
+                                b = specialCases.lookup(Arrays.copyOf(wordBuffer, length), true);
+                            } catch (IllegalArgumentException e) {
+                            }
+                            if (b == null) {
+                                tokenString.ref = "";
+                                tokenLengthInSource = 0;
+                                return 0;
+                            }
+                        }
 						break;
 					} else {
 						tokenString.ref = "";
@@ -161,7 +194,16 @@ public class Tokenizer {
                 }
                 // Everything else will be ignored
             } else { // we should consume every letter or digit, and tokenize on everything else
-                if (isHebrewLetter(c) || isNiqqudChar(c)) {
+                if ((tokenType & TokenType.Custom) > 0) {
+                    final String s = new String(wordBuffer, 0, length) + c;
+                    if (!isRecognizedException(s)) {
+                        tokenType &= ~TokenType.Custom;
+                        length = startedDoingCustomToken;
+                        ioBufferIndex--;
+                        break;
+                    }
+                    appendCurrentChar = true;
+                } else if (isHebrewLetter(c) || isNiqqudChar(c)) {
                     appendCurrentChar = true;
                 } else if (Character.isLetterOrDigit(c)) {
                     // TODO
@@ -182,6 +224,10 @@ public class Tokenizer {
 
                     // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
                     tokenType |= TokenType.Acronym;
+                    appendCurrentChar = true;
+                } else if (isRecognizedException(new String(wordBuffer, 0, length) + c)) {
+                    startedDoingCustomToken = length;
+                    tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
                 } else {
                     // Flag makaf connected words as constructs
@@ -236,7 +282,7 @@ public class Tokenizer {
         else
             tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
 
-		if (isOfChars(wordBuffer[length - 1], Gershayim))
+		if (length > 0 && isOfChars(wordBuffer[length - 1], Gershayim))
 		{
 			wordBuffer[--length] = '\0';
             tokenLengthInSource--; // Don't include Gershayim in the offset calculation
