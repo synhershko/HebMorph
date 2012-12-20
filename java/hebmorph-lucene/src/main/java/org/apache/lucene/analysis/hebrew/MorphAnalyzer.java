@@ -26,10 +26,10 @@ import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
-import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.util.Version;
 
 import java.io.File;
@@ -37,11 +37,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Set;
 
-public class MorphAnalyzer extends Analyzer
-{
+public class MorphAnalyzer extends StopwordAnalyzerBase {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
-
 	*/
 	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(Version.LUCENE_36, StopWords.BasicStopWordsSet);
 
@@ -65,37 +63,49 @@ public class MorphAnalyzer extends Analyzer
 	private final StreamLemmatizer hebMorphLemmatizer;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
-    public MorphAnalyzer(final DictRadix<MorphData> dict) {
+    public MorphAnalyzer(final Version version, final DictRadix<MorphData> dict) {
+        super(version, STOP_WORDS_SET);
         hebMorphLemmatizer = new StreamLemmatizer(dict, false);
+    }
+
+    public MorphAnalyzer(final Version version, final StreamLemmatizer hml) {
+        super(version, STOP_WORDS_SET);
+        hebMorphLemmatizer = hml;
     }
 
     /**
      * Initializes using data files at the default location on the classpath.
      */
-	public MorphAnalyzer() {
-        this(loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
+	public MorphAnalyzer(final Version version) {
+        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
 	}
 
     /**
      * Initializes using data files at the specified location on the classpath.
      */
-    public MorphAnalyzer(final String hspellClasspath) {
-        this(loadFromClasspath(hspellClasspath));
+    public MorphAnalyzer(final Version version, final String hspellClasspath) {
+        this(version, loadFromClasspath(hspellClasspath));
     }
 
     /**
      * Initializes using data files at the specified location (hspellPath must be a directory).
      */
-    public MorphAnalyzer(final File hspellPath) {
-        this(loadFromPath(hspellPath));
+    public MorphAnalyzer(final Version version, final File hspellPath) {
+        this(version, loadFromPath(hspellPath));
     }
 
-
-	public MorphAnalyzer(final StreamLemmatizer hml) {
-		super();
-		hebMorphLemmatizer = hml;
-	}
-
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
+        TokenStream tok = new LowerCaseFilter(matchVersion, src);
+        tok = new StopFilter(matchVersion, tok, stopwords);
+        return new TokenStreamComponents(src, tok) {
+            @Override
+            protected boolean reset(final Reader reader) throws IOException {
+                return super.reset(reader);
+            }
+        };
+    }
 
     static private DictRadix<MorphData> loadFromClasspath(String pathInClasspath) {
         try {
@@ -112,45 +122,4 @@ public class MorphAnalyzer extends Analyzer
             throw new IllegalStateException("Failed to read data", ex);
         }
     }
-
-	
-	private static class SavedStreams {
-		public Tokenizer source;
-		public TokenStream result;
-	}
-
-	@Override
-	public final TokenStream reusableTokenStream(String fieldName, Reader reader) throws java.io.IOException
-	{
-		Object tempVar = getPreviousTokenStream();
-		SavedStreams streams = (SavedStreams)((tempVar instanceof SavedStreams) ? tempVar : null);
-		if (streams == null)
-		{
-			streams = new SavedStreams();
-			streams.source = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
-
-			// This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
-			// all by itself
-			streams.result = new StopFilter(Version.LUCENE_36, streams.source, STOP_WORDS_SET);
-
-			setPreviousTokenStream(streams);
-		}
-		else
-		{
-			streams.source.reset(reader);
-		}
-		return streams.result;
-	}
-
-	@Override
-	public final TokenStream tokenStream(String fieldName, Reader reader)
-	{
-		TokenStream result = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
-
-		// This stop filter is here temporarily, until HebMorph is smart enough to clear stop words
-		// all by itself
-		result = new StopFilter(Version.LUCENE_36, result, STOP_WORDS_SET);
-
-		return result;
-	}
 }
