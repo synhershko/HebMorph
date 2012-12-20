@@ -41,13 +41,13 @@ public class Lemmatizer
         m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
 	}
 
-	public boolean isLegalPrefix(String str)
-	{
-		Integer lookup = m_prefixes.lookup(str);
-		if ((lookup!=null) && (lookup > 0))
-			return true;
-
-		return false;
+	public boolean isLegalPrefix(final String str) {
+        try {
+            m_prefixes.lookup(str);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
 	}
 
 	// See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule
@@ -106,13 +106,17 @@ public class Lemmatizer
 		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
         byte prefLen = 0;
         Integer prefixMask;
-        MorphData md;
+        MorphData md = null;
 
         // Lookup the word in the custom words list. It is guaranteed to have only one lemma for a word,
         // so we can always access the first entry of a record - if we got any
         // If we find any results, we can immediately return
         if (customWords != null){
-            md = customWords.lookup(word);
+            try {
+                md = customWords.lookup(word);
+            } catch (IllegalArgumentException e) {
+            }
+
             if (md != null) { // exact match was found in the custom words list
                 ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[0], md.getLemmas()[0], 1.0f));
                 return ret;
@@ -122,11 +126,17 @@ public class Lemmatizer
                     if (word.length() - prefLen < 2)
                         break;
 
-                    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-                    if ((prefixMask== null) || (prefixMask== 0)) // no such prefix
+                    try {
+                        prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+                    } catch (IllegalArgumentException e) {
                         break;
+                    }
 
-                    md = customWords.lookup(word.substring(prefLen));
+                    try {
+                        md = customWords.lookup(word.substring(prefLen));
+                    } catch (IllegalArgumentException e) {
+                        md = null;
+                    }
                     if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                         if ((LingInfo.DMask2ps(md.getDescFlags()[0]) & prefixMask) > 0) {
                             ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[0], md.getLemmas()[0], 0.9f));
@@ -138,13 +148,21 @@ public class Lemmatizer
         }
 
         // Continue with looking up the word in the standard dictionary
-		md = m_dict.lookup(word);
+        try {
+            md = m_dict.lookup(word);
+        } catch (IllegalArgumentException e) {
+            md = null;
+        }
 		if (md != null) {
 			for (int result = 0; result < md.getLemmas().length; result++) {
 				ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
 			}
 		} else if (word.endsWith("'")) { // Try ommitting closing Geresh
-			md = m_dict.lookup(word.substring(0, word.length() - 1));
+            try {
+                md = m_dict.lookup(word.substring(0, word.length() - 1));
+            } catch (IllegalArgumentException e) {
+                md = null;
+            }
 			if (md != null) {
 				for (int result = 0; result < md.getLemmas().length; result++) {
 					ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
@@ -157,11 +175,17 @@ public class Lemmatizer
 			if (word.length() - prefLen < 2)
 				break;
 
-			prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-			if ((prefixMask== null) ||  (prefixMask== 0)) // no such prefix
-				break;
+            try {
+			    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+            } catch (IllegalArgumentException e) {
+                break;
+            }
 
-			md = m_dict.lookup(word.substring(prefLen));
+            try {
+                md = m_dict.lookup(word.substring(prefLen));
+            } catch (IllegalArgumentException e) {
+                md = null;
+            }
 			if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
 				for (int result = 0; result < md.getLemmas().length; result++) {
 					if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
@@ -201,11 +225,11 @@ public class Lemmatizer
 			if (word.length() - prefLen < 2)
 				break;
 
-			prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-			if ((prefixMask ==null) || (prefixMask == 0)) // no such prefix
-			{
-				break;
-			}
+            try {
+			    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+            } catch (IllegalArgumentException e) {
+                break;
+            }
 
 			tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
 			if (tolerated != null)

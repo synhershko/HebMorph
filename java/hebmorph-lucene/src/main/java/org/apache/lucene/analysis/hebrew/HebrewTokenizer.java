@@ -201,15 +201,14 @@ public class HebrewTokenizer extends Tokenizer
 		hebMorphTokenizer.reset(input);
 	}
 
-	public boolean isLegalPrefix(String str)
+	public boolean isLegalPrefix(final String str)
 	{
-        Integer val = prefixesTree.lookup(str);
-		if (val != null && val > 0)
-		{
-			return true;
-		}
-
-		return false;
+        try {
+            prefixesTree.lookup(str);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
 	}
 
 	// See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule

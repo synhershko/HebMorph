@@ -20,6 +20,7 @@ package com.code972.hebmorph.datastructures;
 
 import com.code972.hebmorph.LookupTolerators;
 import com.code972.hebmorph.Reference;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,9 +59,15 @@ public class DictRadix<T> implements Iterable<T>
 			return key;
 		}
 
+        public void clear() {
+            children = null;
+            key = null;
+            value = null;
+        }
+
         @Override
         public String toString() {
-            return "[ value="+value+"; childrens="+children.length+" ]";
+            return "[ value="+value+"; children="+children.length+" ]";
         }
 	}
 
@@ -211,7 +218,7 @@ public class DictRadix<T> implements Iterable<T>
 	}
 
 
-	protected DictNode m_root;
+	protected final DictNode m_root;
 	public DictNode getRootNode()
 	{
 		return m_root;
@@ -227,23 +234,24 @@ public class DictRadix<T> implements Iterable<T>
     public boolean getAllowValueOverride() { return m_bAllowValueOverride; }
     public void setAllowValueOverride(boolean val) { m_bAllowValueOverride = val; }
 
-	public DictRadix()
-	{
+	public DictRadix() {
 		m_root = new DictNode();
 	}
 
-	public T lookup(String key)
-	{
-		return lookup(key.toCharArray());
+    public T lookup(final String key) {
+        return lookup(key.toCharArray(), false);
+    }
+
+	public T lookup(final String key, final boolean allowPartial) {
+		return lookup(key.toCharArray(), allowPartial);
 	}
 
-	public T lookup(char[] key)
+	public T lookup(final char[] key, final boolean allowPartial)
 	{
-		DictNode dn = lookupImpl(key);
+		final DictNode dn = lookupImpl(key, allowPartial);
 		if (dn == null)
-		{
 			return null;
-		}
+
 		return dn.getValue();
 	}
 
@@ -253,48 +261,47 @@ public class DictRadix<T> implements Iterable<T>
 	 @param key
 	 @return
 	*/
-	private final DictNode lookupImpl(char[] key)
-	{
-		int keyPos = 0, n;
-		int keyLength = getCharArrayLength(key);
+	private final DictNode lookupImpl(final char[] key, final boolean allowPartial) {
+		final int keyLength = getCharArrayLength(key);
+        int keyPos = 0, n;
 
 		DictNode cur = m_root;
-		while ((cur != null) && (cur.getChildren() != null))
-		{
-			for (int childPos = 0; ; childPos++)
-			{
-				DictNode child = cur.getChildren()[childPos];
+		while ((cur != null) && (cur.getChildren() != null)) {
+			for (int childPos = 0; ; childPos++) {
+				final DictNode child = cur.getChildren()[childPos];
+                final char childKey[] = child.getKey();
 
 				// Do key matching
 				n = 0;
-				while ((n < child.getKey().length) && (keyPos < keyLength) && (child.getKey()[n] == key[keyPos]))
-				{
+				while ((n < childKey.length) && (keyPos < keyLength) && (childKey[n] == key[keyPos])) {
 					keyPos++;
 					n++;
 				}
 
-				if (n == child.getKey().length) // We consumed the child's key, and so far it matches our key
-				{
+				if (n == childKey.length) { // We consumed the child's key, and so far it matches our key
 					// We consumed both the child's key and the requested key, meaning we found the requested node
-					if (keyLength == keyPos)
-					{
+					if (keyLength == keyPos) {
 						return child;
 					}
 					// We consumed this child's key, but the key we are looking for isn't over yet
-					else if (keyLength > keyPos)
-					{
+					else if (keyLength > keyPos) {
 						cur = child;
 						break;
 					}
 				}
-				else if ((n > 0) || (childPos + 1 == cur.getChildren().length)) // We looked at all the node's children -  Incomplete match to child's key (worths nothing)
-				{
-					return null;
+                else if (allowPartial && keyPos == keyLength) {
+                    return null;
+                }
+				else if ((n > 0) || (childPos + 1 == cur.getChildren().length)) { // We looked at all the node's children -  Incomplete match to child's key (worths nothing)
+                    throw new IllegalArgumentException("key could not be found: " + new String(key));
 				}
 			}
 		}
 
-		return null;
+        if (allowPartial && keyLength == keyPos)
+		    return null;
+
+        throw new IllegalArgumentException("key could not be found: " + new String(key));
 	}
 
 	public class LookupResult
@@ -519,9 +526,8 @@ public class DictRadix<T> implements Iterable<T>
 		}
 	}
 
-    public void clear()
-    {
-        m_root = new DictNode();
+    public void clear() {
+        m_root.clear();
         m_nCount = 0;
     }
 

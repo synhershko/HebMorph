@@ -1,16 +1,15 @@
 package com.code972.hebmorph.datastructures;
 
+import com.code972.hebmorph.TestBase;
 import com.code972.hebmorph.datastructures.DictRadix.RadixEnumerator;
 import org.junit.Test;
 
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class RadixTest
-{
+public class RadixTest extends TestBase {
 	@Test
     public void DoesAddNodesCorrectlyWithReferenceTypes()
     {
@@ -36,6 +35,12 @@ public class RadixTest
     {
         IntBox counter = new IntBox(0);
 
+        try {
+            d.lookup("abcdef");
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+        }
+
         // Try adding one node...
         addAndIncrement(d, "abcdef", dataGenerator.generate(), counter);
 
@@ -52,7 +57,9 @@ public class RadixTest
         addAndIncrement(d, "bcdef", dataGenerator.generate(), counter);
 
         // Simple node addition
-        addAndIncrement(d, "abcdefg", dataGenerator.generate(), counter);
+        T abcdefgValue = dataGenerator.generate();
+        addAndIncrement(d, "abcdefg", abcdefgValue, counter);
+        assertEquals(d.lookup("abcdefg"), abcdefgValue);
 
         // Re-root operation
         addAndIncrement(d, "a", dataGenerator.generate(), counter);
@@ -91,6 +98,23 @@ public class RadixTest
             enCount++;
         }
         assertEquals(counter.val, enCount);
+
+        assertEquals(d.lookup("abcdefg"), abcdefgValue);
+
+        // Make sure looking up on non-existent key will throw
+        try {
+            d.lookup("z");
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // Existing or partial keys
+        assertNotNull(d.lookup("c"));
+        assertNull(d.lookup("cz"));
+        assertNull(d.lookup("czz"));
+        assertNotNull(d.lookup("czzzzij"));
+        assertNotNull(d.lookup("czzzzija"));
+        assertNotNull(d.lookup("czzzzijabcde"));
     }
 
 
@@ -156,8 +180,14 @@ public class RadixTest
     {
         // Only increment counter if the key doesn't already
         boolean hasKey = true;
-        if (d.lookup(key) == null)
-        {
+
+        T value = null;
+        try {
+            value = d.lookup(key);
+        } catch (IllegalArgumentException e) {
+        }
+
+        if (value == null) {
             counter.val++;
             hasKey = false;
         }
