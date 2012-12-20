@@ -608,6 +608,14 @@ public class DictRadix<T> implements Iterable<T>
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
+        public int hashCode(){
+            final int prime = 31;
+            int ret = m_root.getKey().hashCode();
+            ret = prime * ret + m_root.getChildren().length;
+            ret = prime * ret + m_root.getValue().hashCode();
+            return prime * ret + m_nCount;
+        }
 	}
 
 
