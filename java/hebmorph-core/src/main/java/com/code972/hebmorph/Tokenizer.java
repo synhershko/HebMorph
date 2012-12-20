@@ -246,14 +246,9 @@ public class Tokenizer {
 			if (appendCurrentChar) {
 				// Consume normally
 				if (length == 0) // mark the start of a new token
-				{
                     tokenOffset = inputOffset + ioBufferIndex - 1;
-				}
-				else if (length == wordBuffer.length)
-					// buffer overflow!
-				{
-					break;
-				}
+                else
+                    assert length > 0 && length != wordBuffer.length;
 
 				// Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
 				if (isOfChars(c, Geresh))
@@ -282,7 +277,7 @@ public class Tokenizer {
         else
             tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
 
-		if (length > 0 && isOfChars(wordBuffer[length - 1], Gershayim))
+		if (isOfChars(wordBuffer[length - 1], Gershayim))
 		{
 			wordBuffer[--length] = '\0';
             tokenLengthInSource--; // Don't include Gershayim in the offset calculation
