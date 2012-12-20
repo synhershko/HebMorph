@@ -30,6 +30,9 @@ import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.synonym.SynonymFilter;
+import org.apache.lucene.analysis.synonym.SynonymMap;
+import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.Version;
 
 import java.io.File;
@@ -49,48 +52,60 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
 	 namespace) to perform searches on the same field used for the Morph analyzer. When used this
 	 way, make sure to turn this on only while indexing, so searches don't get slower.
 	 Default is false to save some index space.
-
 	*/
 	public boolean alwaysSaveMarkedOriginal = false;
 
 	/**
 	 A filter object to provide flexibility on deciding which lemmas are valid as index terms
 	 and which are not.
-
 	*/
 	public LemmaFilterBase lemmaFilter = null;
 
 	private final StreamLemmatizer hebMorphLemmatizer;
+    private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
-    public MorphAnalyzer(final Version version, final DictRadix<MorphData> dict) {
+    public MorphAnalyzer(final Version version, final DictRadix<MorphData> dict) throws IOException {
         super(version, STOP_WORDS_SET);
         hebMorphLemmatizer = new StreamLemmatizer(dict, false);
+        acronymMergingMap = buildAcronymsMergingMap();
     }
 
-    public MorphAnalyzer(final Version version, final StreamLemmatizer hml) {
+    public MorphAnalyzer(final Version version, final StreamLemmatizer hml) throws IOException {
         super(version, STOP_WORDS_SET);
         hebMorphLemmatizer = hml;
+        acronymMergingMap = buildAcronymsMergingMap();
+    }
+
+    private static SynonymMap buildAcronymsMergingMap() throws IOException {
+        SynonymMap.Builder synonymMap = new SynonymMap.Builder(true);
+        synonymMap.add(new CharsRef("אף על פי כן"), new CharsRef("אעפ\"כ"), false);
+        synonymMap.add(new CharsRef("אף על פי"), new CharsRef("אע\"פ"), false);
+        synonymMap.add(new CharsRef("כמו כן"), new CharsRef("כמו\"כ"), false);
+        synonymMap.add(new CharsRef("על ידי"), new CharsRef("ע\"י"), false);
+        synonymMap.add(new CharsRef("על פי"), new CharsRef("ע\"פ"), false);
+        synonymMap.add(new CharsRef("כל כך"), new CharsRef("כ\"כ"), false);
+        return synonymMap.build();
     }
 
     /**
      * Initializes using data files at the default location on the classpath.
      */
-	public MorphAnalyzer(final Version version) {
+	public MorphAnalyzer(final Version version) throws IOException {
         this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
 	}
 
     /**
      * Initializes using data files at the specified location on the classpath.
      */
-    public MorphAnalyzer(final Version version, final String hspellClasspath) {
+    public MorphAnalyzer(final Version version, final String hspellClasspath) throws IOException {
         this(version, loadFromClasspath(hspellClasspath));
     }
 
     /**
      * Initializes using data files at the specified location (hspellPath must be a directory).
      */
-    public MorphAnalyzer(final Version version, final File hspellPath) {
+    public MorphAnalyzer(final Version version, final File hspellPath) throws IOException {
         this(version, loadFromPath(hspellPath));
     }
 
@@ -98,6 +113,7 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
         TokenStream tok = new LowerCaseFilter(matchVersion, src);
+        tok = new SynonymFilter(tok, acronymMergingMap, false);
         tok = new StopFilter(matchVersion, tok, stopwords);
         return new TokenStreamComponents(src, tok) {
             @Override
