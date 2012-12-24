@@ -28,7 +28,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-public class Loader {
+public final class Loader {
 
     public static DictRadix<MorphData> loadDictionaryFromClasspath(String pathInClasspath, boolean bLoadMorphData) throws IOException {
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -81,32 +81,37 @@ public class Loader {
             }
 
             final DictRadix<MorphData> ret = new DictRadix<MorphData>();
-            InputStream fprefixes = null, fdesc = null;
+            InputStream fprefixes = null, fdesc = null, fstem = null;
             try {
                 fprefixes = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.prefixesFile)));
                 fdesc = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.descFile)));
-                final List<Integer> stemReferences = readStemFile(hspellFolder);
+                fstem = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.stemsFile)));
+
+                final Loader loader = new Loader();
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
-                    data.setDescFlags(readDescFile(fdesc));
+                    data.setDescFlags(loader.readDescFile(fdesc));
 
-                    data.setLemmas(new String[stemReferences.size()]);
+                    final List<Integer> stemReferences = loader.readStemFile(fstem);
+                    final String[] lemmas = new String[stemReferences.size()];
                     int stemPosition = 0;
                     for (int r : stemReferences) {
                         // This is a bypass for the psuedo-stem "שונות", as defined by hspell
                         // TODO: Try looking into changing this in hspell itself
                         if (lookup[r].equals("שונות") && !lookup[r].equals(lookup[i])) {
-                            data.getLemmas()[stemPosition++] = null;
+                            lemmas[stemPosition++] = null;
                         } else {
-                            data.getLemmas()[stemPosition++] = lookup[r];
+                            lemmas[stemPosition++] = lookup[r];
                         }
                     }
+                    data.setLemmas(lemmas);
                     ret.addNode(lookup[i], data);
                 }
             } finally {
                 if (fprefixes != null) try { fprefixes.close(); } catch (IOException ignored) {}
                 if (fdesc != null) try { fdesc.close(); } catch (IOException ignored) {}
+                if (fstem != null) try { fstem.close(); } catch (IOException ignored) {}
             }
 
 			return ret;
@@ -153,16 +158,18 @@ public class Loader {
 		}
 	}
 
-    private final static Integer[] readDescFile(InputStream fdesc) throws IOException {
-        final java.util.ArrayList<Integer> wordMasks = new java.util.ArrayList<Integer>();
-        int bufPos = 0;
-        final int[] buf = new int[5];
-        while ((buf[bufPos] = fdesc.read()) > -1)
-        {
+    private int bufPos = 0;
+    private final int[] buf = new int[5];
+
+    private final java.util.ArrayList<Integer> wordMasks = new java.util.ArrayList<Integer>();
+    final Integer[] readDescFile(InputStream fdesc) throws IOException {
+        while ((buf[bufPos] = fdesc.read()) > -1) {
             // Break on EOL or EOF
             if ((buf[bufPos] == '\n') || (buf[bufPos] == 0))
             {
-                Integer[] ret = wordMasks.toArray(new Integer[]{});
+                bufPos = 0;
+                Integer[] ret = wordMasks.toArray(new Integer[wordMasks.size()]);
+                wordMasks.clear();
                 return ret;
             }
             bufPos++;
@@ -170,35 +177,31 @@ public class Loader {
                 int i = buf[0] - 'A' + (buf[1] - 'A') * 26;
                 wordMasks.add(Constants.dmasks[i]);
                 bufPos = 0;
+                continue;
             }
         }
         return null;
     }
 
     // Note: What HSpell call "stems", which we define as lemmas
-    private final static List<Integer> readStemFile(File hspellFolder) throws IOException {
-        InputStream fstem = null;
-        final java.util.ArrayList<Integer> wordStems = new java.util.ArrayList<Integer>();
-        try {
-            fstem = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.stemsFile)));
-            int bufPos = 0;
-            final int[] buf = new int[5];
-            while ((buf[bufPos] = fstem.read()) > -1)
-            {
-                // Break on EOL or EOF
-                if ((buf[bufPos] == '\n') || (buf[bufPos] == 0))
-                    break;
-
-                bufPos++;
-                if (bufPos % 3 == 0) {
-                    wordStems.add(buf[0] - 33 + (buf[1] - 33) * 94 + (buf[2] - 33) * 94 * 94);
-                    bufPos = 0;
-                }
+    private final java.util.ArrayList<Integer> wordStems = new java.util.ArrayList<Integer>();
+    final List<Integer> readStemFile(InputStream fstem) throws IOException {
+        wordStems.clear();
+        while ((buf[bufPos] = fstem.read()) > -1) {
+            // Break on EOL or EOF
+            if ((buf[bufPos] == '\n') || (buf[bufPos] == 0)) {
+                bufPos = 0;
+                return wordStems;
             }
-        } finally {
-            if (fstem != null) try { fstem.close(); } catch (IOException ignored) {}
+
+            bufPos++;
+            if (bufPos % 3 == 0) {
+                wordStems.add(buf[0] - 33 + (buf[1] - 33) * 94 + (buf[2] - 33) * 94 * 94);
+                bufPos = 0;
+                continue;
+            }
         }
-        return wordStems;
+        return null;
     }
 
 	// Mapping is based on
