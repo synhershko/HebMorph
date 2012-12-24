@@ -29,9 +29,9 @@ namespace HebMorph
 {
     public class Lemmatizer
     {
-        private DictRadix<HebMorph.MorphData> m_dict;
-        private DictRadix<int> m_prefixes;
-        private bool m_IsInitialized = false;
+        private readonly DictRadix<HebMorph.MorphData> m_dict;
+        private readonly DictRadix<int> m_prefixes;
+        private readonly bool m_IsInitialized = false;
         public bool IsInitialized { get { return m_IsInitialized; } }
 
         public Lemmatizer()
@@ -105,7 +105,7 @@ namespace HebMorph
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
-            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+            var ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
             MorphData md = m_dict.Lookup(word);
             if (md != null)
