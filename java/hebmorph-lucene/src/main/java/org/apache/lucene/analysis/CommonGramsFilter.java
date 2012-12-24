@@ -38,10 +38,11 @@ import java.util.Set;
  */
 public final class CommonGramsFilter extends TokenFilter {
 
-    static final String GRAM_TYPE = "gram";
+    public static final String GRAM_TYPE = "gram";
     private static final char SEPARATOR = '_';
 
     private final CharArraySet commonWords;
+    private final boolean keepOrigin;
 
     private final StringBuilder buffer = new StringBuilder();
 
@@ -63,38 +64,27 @@ public final class CommonGramsFilter extends TokenFilter {
      *
      * @param input TokenStream input in filter chain
      * @param commonWords The set of common words.
+     * @deprecated use the one with keepOrigin
      */
-    public CommonGramsFilter(Version matchVersion, TokenStream input, Set<?> commonWords) {
-        this(matchVersion, input, commonWords, false);
+    @Deprecated
+    public CommonGramsFilter(Version matchVersion, TokenStream input, CharArraySet commonWords) {
+        this(matchVersion, input, commonWords, true);
     }
 
     /**
      * Construct a token stream filtering the given input using a Set of common
-     * words to create bigrams, case-sensitive if ignoreCase is false (unless Set
-     * is CharArraySet). If <code>commonWords</code> is an instance of
-     * {@link CharArraySet} (true if <code>makeCommonSet()</code> was used to
-     * construct the set) it will be directly used and <code>ignoreCase</code>
-     * will be ignored since <code>CharArraySet</code> directly controls case
-     * sensitivity.
-     * <p/>
-     * If <code>commonWords</code> is not an instance of {@link CharArraySet}, a
-     * new CharArraySet will be constructed and <code>ignoreCase</code> will be
-     * used to specify the case sensitivity of that set.
+     * words to create bigrams. Outputs both unigrams with position increment and
+     * bigrams with position increment 0 type=gram where one or both of the words
+     * in a potential bigram are in the set of common words .
      *
-     * @param input TokenStream input in filter chain.
+     * @param input TokenStream input in filter chain
      * @param commonWords The set of common words.
-     * @param ignoreCase -Ignore case when constructing bigrams for common words.
-     * @deprecated Use {@link #CommonGramsFilter(Version, TokenStream, Set)} instead
+     * @param keepOrigin Whether to keep the original common word as a unigram or not.
      */
-    @Deprecated
-    public CommonGramsFilter(Version matchVersion, TokenStream input, Set<?> commonWords, boolean ignoreCase) {
+    public CommonGramsFilter(Version matchVersion, TokenStream input, CharArraySet commonWords, boolean keepOrigin) {
         super(input);
-        if (commonWords instanceof CharArraySet) {
-            this.commonWords = (CharArraySet) commonWords;
-        } else {
-            this.commonWords = new CharArraySet(matchVersion, commonWords.size(), ignoreCase);
-            this.commonWords.addAll(commonWords);
-        }
+        this.commonWords = commonWords;
+        this.keepOrigin = keepOrigin;
     }
 
     /**
@@ -115,24 +105,52 @@ public final class CommonGramsFilter extends TokenFilter {
      */
     @Override
     public boolean incrementToken() throws IOException {
-        // get the next piece of input
-        if (savedState != null) {
+        // if we have a token from a previous iteration, return it now
+        if (restoreMaintainedToken()) {
+            saveTermBuffer();
+            if (!isCommon())
+                return true;
+        }
+        else if (savedState != null) { // only relevant if we are keeping originals
             restoreState(savedState);
             savedState = null;
             saveTermBuffer();
+            lastWasCommon = isCommon();
             return true;
-        } else if (!input.incrementToken()) {
+        }
+
+        // get the next piece of input
+        if (!input.incrementToken()) {
             return false;
         }
 
-        /* We build n-grams before and after stopwords.
-        * When valid, the buffer always contains at least the separator.
-        * If its empty, there is nothing before this stopword.
-        */
-        if (lastWasCommon || (isCommon() && buffer.length() > 0)) {
-            savedState = captureState();
-            gramToken();
-            return true;
+    /* We build n-grams before and after stopwords.
+     * When valid, the buffer always contains at least the separator.
+     * If its empty, there is nothing before this stopword.
+     */
+        boolean isCommon = isCommon();
+        if (keepOrigin) {
+            if (lastWasCommon || (isCommon && buffer.length() > 0)) {
+                savedState = captureState();
+                gramToken();
+                return true;
+            }
+            lastWasCommon = isCommon;
+        } else {
+            if (!lastWasCommon && isCommon && buffer.length() == 0) {
+                lastWasCommon = true;
+                saveTermBuffer();
+                if (!input.incrementToken())
+                    return false;
+                isCommon = isCommon();
+            }
+
+            if (lastWasCommon || (isCommon && buffer.length() > 0)) {
+                lastWasCommon = isCommon;
+                rememberCurrentToken();
+                gramToken();
+                return true;
+            }
         }
 
         saveTermBuffer();
@@ -148,6 +166,7 @@ public final class CommonGramsFilter extends TokenFilter {
         lastWasCommon = false;
         savedState = null;
         buffer.setLength(0);
+        maintainedToken = false;
     }
 
     // ================================================= Helper Methods ================================================
@@ -169,7 +188,6 @@ public final class CommonGramsFilter extends TokenFilter {
         buffer.append(termAttribute.buffer(), 0, termAttribute.length());
         buffer.append(SEPARATOR);
         lastStartOffset = offsetAttribute.startOffset();
-        lastWasCommon = isCommon();
     }
 
     /**
@@ -189,10 +207,53 @@ public final class CommonGramsFilter extends TokenFilter {
 
         buffer.getChars(0, length, termText, 0);
         termAttribute.setLength(length);
-        posIncAttribute.setPositionIncrement(0);
+        posIncAttribute.setPositionIncrement(keepOrigin ? 0 : 1);
         posLenAttribute.setPositionLength(2); // bigram
         offsetAttribute.setOffset(lastStartOffset, endOffset);
         typeAttribute.setType(GRAM_TYPE);
         buffer.setLength(0);
+    }
+
+    boolean maintainedToken = false;
+    int maintainedTokenTextLen, maintainedTokenPosInc, maintainedTokenPosLen;
+    int maintainedTokenStartOffset, maintainedTokenEndOffset;
+    String maintainedTokenType;
+    char maintainedTokenText[] = new char[Byte.MAX_VALUE];
+
+    private void rememberCurrentToken() {
+        maintainedTokenStartOffset = offsetAttribute.startOffset();
+        maintainedTokenEndOffset = offsetAttribute.endOffset();
+        maintainedTokenPosInc = posIncAttribute.getPositionIncrement();
+        maintainedTokenPosLen = posLenAttribute.getPositionLength();
+        maintainedTokenType = typeAttribute.type();
+
+        if (maintainedTokenText.length < termAttribute.length())
+            maintainedTokenText = new char[termAttribute.length()];
+        System.arraycopy(termAttribute.buffer(), 0, maintainedTokenText, 0, termAttribute.length());
+        maintainedTokenTextLen = termAttribute.length();
+        maintainedToken = true;
+    }
+
+    private boolean restoreMaintainedToken() {
+        if (!maintainedToken)
+            return false;
+
+        clearAttributes();
+
+        char termText[] = termAttribute.buffer();
+        if (maintainedTokenTextLen > termText.length) {
+            termText = termAttribute.resizeBuffer(maintainedTokenTextLen);
+        }
+
+        System.arraycopy(maintainedTokenText, 0, termText, 0, maintainedTokenTextLen);
+        termAttribute.setLength(maintainedTokenTextLen);
+        posIncAttribute.setPositionIncrement(maintainedTokenPosInc);
+        posLenAttribute.setPositionLength(maintainedTokenPosLen);
+        offsetAttribute.setOffset(maintainedTokenStartOffset, maintainedTokenEndOffset);
+        typeAttribute.setType(maintainedTokenType);
+        buffer.setLength(0);
+
+        maintainedToken = false;
+        return true;
     }
 }
