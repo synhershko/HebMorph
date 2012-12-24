@@ -17,3 +17,4 @@ workspace.xml
 tasks.xml
 java/*/target/
 *.java~
+Backup/
