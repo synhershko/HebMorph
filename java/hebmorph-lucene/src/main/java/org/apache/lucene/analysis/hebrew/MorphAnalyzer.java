@@ -21,15 +21,11 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.StopWords;
 import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymMap;
 import org.apache.lucene.util.CharsRef;
@@ -38,13 +34,12 @@ import org.apache.lucene.util.Version;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
 
 public class MorphAnalyzer extends StopwordAnalyzerBase {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 	*/
-	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(Version.LUCENE_36, StopWords.BasicStopWordsSet);
+    private final CharArraySet commonWords;
 
 	/**
 	 Set to true to mark tokens with a $ prefix also when there is only one lemma returned
@@ -65,16 +60,63 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
     private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
 
-    public MorphAnalyzer(final Version version, final DictRadix<MorphData> dict) throws IOException {
-        super(version, STOP_WORDS_SET);
-        hebMorphLemmatizer = new StreamLemmatizer(dict, false);
-        acronymMergingMap = buildAcronymsMergingMap();
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
+        this(matchVersion, new StreamLemmatizer(dict, false), commonWords);
     }
 
-    public MorphAnalyzer(final Version version, final StreamLemmatizer hml) throws IOException {
-        super(version, STOP_WORDS_SET);
+    /**
+     * Initializes using data files at the default location on the classpath.
+     */
+    public MorphAnalyzer(final Version version) throws IOException {
+        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH), null);
+    }
+
+    /**
+     * Initializes using data files at the specified location on the classpath.
+     */
+    public MorphAnalyzer(final Version version, final String hspellClasspath) throws IOException {
+        this(version, hspellClasspath, null);
+    }
+
+    public MorphAnalyzer(final Version version, final String hspellClasspath, final CharArraySet commonWords) throws IOException {
+        this(version, loadFromClasspath(hspellClasspath), commonWords);
+    }
+
+    /**
+     * Initializes using data files at the specified location (hspellPath must be a directory).
+     */
+    public MorphAnalyzer(final Version version, final File hspellPath) throws IOException {
+        this(version, hspellPath, null);
+    }
+
+    /**
+     * Initializes using data files at the specified location (hspellPath must be a directory).
+     */
+    public MorphAnalyzer(final Version version, final File hspellPath, final CharArraySet commonWords) throws IOException {
+        this(version, loadFromPath(hspellPath), commonWords);
+    }
+
+    public MorphAnalyzer(final Version matchVersion, final StreamLemmatizer hml, final CharArraySet commonWords) throws IOException {
+        super(matchVersion, null);
         hebMorphLemmatizer = hml;
         acronymMergingMap = buildAcronymsMergingMap();
+        this.commonWords = commonWords;
+    }
+
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
+        TokenStream tok = new LowerCaseFilter(matchVersion, src);
+        tok = new SynonymFilter(tok, acronymMergingMap, false);
+        if (commonWords != null)
+            tok = new CommonGramsFilter(matchVersion, tok, commonWords);
+        tok = new StopFilter(matchVersion, tok, stopwords);
+        return new TokenStreamComponents(src, tok) {
+            @Override
+            protected boolean reset(final Reader reader) throws IOException {
+                return super.reset(reader);
+            }
+        };
     }
 
     private static SynonymMap buildAcronymsMergingMap() throws IOException {
@@ -86,41 +128,6 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
         synonymMap.add(new CharsRef("על פי"), new CharsRef("ע\"פ"), false);
         synonymMap.add(new CharsRef("כל כך"), new CharsRef("כ\"כ"), false);
         return synonymMap.build();
-    }
-
-    /**
-     * Initializes using data files at the default location on the classpath.
-     */
-	public MorphAnalyzer(final Version version) throws IOException {
-        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH));
-	}
-
-    /**
-     * Initializes using data files at the specified location on the classpath.
-     */
-    public MorphAnalyzer(final Version version, final String hspellClasspath) throws IOException {
-        this(version, loadFromClasspath(hspellClasspath));
-    }
-
-    /**
-     * Initializes using data files at the specified location (hspellPath must be a directory).
-     */
-    public MorphAnalyzer(final Version version, final File hspellPath) throws IOException {
-        this(version, loadFromPath(hspellPath));
-    }
-
-    @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
-        TokenStream tok = new LowerCaseFilter(matchVersion, src);
-        tok = new SynonymFilter(tok, acronymMergingMap, false);
-        tok = new StopFilter(matchVersion, tok, stopwords);
-        return new TokenStreamComponents(src, tok) {
-            @Override
-            protected boolean reset(final Reader reader) throws IOException {
-                return super.reset(reader);
-            }
-        };
     }
 
     static private DictRadix<MorphData> loadFromClasspath(String pathInClasspath) {

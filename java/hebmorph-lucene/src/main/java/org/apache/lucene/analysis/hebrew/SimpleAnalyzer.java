@@ -21,7 +21,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.StopWords;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.*;
