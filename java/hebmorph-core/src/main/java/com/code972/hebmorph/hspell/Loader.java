@@ -45,6 +45,14 @@ public final class Loader {
         tmp = Integer.parseInt(sizes.substring(tmp + 1).trim());
         return tmp - 1; // hspell stores the actual word count + 1
     }
+
+    protected final List<String> dmasks;
+    protected Loader(File hspellFolder) throws IOException {
+        dmasks = Files.readAllLines(new File(hspellFolder, Constants.dmaskFile).toPath(), Charset.defaultCharset());
+        while (!dmasks.get(0).contains("dmasks[]"))
+            dmasks.remove(0);
+        dmasks.remove(0);
+    }
 	
 	public static DictRadix<MorphData> loadDictionaryFromHSpellData(final File hspellFolder, boolean loadMorphData) throws IOException {
         if (!hspellFolder.exists() || !hspellFolder.isDirectory())
@@ -87,7 +95,7 @@ public final class Loader {
                 fdesc = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.descFile)));
                 fstem = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.stemsFile)));
 
-                final Loader loader = new Loader();
+                final Loader loader = new Loader(hspellFolder);
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
@@ -175,7 +183,7 @@ public final class Loader {
             bufPos++;
             if (bufPos % 2 == 0) {
                 int i = buf[0] - 'A' + (buf[1] - 'A') * 26;
-                wordMasks.add(Constants.dmasks[i]);
+                wordMasks.add(Integer.valueOf(dmasks.get(i).substring(0, dmasks.get(i).length() - 1)));
                 bufPos = 0;
                 continue;
             }
