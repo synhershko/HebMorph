@@ -31,6 +31,8 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.util.CharacterUtils;
+import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -46,6 +48,8 @@ public class StreamLemmasFilter extends Tokenizer
 	private TypeAttribute typeAtt;
 	//protected PayloadAttribute payAtt;
 
+    private final CharacterUtils charUtils;
+
 	private boolean alwaysSaveMarkedOriginal;
 	private LemmaFilterBase lemmaFilter = null;
 
@@ -56,39 +60,34 @@ public class StreamLemmasFilter extends Tokenizer
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
 	{
-        super(input);
-		init(input, _lemmatizer, null, false);
+		this(input, _lemmatizer, null, false);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, boolean alwaysSaveMarkedOriginal)
 	{
-        super(input);
-		init(input, _lemmatizer, null, alwaysSaveMarkedOriginal);
+		this(input, _lemmatizer, null, alwaysSaveMarkedOriginal);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
 	{
         super(input);
-		init(input, _lemmatizer, _lemmaFilter, alwaysSaveMarkedOriginal);
+
+        termAtt = addAttribute(TermAttribute.class);
+        offsetAtt = addAttribute(OffsetAttribute.class);
+        posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+        typeAtt = addAttribute(TypeAttribute.class);
+
+        _streamLemmatizer = _lemmatizer;
+        _streamLemmatizer.setStream(input);
+        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
+        lemmaFilter = _lemmaFilter;
+
+        charUtils = CharacterUtils.getInstance(Version.LUCENE_36);
 	}
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
 	{
-        super(input);
-		init(input, _lemmatizer, _lemmaFilter, false);
-	}
-
-	private void init(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
-	{
-		termAtt = addAttribute(TermAttribute.class);
-		offsetAtt = addAttribute(OffsetAttribute.class);
-		posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-		typeAtt = addAttribute(TypeAttribute.class);
-
-		_streamLemmatizer = _lemmatizer;
-		_streamLemmatizer.setStream(input);
-		this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
-		lemmaFilter = _lemmaFilter;
+        this(input,  _lemmatizer, _lemmaFilter, false);
 	}
 
 	@Override
@@ -135,10 +134,11 @@ public class StreamLemmasFilter extends Tokenizer
 				// Applying LowerCaseFilter for Non-Hebrew terms
 				char[] buffer = termAtt.termBuffer();
 				int length = termAtt.termLength();
-				for (int i = 0; i < length; i++)
-				{
-					buffer[i] = Character.toLowerCase(buffer[i]);
-				}
+                for (int i = 0; i < length;) {
+                    i += Character.toChars(
+                            Character.toLowerCase(
+                                    charUtils.codePointAt(buffer, i)), buffer, i);
+                }
 			}
 
 			stack.clear();
