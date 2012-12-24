@@ -1,4 +1,5 @@
 ﻿using System;
+using HebMorph.DataStructures;
 using HebMorph.Tests;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Hebrew;
@@ -43,6 +44,10 @@ namespace HebMorph.Lucene.Tests
 		{
 		}
 
+		public HtmlMorphAnalyzer(DictRadix<MorphData> dictRadix) : base(dictRadix)
+		{
+		}
+
 		public override TokenStream TokenStream(string fieldName, System.IO.TextReader reader)
 		{
 			var filter = new HTMLStripCharFilter(CharReader.Get(reader));
@@ -58,7 +63,7 @@ namespace HebMorph.Lucene.Tests
 			const string str = @"test1 testlink test2 test3";
 
 			PerFieldAnalyzerWrapper pfaw = new PerFieldAnalyzerWrapper(new StandardAnalyzer(Version.LUCENE_30));
-			pfaw.AddAnalyzer("Morph", new MorphAnalyzer(hspellPath));
+			pfaw.AddAnalyzer("Morph", new MorphAnalyzer(HspellDict));
 			Directory indexDirectory = new RAMDirectory();
 			IndexWriter writer = new IndexWriter(indexDirectory, pfaw, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
@@ -77,7 +82,7 @@ namespace HebMorph.Lucene.Tests
 			const string str = @"test1 <a href=""foo"">testlink</a> test2 test3";
 
 			PerFieldAnalyzerWrapper pfaw = new PerFieldAnalyzerWrapper(new HtmlStandardAnalyzer());
-			pfaw.AddAnalyzer("Morph", new HtmlMorphAnalyzer(hspellPath));
+			pfaw.AddAnalyzer("Morph", new HtmlMorphAnalyzer(HspellDict));
 			Directory indexDirectory = new RAMDirectory();
 			IndexWriter writer = new IndexWriter(indexDirectory, pfaw, true, IndexWriter.MaxFieldLength.UNLIMITED);
 

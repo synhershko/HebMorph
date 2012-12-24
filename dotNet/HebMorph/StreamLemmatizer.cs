@@ -23,6 +23,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using HebMorph.DataStructures;
 using HebMorph.HSpell;
 
 namespace HebMorph
@@ -73,7 +74,12 @@ namespace HebMorph
 
         public bool TolerateWhenLemmatizingStream = true;
 
-        public int LemmatizeNextToken(out string nextToken, IList<Token> retTokens)
+	    public StreamLemmatizer(DictRadix<MorphData> dict, bool allowHeHasheela)
+			: base(dict, allowHeHasheela)
+	    {
+	    }
+
+	    public int LemmatizeNextToken(out string nextToken, IList<Token> retTokens)
         {
             retTokens.Clear();
 

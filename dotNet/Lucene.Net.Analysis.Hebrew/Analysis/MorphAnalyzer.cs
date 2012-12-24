@@ -19,6 +19,9 @@
  * 
  */
 
+using HebMorph;
+using HebMorph.DataStructures;
+
 namespace Lucene.Net.Analysis.Hebrew
 {
     public class MorphAnalyzer : Analyzer
@@ -69,12 +72,16 @@ namespace Lucene.Net.Analysis.Hebrew
         public MorphAnalyzer(string HSpellDataFilesPath)
             : base()
         {
-            hebMorphLemmatizer = new HebMorph.StreamLemmatizer();
-            hebMorphLemmatizer.InitFromHSpellFolder(HSpellDataFilesPath, true, false);
+			hebMorphLemmatizer = new StreamLemmatizer(HSpellDataFilesPath, true, false);
 			SetOverridesTokenStreamMethod<MorphAnalyzer>();
         }
 
-        protected class SavedStreams
+	    public MorphAnalyzer(DictRadix<MorphData> dict)
+	    {
+			hebMorphLemmatizer = new HebMorph.StreamLemmatizer(dict, false);
+	    }
+
+	    protected class SavedStreams
         {
             public Tokenizer source;
             public TokenStream result;

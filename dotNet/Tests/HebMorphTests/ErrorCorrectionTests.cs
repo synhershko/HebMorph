@@ -29,7 +29,7 @@ namespace HebMorph.Tests
 
 		public ErrorCorrectionTests() : base()
 		{
-			_lemmatizer = new Lemmatizer(hspellPath, true, false);
+			_lemmatizer = new Lemmatizer(HspellDict, false);
 		}
 
 		[Fact]

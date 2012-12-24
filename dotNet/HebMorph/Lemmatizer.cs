@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using HebMorph.DataStructures;
+using HebMorph.HSpell;
 
 namespace HebMorph
 {
@@ -38,16 +39,16 @@ namespace HebMorph
         }
 
 		public Lemmatizer(string hspellPath, bool loadMorpholicalData, bool allowHeHasheela)
+			: this(HSpell.Loader.LoadDictionaryFromHSpellFolder(hspellPath, loadMorpholicalData), allowHeHasheela)
 		{
-			InitFromHSpellFolder(hspellPath, loadMorpholicalData, allowHeHasheela);
 		}
 
-    	public void InitFromHSpellFolder(string path, bool loadMorpholicalData, bool allowHeHasheela)
-        {
-            m_dict = HSpell.Loader.LoadDictionaryFromHSpellFolder(path, loadMorpholicalData);
-            m_prefixes = HebMorph.HSpell.LingInfo.BuildPrefixTree(allowHeHasheela);
-            m_IsInitialized = true;
-        }
+		public Lemmatizer(DictRadix<MorphData> dict, bool allowHeHasheela)
+	    {
+		    m_dict = dict;
+			m_prefixes = LingInfo.BuildPrefixTree(allowHeHasheela);
+			m_IsInitialized = true;
+	    }
 
         public bool IsLegalPrefix(string str)
         {

@@ -20,7 +20,7 @@ namespace HebMorph.Lucene.Tests
 		[Fact]
         public void StoresPositionCorrectly()
         {
-            analyzer = new MorphAnalyzer(hspellPath);
+            analyzer = new MorphAnalyzer(HspellDict);
             indexDirectory = new RAMDirectory();
             
             IndexWriter writer = new IndexWriter(indexDirectory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);

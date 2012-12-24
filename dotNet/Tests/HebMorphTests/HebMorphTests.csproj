@@ -72,6 +72,7 @@
     <Compile Include="ErrorCorrectionTests.cs" />
     <Compile Include="HSpell\HSpellLoaderTest.cs" />
     <Compile Include="HTMLStripCharFilter.cs" />
+    <Compile Include="Lucene\BasicHebrewSearchTests.cs" />
     <Compile Include="Lucene\HebrewQueryParserTest.cs" />
     <Compile Include="Lucene\MorphAnalyzerTests.cs" />
     <Compile Include="Lucene\TermPositionVectorTest.cs" />
