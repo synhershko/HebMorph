@@ -1,6 +1,6 @@
 package com.code972.hebmorph;
 
-import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.analysis.BaseCharFilter;
 import org.apache.lucene.analysis.CharReader;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.Before;
@@ -151,7 +151,7 @@ public class TokenizerTest {
     public void IncrementsOffsetCorrectlyWithAnotherReader2() throws IOException {
         String input = "test1 <a href=\"foo\">testlink</a> test2 test3";
 
-        CharFilter filter = new HTMLStripCharFilter(CharReader.get(new StringReader(input)));
+        BaseCharFilter filter = new HTMLStripCharFilter(CharReader.get(new StringReader(input)));
         Tokenizer t = new Tokenizer(filter);
 
         Reference<String> token = new Reference<String>("");
