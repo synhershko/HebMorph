@@ -83,6 +83,11 @@ public final class CommonGramsFilter extends TokenFilter {
      */
     public CommonGramsFilter(Version matchVersion, TokenStream input, CharArraySet commonWords, boolean keepOrigin) {
         super(input);
+
+        if (commonWords == null || commonWords.size() == 0)
+            throw new IllegalArgumentException("CommonWords list has to contain something; if it doesn't,"
+                    + " don't initialize this filter in your analyzer");
+
         this.commonWords = commonWords;
         this.keepOrigin = keepOrigin;
     }
@@ -177,7 +182,7 @@ public final class CommonGramsFilter extends TokenFilter {
      * @return {@code true} if the current token is a common term, {@code false} otherwise
      */
     private boolean isCommon() {
-        return commonWords != null && commonWords.contains(termAttribute.buffer(), 0, termAttribute.length());
+        return commonWords.contains(termAttribute.buffer(), 0, termAttribute.length());
     }
 
     /**

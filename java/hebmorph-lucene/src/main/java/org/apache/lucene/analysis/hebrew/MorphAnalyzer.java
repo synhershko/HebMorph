@@ -108,7 +108,7 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
         TokenStream tok = new LowerCaseFilter(matchVersion, src);
         tok = new SynonymFilter(tok, acronymMergingMap, false);
-        if (commonWords != null)
+        if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
         tok = new StopFilter(matchVersion, tok, stopwords);
         return new TokenStreamComponents(src, tok) {
