@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
-public class MorphAnalyzer extends StopwordAnalyzerBase {
+public class MorphAnalyzer extends ReusableAnalyzerBase {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 	*/
@@ -59,6 +59,7 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
 	private final StreamLemmatizer hebMorphLemmatizer;
     private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
+    protected final Version matchVersion;
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
         this(matchVersion, new StreamLemmatizer(dict, false), commonWords);
@@ -97,7 +98,7 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
     }
 
     public MorphAnalyzer(final Version matchVersion, final StreamLemmatizer hml, final CharArraySet commonWords) throws IOException {
-        super(matchVersion, null);
+        this.matchVersion = matchVersion;
         hebMorphLemmatizer = hml;
         acronymMergingMap = buildAcronymsMergingMap();
         this.commonWords = commonWords;
@@ -110,7 +111,6 @@ public class MorphAnalyzer extends StopwordAnalyzerBase {
         tok = new SynonymFilter(tok, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
-        tok = new StopFilter(matchVersion, tok, stopwords);
         return new TokenStreamComponents(src, tok) {
             @Override
             protected boolean reset(final Reader reader) throws IOException {
