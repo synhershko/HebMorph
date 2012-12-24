@@ -55,7 +55,7 @@ public class BasicHebrewTests extends TestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		analyzer = new MorphAnalyzer(Version.LUCENE_36, getDictionary(), commonWords);
+		analyzer = new MorphAnalyzer(Version.LUCENE_36, getDictionary(), null);
 	}
 
 	@After

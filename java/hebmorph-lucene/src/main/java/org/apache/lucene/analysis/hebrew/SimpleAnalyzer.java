@@ -37,13 +37,21 @@ public class SimpleAnalyzer extends Analyzer
 	 useful for searching.
 
 	*/
-	public static final Set STOP_WORDS_SET = StopFilter.makeStopSet(StopWords.BasicStopWordsSet);
+    private final CharArraySet commonWords;
 	public static final DictRadix<Integer> PrefixTree = LingInfo.buildPrefixTree(false);
 
 	private boolean enableStopPositionIncrements = true;
 	private Map<String, char[]> suffixByTokenType = null;
 
-	public void registerSuffix(String tokenType, String suffix)
+    public SimpleAnalyzer() {
+        this(null);
+    }
+
+    public SimpleAnalyzer(CharArraySet commonWords) {
+        this.commonWords = commonWords;
+    }
+
+    public void registerSuffix(String tokenType, String suffix)
 	{
 		if (suffixByTokenType == null)
 		{
@@ -58,8 +66,7 @@ public class SimpleAnalyzer extends Analyzer
 
 	// TODO: Support loading external stop lists
 
-	private static class SavedStreams
-	{
+	private static class SavedStreams {
 		public Tokenizer source;
 		public TokenStream result;
 	}
@@ -78,8 +85,8 @@ public class SimpleAnalyzer extends Analyzer
 			// Niqqud normalization
 			streams.result = new NiqqudFilter(streams.source);
 
-			// TODO: should we ignoreCase in StopFilter?
-			streams.result = new StopFilter(Version.LUCENE_36, streams.result, STOP_WORDS_SET);
+            if (commonWords != null && commonWords.size() > 0)
+			    streams.result = new StopFilter(Version.LUCENE_36, streams.result, commonWords);
 
 			// TODO: Apply LowerCaseFilter to NonHebrew tokens only
 			streams.result = new LowerCaseFilter(Version.LUCENE_36, streams.result);
@@ -106,8 +113,8 @@ public class SimpleAnalyzer extends Analyzer
 		// Niqqud normalization
 		result = new NiqqudFilter(result);
 
-		// TODO: should we ignoreCase in StopFilter?
-		result = new StopFilter(Version.LUCENE_36, result, STOP_WORDS_SET);
+        if (commonWords != null && commonWords.size() > 0)
+		    result = new StopFilter(Version.LUCENE_36, result, commonWords);
 
 		// TODO: Apply LowerCaseFilter to NonHebrew tokens only
 		result = new LowerCaseFilter(Version.LUCENE_36, result);
