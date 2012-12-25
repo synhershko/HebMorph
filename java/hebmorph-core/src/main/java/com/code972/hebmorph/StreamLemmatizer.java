@@ -29,7 +29,7 @@ public class StreamLemmatizer extends Lemmatizer
 {
 	private Tokenizer _tokenizer;
 
-	public StreamLemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela)
+    public StreamLemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela)
 	{
 		super(dict, allowHeHasheela);
 	}
@@ -63,9 +63,8 @@ public class StreamLemmatizer extends Lemmatizer
 
 	private boolean tolerateWhenLemmatizingStream = true;
 
-    public Character getSuffixForExactMatch() {
-        return _tokenizer.getSuffixForExactMatch();
-    }
+    // should only be set to true when querying, and if support for a query like word$
+    // is wanted
     public void setSuffixForExactMatch(Character suffixForExactMatch) {
         this._tokenizer.setSuffixForExactMatch(suffixForExactMatch);
     }
@@ -111,7 +110,7 @@ public class StreamLemmatizer extends Lemmatizer
                 // Returning an with an empty stack will force consumer to use the tokenized word,
                 // available through the Reference passed to this method
                 if ((tokenType & Tokenizer.TokenType.Exact) > 0) {
-                    break;
+                    break; // report this as an OOV, will force treating as Exact
                 }
 
 				// This second case is a bit more complex. We take a risk of splitting a valid acronym or
@@ -179,13 +178,9 @@ public class StreamLemmatizer extends Lemmatizer
 						//retTokens.Add(new HebrewToken(nextToken, 0, 0, null, 1.0f));
 					}
 				}
-			}
-			else if ((tokenType & Tokenizer.TokenType.Numeric) > 0)
-			{
+			} else if ((tokenType & Tokenizer.TokenType.Numeric) > 0) {
 				retTokens.add(new Token(nextToken.ref, true));
-			}
-			else
-			{
+			} else {
 				retTokens.add(new Token(nextToken.ref));
 			}
 

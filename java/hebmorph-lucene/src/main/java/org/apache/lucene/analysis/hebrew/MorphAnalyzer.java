@@ -41,25 +41,15 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
 	*/
     private final CharArraySet commonWords;
 
-	/**
-	 Set to true to mark tokens with a $ prefix also when there is only one lemma returned
-	 from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
-	 namespace) to perform searches on the same field used for the Morph analyzer. When used this
-	 way, make sure to turn this on only while indexing, so searches don't get slower.
-	 Default is false to save some index space.
-	*/
-	public boolean alwaysSaveMarkedOriginal = false;
+	private boolean alwaysSaveMarkedOriginal = false;
 
-	/**
-	 A filter object to provide flexibility on deciding which lemmas are valid as index terms
-	 and which are not.
-	*/
-	public LemmaFilterBase lemmaFilter = null;
+	private LemmaFilterBase lemmaFilter;
 
 	private final StreamLemmatizer hebMorphLemmatizer;
     private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
     protected final Version matchVersion;
+    private Character suffixForExactMatch;
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
         this(matchVersion, new StreamLemmatizer(dict, false), commonWords);
@@ -105,8 +95,11 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
     }
 
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
+    protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter);
+        src.setAlwaysSaveMarkedOriginal(alwaysSaveMarkedOriginal);
+        src.setSuffixForExactMatch(suffixForExactMatch);
+
         TokenStream tok = new SynonymFilter(src, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
@@ -116,6 +109,29 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
                 return super.reset(reader);
             }
         };
+    }
+
+    public void setSuffixForExactMatch(Character suffixForExactMatch) {
+        this.suffixForExactMatch = suffixForExactMatch;
+    }
+
+    /**
+     A filter object to provide flexibility on deciding which lemmas are valid as index terms
+     and which are not.
+     */
+    public void setLemmaFilter(LemmaFilterBase lemmaFilter) {
+        this.lemmaFilter = lemmaFilter;
+    }
+
+    /**
+     Set to true to mark tokens with a $ prefix also when there is only one lemma returned
+     from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
+     namespace) to perform searches on the same field used for the Morph analyzer. When used this
+     way, make sure to turn this on only while indexing, so searches don't get slower.
+     Default is false to save some index space.
+     */
+    public void setAlwaysSaveMarkedOriginal(boolean alwaysSaveMarkedOriginal) {
+        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
     }
 
     private static SynonymMap buildAcronymsMergingMap() throws IOException {

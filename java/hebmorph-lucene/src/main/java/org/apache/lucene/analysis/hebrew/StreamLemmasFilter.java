@@ -46,12 +46,11 @@ public class StreamLemmasFilter extends Tokenizer
 	private OffsetAttribute offsetAtt;
 	private PositionIncrementAttribute posIncrAtt;
 	private TypeAttribute typeAtt;
-	//protected PayloadAttribute payAtt;
 
     private final CharacterUtils charUtils;
 
 	private boolean alwaysSaveMarkedOriginal;
-	private LemmaFilterBase lemmaFilter = null;
+	private final LemmaFilterBase lemmaFilter;
 
 	private final List<Token> stack = new ArrayList<Token>();
 	private final List<Token> filterCache = new ArrayList<Token>();
@@ -60,15 +59,10 @@ public class StreamLemmasFilter extends Tokenizer
 
 	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
 	{
-		this(input, _lemmatizer, null, false);
+		this(input, _lemmatizer, null);
 	}
 
-	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, boolean alwaysSaveMarkedOriginal)
-	{
-		this(input, _lemmatizer, null, alwaysSaveMarkedOriginal);
-	}
-
-	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter, boolean alwaysSaveMarkedOriginal)
+	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
 	{
         super(input);
 
@@ -79,16 +73,14 @@ public class StreamLemmasFilter extends Tokenizer
 
         _streamLemmatizer = _lemmatizer;
         _streamLemmatizer.setStream(input);
-        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
         lemmaFilter = _lemmaFilter;
 
         charUtils = CharacterUtils.getInstance(Version.LUCENE_36);
 	}
 
-	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
-	{
-        this(input,  _lemmatizer, _lemmaFilter, false);
-	}
+    public void setSuffixForExactMatch(Character c){
+        _streamLemmatizer.setSuffixForExactMatch(c);
+    }
 
 	@Override
 	public final boolean incrementToken() throws IOException {
@@ -218,4 +210,8 @@ public class StreamLemmasFilter extends Tokenizer
 		index = 0;
 		_streamLemmatizer.setStream(input);
 	}
+
+    public void setAlwaysSaveMarkedOriginal(boolean alwaysSaveMarkedOriginal) {
+        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
+    }
 }
