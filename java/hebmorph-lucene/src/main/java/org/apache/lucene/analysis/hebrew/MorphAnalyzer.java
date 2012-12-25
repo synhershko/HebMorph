@@ -107,8 +107,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter, alwaysSaveMarkedOriginal);
-        TokenStream tok = new LowerCaseFilter(matchVersion, src);
-        tok = new SynonymFilter(tok, acronymMergingMap, false);
+        TokenStream tok = new SynonymFilter(src, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
         return new TokenStreamComponents(src, tok) {
