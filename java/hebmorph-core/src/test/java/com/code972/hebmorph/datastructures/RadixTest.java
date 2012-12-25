@@ -41,6 +41,12 @@ public class RadixTest extends TestBase {
         } catch (IllegalArgumentException e) {
         }
 
+        try {
+            d.lookup("abcdef", true);
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+        }
+
         // Try adding one node...
         addAndIncrement(d, "abcdef", dataGenerator.generate(), counter);
 
@@ -110,8 +116,8 @@ public class RadixTest extends TestBase {
 
         // Existing or partial keys
         assertNotNull(d.lookup("c"));
-        assertNull(d.lookup("cz"));
-        assertNull(d.lookup("czz"));
+        assertNull(d.lookup("cz", true));
+        assertNull(d.lookup("czz", true));
         assertNotNull(d.lookup("czzzzij"));
         assertNotNull(d.lookup("czzzzija"));
         assertNotNull(d.lookup("czzzzijabcde"));
