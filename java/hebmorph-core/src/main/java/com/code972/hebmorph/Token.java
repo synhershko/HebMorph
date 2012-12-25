@@ -98,6 +98,6 @@ public class Token
 
     @Override
     public String toString() {
-        return String.format("\t%s isNumeric:(%b)", text , isNumeric);
+        return String.format("%s isNumeric:(%b)", text , isNumeric);
     }
 }

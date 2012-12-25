@@ -99,7 +99,7 @@ public class HebrewToken extends Token implements Comparable<Token>
     @Override
     public String toString()
     {
-        return String.format("\t%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
+        return String.format("%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
     }
 
     public final int compareTo(Token token)
