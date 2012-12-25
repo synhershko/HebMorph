@@ -130,7 +130,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         return synonymMap.build();
     }
 
-    static private DictRadix<MorphData> loadFromClasspath(String pathInClasspath) {
+    static private DictRadix<MorphData> loadFromClasspath(final String pathInClasspath) {
         try {
             return Loader.loadDictionaryFromClasspath(pathInClasspath, true);
         } catch (IOException ex) {
@@ -138,7 +138,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         }
     }
 
-    static private DictRadix<MorphData> loadFromPath(File path) {
+    static private DictRadix<MorphData> loadFromPath(final File path) {
         try {
             return Loader.loadDictionaryFromHSpellData(path, true);
         } catch (IOException ex) {
