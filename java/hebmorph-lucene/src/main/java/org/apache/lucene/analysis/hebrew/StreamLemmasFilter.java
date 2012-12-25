@@ -94,7 +94,7 @@ public class StreamLemmasFilter extends Tokenizer
 	public final boolean incrementToken() throws IOException {
 		// Index all unique lemmas at the same position
 		while (index < stack.size()) {
-			HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
+			final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
 			index++;
 
             if ((res == null) || !previousLemmas.add(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
