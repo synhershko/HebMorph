@@ -21,6 +21,7 @@
  **************************************************************************/
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
@@ -31,49 +32,64 @@ import java.util.Map;
 
 public final class AddSuffixFilter extends TokenFilter
 {
-	private TermAttribute termAtt;
-	private TypeAttribute typeAtt;
+    private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+    private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
 
-	public Map<String, char[]> suffixByTokenType = null;
+	private final Map<String, char[]> suffixByTokenType;
+    private final boolean keepOrigin;
 
-	public AddSuffixFilter(TokenStream input, Map<String, char[]> _suffixByTokenType)
-	{
+    public AddSuffixFilter(final TokenStream input, final Map<String, char[]> _suffixByTokenType) {
+        this(input, _suffixByTokenType, false);
+    }
+
+	public AddSuffixFilter(final TokenStream input, final Map<String, char[]> _suffixByTokenType, boolean keepOrigin) {
 		super(input);
-		termAtt = addAttribute(TermAttribute.class);
-		typeAtt = addAttribute(TypeAttribute.class);
 		suffixByTokenType = _suffixByTokenType;
+        this.keepOrigin = keepOrigin;
 	}
 
+    private char[] tokenBuffer = new char[Byte.MAX_VALUE];
+    private int tokenLen = 0;
+
 	@Override
-	public final boolean incrementToken() throws IOException
-	{
-		if (!input.incrementToken())
-			// reached EOS -- return null
-		{
+	public final boolean incrementToken() throws IOException {
+        if (tokenLen > 0) {
+            termAtt.setTermBuffer(tokenBuffer, 0, tokenLen);
+            tokenLen = 0;
+            posIncAtt.setPositionIncrement(0); // since we are just putting the original now
+            return true;
+        }
+
+		if (!input.incrementToken()) { // reached EOS -- return null
 			return false;
 		}
 
-		if (suffixByTokenType == null)
-		{
+		if (suffixByTokenType == null) { // this practically means the filter is disabled
 			return true;
 		}
 
-		char[] suffix;
-		if (!((suffix = suffixByTokenType.get(typeAtt.type())) != null))
-		{
+		final char[] suffix;
+		if (!((suffix = suffixByTokenType.get(typeAtt.type())) != null)) {
 			return true;
 		}
 
 		char[] buffer = termAtt.termBuffer();
-		int length = termAtt.termLength();
-
-		if (buffer.length <= length)
-		{
+		final int length = termAtt.termLength();
+		if (buffer.length <= length) {
 			buffer = termAtt.resizeTermBuffer(length + suffix.length);
 		}
 
 		System.arraycopy(suffix, 0, buffer, length, suffix.length);
 		termAtt.setTermLength(length + suffix.length);
+
+        if (keepOrigin) {
+            if (tokenBuffer == null || tokenBuffer.length < length)
+                tokenBuffer = buffer.clone();
+            else
+                System.arraycopy(buffer, 0, tokenBuffer, 0, length);
+            tokenLen = length;
+        }
 
 		return true;
 	}
