@@ -42,17 +42,22 @@ public final class HebrewTokenizer extends Tokenizer
 {
 	private final com.code972.hebmorph.Tokenizer hebMorphTokenizer;
 	private final DictRadix<Integer> prefixesTree;
+    private final String exactMatchSuffix;
 
 	private final TermAttribute termAtt;
 	private final OffsetAttribute offsetAtt;
 	private final PositionIncrementAttribute posIncrAtt;
 	private final TypeAttribute typeAtt;
 
-	public HebrewTokenizer(Reader _input) {
-		this(_input, LingInfo.buildPrefixTree(false));
+	public HebrewTokenizer(final Reader _input) {
+		this(_input, LingInfo.buildPrefixTree(false), null);
 	}
 
-	public HebrewTokenizer(Reader _input, DictRadix<Integer> _prefixesTree) {
+    public HebrewTokenizer(final Reader _input, final String exactMatchSuffix) {
+        this(_input, LingInfo.buildPrefixTree(false), exactMatchSuffix);
+    }
+
+	public HebrewTokenizer(final Reader _input, final DictRadix<Integer> _prefixesTree, final String exactMatchSuffix) {
         super(_input);
 		termAtt = addAttribute(TermAttribute.class);
 		offsetAtt = addAttribute(OffsetAttribute.class);
@@ -60,6 +65,7 @@ public final class HebrewTokenizer extends Tokenizer
 		typeAtt = addAttribute(TypeAttribute.class);
 		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(_input);
 		prefixesTree = _prefixesTree;
+        this.exactMatchSuffix = exactMatchSuffix;
 	}
 
 	public static interface TOKEN_TYPES {
@@ -125,6 +131,10 @@ public final class HebrewTokenizer extends Tokenizer
 
 			break;
 		}
+
+        if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0 && exactMatchSuffix != null) {
+            nextTokenVal += "$";
+        }
 
 		// Record the term string
 		if (termAtt.termLength() < nextTokenVal.length()) {
