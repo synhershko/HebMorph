@@ -123,7 +123,7 @@ public class StreamLemmasFilter extends Tokenizer
 
 		// A non-Hebrew word
 		if ((stack.size() == 1) && !(stack.get(0) instanceof HebrewToken)) {
-			setTermText(word);
+            termAtt.setTermBuffer(word);
 
 			Token tkn = stack.get(0);
 			if (tkn.isNumeric()) {
@@ -158,7 +158,7 @@ public class StreamLemmasFilter extends Tokenizer
 			// TODO: To allow for more advanced uses, fill stack with processed tokens and
 			// SetPositionIncrement(0)
 
-			setTermText(word + "$");
+            termAtt.setTermBuffer(word + "$");
 			typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 			return true;
 		}
@@ -176,14 +176,14 @@ public class StreamLemmasFilter extends Tokenizer
 			} else { // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
 				// DILEMMA: Does indexing word.Substring(hebToken.PrefixLength) + "$" make more or less sense?
 				// For now this is kept the way it is below to support duality of SimpleAnalyzer and MorphAnalyzer
-				setTermText(word + "$");
+                termAtt.setTermBuffer(word + "$");
 			}
 		}
 
 		// More than one lemma exist. Mark and store the original term to increase precision, while all
 		// lemmas will be popped out of the stack and get stored at the next call to IncrementToken.
 		else {
-			setTermText(word + "$");
+            termAtt.setTermBuffer(word + "$");
 		}
 
         typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
@@ -193,7 +193,7 @@ public class StreamLemmasFilter extends Tokenizer
 
 
 	protected boolean createHebrewToken(HebrewToken hebToken) {
-		setTermText(hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma());
+        termAtt.setTermBuffer(hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma());
 		posIncrAtt.setPositionIncrement(0);
 
 		// TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
@@ -210,21 +210,6 @@ public class StreamLemmasFilter extends Tokenizer
 
 		return true;
 	}
-
-
-	private void setTermText(String token) {
-		// Record the term string
-		if (termAtt.termLength() < token.length()) {
-			termAtt.setTermBuffer(token);
-		} else { // Perform a copy to save on memory operations
-	        char[] chars = token.toCharArray();
-            termAtt.setTermBuffer(chars,0,chars.length);
-            //char[] buf = termAtt.termBuffer();
-			//token.CopyTo(0, buf, 0, token.length());
-		}
-		termAtt.setTermLength(token.length());
-	}
-
     
 	@Override
 	public void reset(Reader input) throws IOException {
