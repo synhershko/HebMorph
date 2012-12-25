@@ -137,16 +137,7 @@ public final class HebrewTokenizer extends Tokenizer
         }
 
 		// Record the term string
-		if (termAtt.termLength() < nextTokenVal.length()) {
-			termAtt.setTermBuffer(nextTokenVal);
-		} else // Perform a copy to save on memory operations
-		{
-	        final char[] chars = nextTokenVal.toCharArray();
-            termAtt.setTermBuffer(chars,0,chars.length);
-			//char[] buf = termAtt.termBuffer();
-			//nextToken.CopyTo(0, buf, 0, nextToken.length());
-		}
-		termAtt.setTermLength(nextTokenVal.length());
+		termAtt.setTermBuffer(nextTokenVal);
 
 		offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
 
