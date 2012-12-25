@@ -39,8 +39,8 @@ public final class AddSuffixFilter extends TokenFilter
 	public AddSuffixFilter(TokenStream input, Map<String, char[]> _suffixByTokenType)
 	{
 		super(input);
-		termAtt = (TermAttribute)addAttribute(TermAttribute.class);
-		typeAtt = (TypeAttribute)addAttribute(TypeAttribute.class);
+		termAtt = addAttribute(TermAttribute.class);
+		typeAtt = addAttribute(TypeAttribute.class);
 		suffixByTokenType = _suffixByTokenType;
 	}
 

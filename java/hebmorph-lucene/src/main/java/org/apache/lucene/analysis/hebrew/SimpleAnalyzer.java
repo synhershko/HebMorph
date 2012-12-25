@@ -37,7 +37,6 @@ public final class SimpleAnalyzer extends ReusableAnalyzerBase {
     private final CharArraySet commonWords;
 	public static final DictRadix<Integer> PrefixTree = LingInfo.buildPrefixTree(false);
 
-	private boolean enableStopPositionIncrements = true;
 	private Map<String, char[]> suffixByTokenType = null;
     private final Version matchVersion;
 
@@ -51,7 +50,7 @@ public final class SimpleAnalyzer extends ReusableAnalyzerBase {
     }
 
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+    protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         final HebrewTokenizer src = new HebrewTokenizer(reader, PrefixTree);
         TokenStream tok = new NiqqudFilter(src);
         tok = new LowerCaseFilter(matchVersion, tok);
@@ -65,6 +64,7 @@ public final class SimpleAnalyzer extends ReusableAnalyzerBase {
                 return super.reset(reader);
             }
         };
+
     }
 
     public void registerSuffix(String tokenType, String suffix) {
