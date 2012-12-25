@@ -53,6 +53,18 @@ public class TokenizerTest {
 
     @Test
     public void tokenizesCorrectly() throws IOException {
+        // NonHebrew
+        assertTokenizesTo("test", "test");
+        assertTokenizesTo("test123", "test123");
+        assertTokenizesTo("test two", new String[] { "test", "two" });
+
+        // NonHebrew, non-English
+        assertTokenizesTo("décimo", "décimo");
+        assertTokenizesTo("traducción", "traducción");
+        assertTokenizesTo("Úlcera", "Úlcera");
+        assertTokenizesTo("ía", "ía");
+        assertTokenizesTo("el árbol", new String[]{"el", "árbol"});
+
         assertTokenizesTo("בדיקה", "בדיקה");
         assertTokenizesTo("בדיקה.", "בדיקה");
         assertTokenizesTo("בדיקה..", "בדיקה");
@@ -62,6 +74,7 @@ public class TokenizerTest {
         assertTokenizesTo("בדיקה. שניה", new String[] {"בדיקה", "שניה"});
         assertTokenizesTo("בדיקה,שניה", new String[] {"בדיקה", "שניה"});
         assertTokenizesTo("בדיקה+שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה-שניה", new String[] {"בדיקה", "שניה"});
 
         assertTokenizesTo("בדיקה\"", "בדיקה");
 
@@ -76,6 +89,8 @@ public class TokenizerTest {
         assertTokenizesTo("שלומיabc", "שלומיabc");
 
         assertTokenizesTo("בלונים$", "בלונים", Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact);
+        assertTokenizesTo("test$", "test", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Exact );
+        assertTokenizesTo("123$", "123", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Numeric | Tokenizer.TokenType.Exact );
 
         // Gershayim unification
         assertTokenizesTo("צה\"ל", "צה\"ל");
