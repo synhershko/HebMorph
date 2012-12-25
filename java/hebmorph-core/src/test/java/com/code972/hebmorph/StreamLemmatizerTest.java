@@ -57,7 +57,7 @@ public class StreamLemmatizerTest extends TestBase
         List<Token> results = new ArrayList<Token>();
 
         assertTrue(sl.getLemmatizeNextToken(token, results) > 0);
-        assertEquals(1, results.size());
+        assertEquals(3, results.size());
     }
 
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to
