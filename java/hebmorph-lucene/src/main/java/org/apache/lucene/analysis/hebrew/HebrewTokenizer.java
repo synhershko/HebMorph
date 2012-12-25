@@ -26,6 +26,7 @@ import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
@@ -36,42 +37,32 @@ import java.io.Reader;
 /**
  Tokenizes a given stream using HebMorph's Tokenizer, removes prefixes where possible, and tags Tokens
  with appropriate types where possible
-
 */
 public final class HebrewTokenizer extends Tokenizer
 {
-	private com.code972.hebmorph.Tokenizer hebMorphTokenizer;
-	private DictRadix<Integer> prefixesTree;
+	private final com.code972.hebmorph.Tokenizer hebMorphTokenizer;
+	private final DictRadix<Integer> prefixesTree;
 
-	private TermAttribute termAtt;
-	private OffsetAttribute offsetAtt;
-	//private PositionIncrementAttribute posIncrAtt;
-	private TypeAttribute typeAtt;
+	private final TermAttribute termAtt;
+	private final OffsetAttribute offsetAtt;
+	private final PositionIncrementAttribute posIncrAtt;
+	private final TypeAttribute typeAtt;
 
-	public HebrewTokenizer(Reader _input)//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
-	{
-        super(_input);
-		init(_input, LingInfo.buildPrefixTree(false));
+	public HebrewTokenizer(Reader _input) {
+		this(_input, LingInfo.buildPrefixTree(false));
 	}
 
-	public HebrewTokenizer(Reader _input, DictRadix<Integer> _prefixesTree)//: base(input) <- converts to CharStream, and causes issues due to a call to ReadToEnd in ctor
-	{
+	public HebrewTokenizer(Reader _input, DictRadix<Integer> _prefixesTree) {
         super(_input);
-		init(_input, _prefixesTree);
-	}
-
-	private void init(Reader _input, DictRadix<Integer> _prefixesTree)
-	{
-		termAtt = (TermAttribute)addAttribute(TermAttribute.class);
-		offsetAtt = (OffsetAttribute)addAttribute(OffsetAttribute.class);
-		//posIncrAtt = (PositionIncrementAttribute)AddAttribute(typeof(PositionIncrementAttribute));
-		typeAtt = (TypeAttribute)addAttribute(TypeAttribute.class);
+		termAtt = addAttribute(TermAttribute.class);
+		offsetAtt = addAttribute(OffsetAttribute.class);
+		posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+		typeAtt = addAttribute(TypeAttribute.class);
 		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(_input);
 		prefixesTree = _prefixesTree;
 	}
 
-	public static interface TOKEN_TYPES
-	{
+	public static interface TOKEN_TYPES {
 		public static final int Hebrew = 0;
 		public static final int NonHebrew = 1;
 		public static final int Numeric = 2;
@@ -79,8 +70,7 @@ public final class HebrewTokenizer extends Tokenizer
 		public static final int Acronym = 4;
 	}
 
-	public static final String[] TOKEN_TYPE_SIGNATURES = new String[]
-    {
+	public static final String[] TOKEN_TYPE_SIGNATURES = new String[] {
 		"<HEBREW>",
 		"<NON_HEBREW>",
 		"<NUM>",
@@ -89,68 +79,59 @@ public final class HebrewTokenizer extends Tokenizer
 		null
 	};
 
-	public static String tokenTypeSignature(int tokenType)
-	{
+	public static String tokenTypeSignature(final int tokenType) {
 		return TOKEN_TYPE_SIGNATURES[tokenType];
 	}
 
 	@Override
-	public boolean incrementToken() throws IOException
-	{
+	public boolean incrementToken() throws IOException {
 		clearAttributes();
 
-		Reference<String> nextToken = new Reference<String>(null);
+		final Reference<String> nextToken = new Reference<String>(null);
         String nextTokenVal = null;
 		int tokenType;
 
 		// Used to loop over certain noise cases
-		while (true)
-		{
+		while (true) {
 			tokenType = hebMorphTokenizer.nextToken(nextToken);
             nextTokenVal = nextToken.ref;
 
 			if (tokenType == 0)
-			{
 				return false; // EOS
-			}
 
-			// Ignore "words" which are actually only prefixes in a single word.
-			// This first case is easy to spot, since the prefix and the following word will be
-			// separated by a dash marked as a construct (סמיכות) by the Tokenizer
-			if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0)
-			{
-				if (isLegalPrefix(nextToken.ref))
-				{
-					continue;
-				}
-			}
+            if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Hebrew) > 0 && prefixesTree != null) {
+                // Ignore "words" which are actually only prefixes in a single word.
+                // This first case is easy to spot, since the prefix and the following word will be
+                // separated by a dash marked as a construct (סמיכות) by the Tokenizer
+                if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0)
+                {
+                    if (isLegalPrefix(nextToken.ref))
+                        continue;
+                }
 
-			// This second case is a bit more complex. We take a risk of splitting a valid acronym or
-			// abbrevated word into two, so we send it to an external function to analyze the word, and
-			// get a possibly corrected word. Examples for words we expect to simplify by this operation
-			// are ה"שטיח", ש"המידע.
-			if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0)
-			{
-				nextTokenVal = nextToken.ref = tryStrippingPrefix(nextToken.ref);
+                // This second case is a bit more complex. We take a risk of splitting a valid acronym or
+                // abbrevated word into two, so we send it to an external function to analyze the word, and
+                // get a possibly corrected word. Examples for words we expect to simplify by this operation
+                // are ה"שטיח", ש"המידע.
+                if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0) {
+                    nextTokenVal = nextToken.ref = tryStrippingPrefix(nextToken.ref);
 
-				// Re-detect acronym, in case it was a false positive
-				if (nextTokenVal.indexOf('"') == -1)
-				{
-					tokenType |= ~com.code972.hebmorph.Tokenizer.TokenType.Acronym;
-				}
-			}
+                    // Re-detect acronym, in case it was a false positive
+                    if (nextTokenVal.indexOf('"') == -1) {
+                        tokenType |= ~com.code972.hebmorph.Tokenizer.TokenType.Acronym;
+                    }
+                }
+            }
 
 			break;
 		}
 
 		// Record the term string
-		if (termAtt.termLength() < nextTokenVal.length())
-		{
+		if (termAtt.termLength() < nextTokenVal.length()) {
 			termAtt.setTermBuffer(nextTokenVal);
-		}
-		else // Perform a copy to save on memory operations
+		} else // Perform a copy to save on memory operations
 		{
-	        char[] chars = nextTokenVal.toCharArray();
+	        final char[] chars = nextTokenVal.toCharArray();
             termAtt.setTermBuffer(chars,0,chars.length);
 			//char[] buf = termAtt.termBuffer();
 			//nextToken.CopyTo(0, buf, 0, nextToken.length());
@@ -165,7 +146,7 @@ public final class HebrewTokenizer extends Tokenizer
 			{
 				typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Acronym));
 			}
-			if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0)
+			else if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0)
 			{
 				typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Construct));
 			}
