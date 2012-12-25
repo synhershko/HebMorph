@@ -29,101 +29,49 @@ import org.apache.lucene.util.Version;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
-import java.util.Set;
 
-public class SimpleAnalyzer extends Analyzer
-{
+public final class SimpleAnalyzer extends ReusableAnalyzerBase {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
-
 	*/
     private final CharArraySet commonWords;
 	public static final DictRadix<Integer> PrefixTree = LingInfo.buildPrefixTree(false);
 
 	private boolean enableStopPositionIncrements = true;
 	private Map<String, char[]> suffixByTokenType = null;
+    private final Version matchVersion;
 
-    public SimpleAnalyzer() {
-        this(null);
+    public SimpleAnalyzer(Version matchVersion) {
+        this(matchVersion, null);
     }
 
-    public SimpleAnalyzer(CharArraySet commonWords) {
+    public SimpleAnalyzer(final Version matchVersion, final CharArraySet commonWords) {
         this.commonWords = commonWords;
+        this.matchVersion = matchVersion;
     }
 
-    public void registerSuffix(String tokenType, String suffix)
-	{
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final HebrewTokenizer src = new HebrewTokenizer(reader, PrefixTree);
+        TokenStream tok = new NiqqudFilter(src);
+        tok = new LowerCaseFilter(matchVersion, tok);
+        if (commonWords != null && commonWords.size() > 0)
+            tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
+        if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
+            tok = new AddSuffixFilter(tok, suffixByTokenType);
+        return new TokenStreamComponents(src, tok) {
+            @Override
+            protected boolean reset(final Reader reader) throws IOException {
+                return super.reset(reader);
+            }
+        };
+    }
+
+    public void registerSuffix(String tokenType, String suffix) {
 		if (suffixByTokenType == null)
-		{
-			suffixByTokenType = new java.util.HashMap<String, char[]>();
-		}
+			suffixByTokenType = new java.util.HashMap<>();
 
 		if (!suffixByTokenType.containsKey(tokenType))
-		{
 			suffixByTokenType.put(tokenType, suffix.toCharArray());
-		}
-	}
-
-	// TODO: Support loading external stop lists
-
-	private static class SavedStreams {
-		public Tokenizer source;
-		public TokenStream result;
-	}
-
-	@Override
-	public TokenStream reusableTokenStream(String fieldName, Reader reader) throws IOException
-	{
-		Object tempVar = getPreviousTokenStream();
-		SavedStreams streams = (SavedStreams)((tempVar instanceof SavedStreams) ? tempVar : null);
-		if (streams == null)
-		{
-			streams = new SavedStreams();
-
-			streams.source = new HebrewTokenizer(reader, PrefixTree);
-
-			// Niqqud normalization
-			streams.result = new NiqqudFilter(streams.source);
-
-            if (commonWords != null && commonWords.size() > 0)
-			    streams.result = new StopFilter(Version.LUCENE_36, streams.result, commonWords);
-
-			// TODO: Apply LowerCaseFilter to NonHebrew tokens only
-			streams.result = new LowerCaseFilter(Version.LUCENE_36, streams.result);
-
-			if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
-			{
-				streams.result = new AddSuffixFilter(streams.result, suffixByTokenType);
-			}
-
-			setPreviousTokenStream(streams);
-		}
-		else
-		{
-			streams.source.reset(reader);
-		}
-		return streams.result;
-	}
-
-	@Override
-	public TokenStream tokenStream(String arg0, Reader reader)
-	{
-		TokenStream result = new HebrewTokenizer(reader, PrefixTree);
-
-		// Niqqud normalization
-		result = new NiqqudFilter(result);
-
-        if (commonWords != null && commonWords.size() > 0)
-		    result = new StopFilter(Version.LUCENE_36, result, commonWords);
-
-		// TODO: Apply LowerCaseFilter to NonHebrew tokens only
-		result = new LowerCaseFilter(Version.LUCENE_36, result);
-
-		if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
-		{
-			result = new AddSuffixFilter(result, suffixByTokenType);
-		}
-
-		return result;
 	}
 }

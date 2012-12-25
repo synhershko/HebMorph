@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;
-import java.util.Set;
 
 /*
  * TODO: Consider implementing https://issues.apache.org/jira/browse/LUCENE-1688 changes to stop list and associated constructors
@@ -109,7 +108,7 @@ public final class CommonGramsFilter extends TokenFilter {
      * position lookups.
      */
     @Override
-    public boolean incrementToken() throws IOException {
+    public final boolean incrementToken() throws IOException {
         // if we have a token from a previous iteration, return it now
         if (restoreMaintainedToken()) {
             saveTermBuffer();

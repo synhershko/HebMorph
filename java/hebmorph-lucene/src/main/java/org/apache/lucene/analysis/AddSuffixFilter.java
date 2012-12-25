@@ -29,7 +29,7 @@ import java.util.Map;
 
 
 
-public class AddSuffixFilter extends TokenFilter
+public final class AddSuffixFilter extends TokenFilter
 {
 	private TermAttribute termAtt;
 	private TypeAttribute typeAtt;
@@ -45,7 +45,7 @@ public class AddSuffixFilter extends TokenFilter
 	}
 
 	@Override
-	public boolean incrementToken() throws IOException
+	public final boolean incrementToken() throws IOException
 	{
 		if (!input.incrementToken())
 			// reached EOS -- return null

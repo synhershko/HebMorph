@@ -38,7 +38,7 @@ import java.io.Reader;
  with appropriate types where possible
 
 */
-public class HebrewTokenizer extends Tokenizer
+public final class HebrewTokenizer extends Tokenizer
 {
 	private com.code972.hebmorph.Tokenizer hebMorphTokenizer;
 	private DictRadix<Integer> prefixesTree;

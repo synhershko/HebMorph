@@ -21,13 +21,14 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import java.io.IOException;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 
+import java.io.IOException;
 
-public class NiqqudFilter extends TokenFilter
+
+public final class NiqqudFilter extends TokenFilter
 {
 	public NiqqudFilter(TokenStream input)
 	{
@@ -38,7 +39,7 @@ public class NiqqudFilter extends TokenFilter
 	private TermAttribute termAtt;
 
 	@Override
-	public boolean incrementToken() throws IOException
+	public final boolean incrementToken() throws IOException
 	{
 		if (!input.incrementToken())
 			// reached EOS -- return null
