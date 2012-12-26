@@ -108,7 +108,7 @@ public class Tokenizer {
     public Character getSuffixForExactMatch() {
         return suffixForExactMatch;
     }
-    public void setSuffixForExactMatch(Character suffixForExactMatch) {
+    public void setSuffixForExactMatch(final Character suffixForExactMatch) {
         this.suffixForExactMatch = suffixForExactMatch;
     }
 

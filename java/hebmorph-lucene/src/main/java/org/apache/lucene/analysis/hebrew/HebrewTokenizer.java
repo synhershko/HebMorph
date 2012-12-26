@@ -57,6 +57,10 @@ public final class HebrewTokenizer extends Tokenizer
 		prefixesTree = _prefixesTree;
 	}
 
+    public void setSuffixForExactMatch(final Character suffixForExactMatch) {
+        this.hebMorphTokenizer.setSuffixForExactMatch(suffixForExactMatch);
+    }
+
 	public static interface TOKEN_TYPES {
 		public static final int Hebrew = 0;
 		public static final int NonHebrew = 1;
