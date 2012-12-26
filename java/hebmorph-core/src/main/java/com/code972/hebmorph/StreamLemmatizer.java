@@ -27,28 +27,19 @@ import java.util.List;
 
 public class StreamLemmatizer extends Lemmatizer
 {
-	private Tokenizer _tokenizer;
+	private final Tokenizer _tokenizer;
 
-    public StreamLemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela)
-	{
-		super(dict, allowHeHasheela);
-	}
+    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
+        this(input, dict, allowHeHasheela, null);
+    }
 
-	public StreamLemmatizer(Reader input, DictRadix<MorphData> dict, boolean allowHeHasheela)
-	{
+	public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela, final DictRadix<Byte> specialTokenizationCases) {
 		super(dict, allowHeHasheela);
-		_tokenizer = new Tokenizer(input);
+		_tokenizer = new Tokenizer(input, specialTokenizationCases);
 	}
 
 	public void setStream(Reader input) {
-		if (_tokenizer == null)
-		{
-			_tokenizer = new Tokenizer(input);
-		}
-		else
-		{
-			_tokenizer.reset(input);
-		}
+        _tokenizer.reset(input);
 	}
 
 	private int _startOffset, _endOffset;

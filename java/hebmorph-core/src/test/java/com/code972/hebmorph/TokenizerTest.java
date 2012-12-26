@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TokenizerTest {
 
-    private final Tokenizer tokenizer = new Tokenizer();
+    private final Tokenizer tokenizer = new Tokenizer(null);
 
     @Before
     public void setUp() throws Exception {

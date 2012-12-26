@@ -112,7 +112,7 @@ public class Tokenizer {
         this.suffixForExactMatch = suffixForExactMatch;
     }
 
-    private final DictRadix<Byte> specialCases = new DictRadix<Byte>();
+    private final DictRadix<Byte> specialCases;
     private static final Byte dummyData = new Byte((byte)0);
     public void addSpecialCase(final String token) {
         specialCases.addNode(token, dummyData);
@@ -124,12 +124,14 @@ public class Tokenizer {
 
 	private final char[] wordBuffer = new char[Constants.MaxWordLength];
 
-    public Tokenizer() {
-        this(null);
-    }
-	public Tokenizer(Reader _input) {
-		input = _input;
+	public Tokenizer(final Reader input) {
+		this(input, null);
 	}
+
+    public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
+        this.input = input;
+        this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>();
+    }
 
     private boolean isRecognizedException(final String prefix) {
         try {

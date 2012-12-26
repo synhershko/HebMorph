@@ -37,7 +37,7 @@ import java.util.*;
 
 public class StreamLemmasFilter extends Tokenizer
 {
-	private StreamLemmatizer _streamLemmatizer;
+	private final StreamLemmatizer _streamLemmatizer;
 
 	private final TermAttribute termAtt = addAttribute(TermAttribute.class);;
 	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
@@ -54,13 +54,11 @@ public class StreamLemmasFilter extends Tokenizer
 	private int index = 0;
     private final Set<String> previousLemmas = new HashSet<String>();
 
-	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer)
-	{
+	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer) {
 		this(input, _lemmatizer, null);
 	}
 
-	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer, final LemmaFilterBase _lemmaFilter)
-	{
+	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer, final LemmaFilterBase _lemmaFilter) {
         super(input);
 
         _streamLemmatizer = _lemmatizer;

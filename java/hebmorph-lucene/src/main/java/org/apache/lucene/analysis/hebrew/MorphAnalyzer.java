@@ -49,8 +49,13 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
     protected final Version matchVersion;
     private Character suffixForExactMatch;
 
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Byte> specialTokenizationCases,
+                         final CharArraySet commonWords) throws IOException {
+        this(matchVersion, new StreamLemmatizer(null, dict, false, specialTokenizationCases), commonWords);
+    }
+
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
-        this(matchVersion, new StreamLemmatizer(dict, false), commonWords);
+        this(matchVersion, new StreamLemmatizer(null, dict, false), commonWords);
     }
 
     /**
