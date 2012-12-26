@@ -39,10 +39,10 @@ public class StreamLemmasFilter extends Tokenizer
 {
 	private StreamLemmatizer _streamLemmatizer;
 
-	private TermAttribute termAtt;
-	private OffsetAttribute offsetAtt;
-	private PositionIncrementAttribute posIncrAtt;
-	private TypeAttribute typeAtt;
+	private final TermAttribute termAtt = addAttribute(TermAttribute.class);;
+	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
+	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);;
+	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);;
 
     private final CharacterUtils charUtils;
 
@@ -54,19 +54,14 @@ public class StreamLemmasFilter extends Tokenizer
 	private int index = 0;
     private final Set<String> previousLemmas = new HashSet<String>();
 
-	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer)
+	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer)
 	{
 		this(input, _lemmatizer, null);
 	}
 
-	public StreamLemmasFilter(Reader input, StreamLemmatizer _lemmatizer, LemmaFilterBase _lemmaFilter)
+	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer, final LemmaFilterBase _lemmaFilter)
 	{
         super(input);
-
-        termAtt = addAttribute(TermAttribute.class);
-        offsetAtt = addAttribute(OffsetAttribute.class);
-        posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-        typeAtt = addAttribute(TypeAttribute.class);
 
         _streamLemmatizer = _lemmatizer;
         _streamLemmatizer.setStream(input);
