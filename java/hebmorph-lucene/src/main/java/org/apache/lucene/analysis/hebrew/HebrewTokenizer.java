@@ -25,10 +25,7 @@ import com.code972.hebmorph.Reference;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -43,10 +40,11 @@ public final class HebrewTokenizer extends Tokenizer
 	private final com.code972.hebmorph.Tokenizer hebMorphTokenizer;
 	private final DictRadix<Integer> prefixesTree;
 
-	private final TermAttribute termAtt;
-	private final OffsetAttribute offsetAtt;
-	private final PositionIncrementAttribute posIncrAtt;
-	private final TypeAttribute typeAtt;
+	private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
+	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+    private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
 	public HebrewTokenizer(final Reader _input) {
 		this(_input, LingInfo.buildPrefixTree(false));
@@ -54,10 +52,6 @@ public final class HebrewTokenizer extends Tokenizer
 
 	public HebrewTokenizer(final Reader _input, final DictRadix<Integer> _prefixesTree) {
         super(_input);
-		termAtt = addAttribute(TermAttribute.class);
-		offsetAtt = addAttribute(OffsetAttribute.class);
-		posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-		typeAtt = addAttribute(TypeAttribute.class);
 		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(_input);
 		prefixesTree = _prefixesTree;
 	}
@@ -128,8 +122,9 @@ public final class HebrewTokenizer extends Tokenizer
 
 		// Record the term string
 		termAtt.setTermBuffer(nextTokenVal);
-
 		offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
+        if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0)
+            keywordAtt.setKeyword(true);
 
 		if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Hebrew) > 0)
 		{
