@@ -137,7 +137,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
     }
 
-    private static SynonymMap buildAcronymsMergingMap() throws IOException {
+    public static SynonymMap buildAcronymsMergingMap() throws IOException {
         SynonymMap.Builder synonymMap = new SynonymMap.Builder(true);
         synonymMap.add(new CharsRef("אף על פי כן"), new CharsRef("אעפ\"כ"), false);
         synonymMap.add(new CharsRef("אף על פי"), new CharsRef("אע\"פ"), false);
