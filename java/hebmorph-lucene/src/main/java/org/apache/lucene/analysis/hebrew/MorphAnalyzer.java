@@ -106,6 +106,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         TokenStream tok = new SynonymFilter(src, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
+        tok = new SuffixKeywordFilter(tok, '$');
         return new TokenStreamComponents(src, tok) {
             @Override
             protected boolean reset(final Reader reader) throws IOException {

@@ -24,10 +24,7 @@ import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.Token;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.util.CharacterUtils;
 import org.apache.lucene.util.Version;
 
@@ -39,10 +36,11 @@ public class StreamLemmasFilter extends Tokenizer
 {
 	private final StreamLemmatizer _streamLemmatizer;
 
-	private final TermAttribute termAtt = addAttribute(TermAttribute.class);;
-	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
-	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);;
-	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);;
+	private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
+	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+    private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     private final CharacterUtils charUtils;
 
@@ -72,8 +70,12 @@ public class StreamLemmasFilter extends Tokenizer
         _streamLemmatizer.setSuffixForExactMatch(c);
     }
 
+    private final Reference<String> tempRefObject = new Reference<>("");
+
 	@Override
 	public final boolean incrementToken() throws IOException {
+        keywordAtt.setKeyword(false); // since this is also the Tokenizer, this only manages internal state
+
 		// Index all unique lemmas at the same position
 		while (index < stack.size()) {
 			final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
@@ -82,8 +84,9 @@ public class StreamLemmasFilter extends Tokenizer
             if ((res == null) || !previousLemmas.add(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
 				continue;
 
-			if (createHebrewToken(res))
-				return true;
+			createHebrewToken(res);
+            posIncrAtt.setPositionIncrement(0);
+            return true;
 		}
 
 		// Reset state
@@ -94,26 +97,30 @@ public class StreamLemmasFilter extends Tokenizer
 
 		// Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
 		// an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
-		final Reference<String> tempRefObject = new Reference<String>("");
-		boolean tempVar = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack) == 0;
-        final String word = tempRefObject.ref;
-		if (tempVar)
-			return false; // EOS
+		final int tokenType = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack);
+        if (tokenType == 0) // EOS
+			return false;
 
 		// Store the location of the word in the original stream
 		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
 
+        final String word = tempRefObject.ref;
+
+        // TODO don't lemmatize common words as well
+        if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
+            keywordAtt.setKeyword(true);
+        }
+
 		// A non-Hebrew word
-		if ((stack.size() == 1) && !(stack.get(0) instanceof HebrewToken)) {
+		if (stack.size() == 1 && !(stack.get(0) instanceof HebrewToken)) {
             termAtt.setTermBuffer(word);
 
-			Token tkn = stack.get(0);
+			final Token tkn = stack.get(0);
 			if (tkn.isNumeric()) {
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
 			} else {
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
 
-                // TODO: make this customizable
 				// Applying LowerCaseFilter for Non-Hebrew terms
 				char[] buffer = termAtt.termBuffer();
 				int length = termAtt.termLength();
@@ -129,68 +136,51 @@ public class StreamLemmasFilter extends Tokenizer
 		}
 
 		// If we arrived here, we hit a Hebrew word
+        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+        // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
+
 		// Do some filtering if requested...
-		if ((lemmaFilter != null) && (lemmaFilter.filterCollection(stack, filterCache) != null)) {
+		if (lemmaFilter != null && lemmaFilter.filterCollection(stack, filterCache) != null) {
 			stack.clear();
 			stack.addAll(filterCache);
 		}
 
 		// OOV case -- for now store word as-is and return true
 		if (stack.isEmpty()) {
-			// TODO: To allow for more advanced uses, fill stack with processed tokens and
-			// SetPositionIncrement(0)
-
-            termAtt.setTermBuffer(word + "$");
-			typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+            termAtt.setTermBuffer(word);
+            keywordAtt.setKeyword(true);
 			return true;
 		}
 
 		// If only one lemma was returned for this word
 		if (stack.size() == 1) {
-			HebrewToken hebToken = (HebrewToken)((stack.get(0) instanceof HebrewToken) ? stack.get(0) : null);
+			final HebrewToken hebToken = (HebrewToken)((stack.get(0) instanceof HebrewToken) ? stack.get(0) : null);
 
 			// Index the lemma alone if it exactly matches the word minus prefixes
 			if (!alwaysSaveMarkedOriginal && hebToken.getLemma().equals(word.substring(hebToken.getPrefixLength()))) {
 				createHebrewToken(hebToken);
-				posIncrAtt.setPositionIncrement(1);
 				stack.clear();
 				return true;
 			} else { // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
 				// DILEMMA: Does indexing word.Substring(hebToken.PrefixLength) + "$" make more or less sense?
 				// For now this is kept the way it is below to support duality of SimpleAnalyzer and MorphAnalyzer
-                termAtt.setTermBuffer(word + "$");
+                termAtt.setTermBuffer(word);
+                keywordAtt.setKeyword(true);
 			}
 		}
 
 		// More than one lemma exist. Mark and store the original term to increase precision, while all
 		// lemmas will be popped out of the stack and get stored at the next call to IncrementToken.
 		else {
-            termAtt.setTermBuffer(word + "$");
+            termAtt.setTermBuffer(word);
+            keywordAtt.setKeyword(true);
 		}
-
-        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
 
 		return true;
 	}
 
-
-	protected boolean createHebrewToken(HebrewToken hebToken) {
+	protected void createHebrewToken(HebrewToken hebToken) {
         termAtt.setTermBuffer(hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma());
-		posIncrAtt.setPositionIncrement(0);
-
-		// TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
-        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-
-//
-//             * Morph payload
-//             *
-//            byte[] data = new byte[1];
-//            data[0] = (byte)morphResult.Mask; // TODO: Set bits selectively
-//            Payload payload = new Payload(data);
-//            payAtt.SetPayload(payload);
-//
-
-		return true;
 	}
     
 	@Override
