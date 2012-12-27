@@ -36,10 +36,14 @@ public class Lemmatizer
     }
 
 	public Lemmatizer(DictRadix<MorphData> dict, DictRadix<MorphData> customWords, boolean allowHeHasheela) {
-        m_dict = dict;
-        this.customWords = customWords;
-        m_prefixes = LingInfo.buildPrefixTree(allowHeHasheela);
+        this(dict, customWords, LingInfo.buildPrefixTree(allowHeHasheela));
 	}
+
+    public Lemmatizer(final DictRadix<MorphData> dict, final DictRadix<MorphData> customWords, final DictRadix<Integer> prefixes) {
+        this.m_dict = dict;
+        this.customWords = customWords;
+        this.m_prefixes = prefixes;
+    }
 
 	public boolean isLegalPrefix(final String str) {
         try {

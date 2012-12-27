@@ -38,7 +38,12 @@ public class StreamLemmatizer extends Lemmatizer
 		_tokenizer = new Tokenizer(input, specialTokenizationCases);
 	}
 
-	public void setStream(Reader input) {
+    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes, final DictRadix<Byte> specialTokenizationCases) {
+        super(dict, null, prefixes);
+        _tokenizer = new Tokenizer(input, specialTokenizationCases);
+    }
+
+	public void setStream(final Reader input) {
         _tokenizer.reset(input);
 	}
 
@@ -60,7 +65,7 @@ public class StreamLemmatizer extends Lemmatizer
         this._tokenizer.setSuffixForExactMatch(suffixForExactMatch);
     }
 
-	public int getLemmatizeNextToken(Reference<String> nextToken, List<Token> retTokens) throws IOException {
+	public int getLemmatizeNextToken(final Reference<String> nextToken, final List<Token> retTokens) throws IOException {
 		retTokens.clear();
 
 		int currentPos = 0;
@@ -69,9 +74,8 @@ public class StreamLemmatizer extends Lemmatizer
 		// Used to loop over certain noise cases
 		while (true) {
 			tokenType = _tokenizer.nextToken(nextToken);
-			if (tokenType == 0) {
-				return 0; // EOS
-			}
+			if (tokenType == 0)
+                break; // EOS
 
 			_startOffset = _tokenizer.getOffset();
 			_endOffset = _tokenizer.getOffset() + _tokenizer.getLengthInSource();
@@ -178,6 +182,6 @@ public class StreamLemmatizer extends Lemmatizer
 			break;
 		}
 
-		return currentPos;
+		return tokenType;
 	}
 }
