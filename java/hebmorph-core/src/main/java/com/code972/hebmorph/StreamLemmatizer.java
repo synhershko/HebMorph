@@ -68,7 +68,6 @@ public class StreamLemmatizer extends Lemmatizer
 	public int getLemmatizeNextToken(final Reference<String> nextToken, final List<Token> retTokens) throws IOException {
 		retTokens.clear();
 
-		int currentPos = 0;
 		int tokenType;
 
 		// Used to loop over certain noise cases
@@ -79,8 +78,6 @@ public class StreamLemmatizer extends Lemmatizer
 
 			_startOffset = _tokenizer.getOffset();
 			_endOffset = _tokenizer.getOffset() + _tokenizer.getLengthInSource();
-
-			++currentPos;
 
 			if ((tokenType & Tokenizer.TokenType.Hebrew) > 0) {
 				// Right now we are blindly removing all Niqqud characters. Later we will try and make some
@@ -95,10 +92,7 @@ public class StreamLemmatizer extends Lemmatizer
                     || ((tokenType & Tokenizer.TokenType.Acronym) > 0))
 				{
 					if (isLegalPrefix(nextToken.ref))
-					{
-						--currentPos; // this should be treated as a word prefix
-						continue;
-					}
+						continue; // this should be treated as a word prefix
 				}
 
                 // An exact match request was identified
