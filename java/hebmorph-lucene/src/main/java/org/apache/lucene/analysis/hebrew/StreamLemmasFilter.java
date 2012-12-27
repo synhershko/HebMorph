@@ -23,6 +23,7 @@ import com.code972.hebmorph.Reference;
 import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.Token;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.util.CharacterUtils;
@@ -35,8 +36,9 @@ import java.util.*;
 public class StreamLemmasFilter extends Tokenizer
 {
 	private final StreamLemmatizer _streamLemmatizer;
+    private final CharArraySet commonWords;
 
-	private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+    private final TermAttribute termAtt = addAttribute(TermAttribute.class);
 	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
 	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
 	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
@@ -56,15 +58,20 @@ public class StreamLemmasFilter extends Tokenizer
 		this(input, _lemmatizer, null);
 	}
 
-	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer, final LemmaFilterBase _lemmaFilter) {
+	public StreamLemmasFilter(final Reader input, final StreamLemmatizer lemmatizer, final LemmaFilterBase lemmaFilter) {
+        this(input, lemmatizer, null, lemmaFilter);
+    }
+
+    public StreamLemmasFilter(final Reader input, final StreamLemmatizer lemmatizer, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
         super(input);
 
-        _streamLemmatizer = _lemmatizer;
+        _streamLemmatizer = lemmatizer;
+        this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         _streamLemmatizer.setStream(input);
-        lemmaFilter = _lemmaFilter;
+        this.lemmaFilter = lemmaFilter;
 
         charUtils = CharacterUtils.getInstance(Version.LUCENE_36);
-	}
+    }
 
     public void setSuffixForExactMatch(Character c){
         _streamLemmatizer.setSuffixForExactMatch(c);
@@ -105,8 +112,12 @@ public class StreamLemmasFilter extends Tokenizer
 		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
 
         final String word = tempRefObject.ref;
+        if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
+            termAtt.setTermBuffer(word);
+            return true;
+        }
 
-        // TODO don't lemmatize common words as well
+        // Mark request for exact matches in queries, if configured in the tokenizer
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
             keywordAtt.setKeyword(true);
         }

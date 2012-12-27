@@ -99,7 +99,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, lemmaFilter);
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, commonWords, lemmaFilter);
         src.setAlwaysSaveMarkedOriginal(alwaysSaveMarkedOriginal);
         src.setSuffixForExactMatch(suffixForExactMatch);
 
