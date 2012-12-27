@@ -20,6 +20,7 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants.DMask;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
@@ -33,12 +34,14 @@ public class StreamLemmatizer extends Lemmatizer
         this(input, dict, allowHeHasheela, null);
     }
 
-	public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela, final DictRadix<Byte> specialTokenizationCases) {
+	public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela,
+                            final DictRadix<Byte> specialTokenizationCases) {
 		super(dict, allowHeHasheela);
 		_tokenizer = new Tokenizer(input, specialTokenizationCases);
 	}
 
-    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes, final DictRadix<Byte> specialTokenizationCases) {
+    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes,
+                            final DictRadix<Byte> specialTokenizationCases) {
         super(dict, null, prefixes);
         _tokenizer = new Tokenizer(input, specialTokenizationCases);
     }
@@ -65,7 +68,7 @@ public class StreamLemmatizer extends Lemmatizer
         this._tokenizer.setSuffixForExactMatch(suffixForExactMatch);
     }
 
-	public int getLemmatizeNextToken(final Reference<String> nextToken, final List<Token> retTokens) throws IOException {
+	public final int getLemmatizeNextToken(final Reference<String> nextToken, final List<Token> retTokens) throws IOException {
 		retTokens.clear();
 
 		int tokenType;
