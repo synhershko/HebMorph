@@ -247,29 +247,30 @@ public class Tokenizer {
 
 			if (appendCurrentChar) {
 				// Consume normally
-				if (length == 0) // mark the start of a new token
+				if (length == 0) { // mark the start of a new token
                     tokenOffset = inputOffset + ioBufferIndex - 1;
-                else
-                    assert length > 0 && length != wordBuffer.length;
+                } else if (length < wordBuffer.length) {
+                    // Note that tokens larger than 128 chars will get clipped.
 
-				// Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
-				if (isOfChars(c, Geresh))
-				{
-					if (wordBuffer[length - 1] == c)
-					{
-						wordBuffer[length - 1] = '"';
-					}
-//					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
-//					{
-//						wordBuffer[length++] = c;
-//					}
+                    // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
+                    if (isOfChars(c, Geresh))
+                    {
+                        if (wordBuffer[length - 1] == c)
+                        {
+                            wordBuffer[length - 1] = '"';
+                        }
+    //					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
+    //					{
+    //						wordBuffer[length++] = c;
+    //					}
+                        else
+                            wordBuffer[length++] = c;
+                    }
                     else
-                        wordBuffer[length++] = c;
-				}
-				else
-				{
-					wordBuffer[length++] = c; // TODO: Normalize c
-				}
+                    {
+                        wordBuffer[length++] = c; // TODO: Normalize c
+                    }
+                }
 			}
 		}
 

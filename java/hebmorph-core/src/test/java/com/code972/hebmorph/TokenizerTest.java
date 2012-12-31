@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TokenizerTest {
 
@@ -224,4 +225,23 @@ public class TokenizerTest {
         assertEquals(3, tokenizer.getLengthInSource());
         assertEquals(1, tokenizer.getOffset());
     }
+
+    @Test
+    public void longTokenTest() throws IOException {
+        String text = "רפאלולדןהואפרופסורלרפואהישראלימלמדבאוניברסיטתתלאביבסגןמנהלביתהחוליםשיבאופעילחברתימתמחהבכירוגיהכלליתובכלידם"+
+      						"ולדןנולדבצרפתועלהלישראלבגילהואשימשבביתהחוליםשיבאכמנהלהאגףכירורגיהומנהלהיחידהלכלידם"+
+      						"ולדןפעילוחברבהנהלהבעמותתרופאיםלזכויותאדםוכמוכןחברבהנהלתארגוןלתתולדןזכהבאותלגיוןהכבודהצרפתישלממשלתצרפתבזכותעלפעילותובמסגרתרופאיםלזכויותאדםלקידוםשיתוףהפעולהביןפלסטיניםלישראליםהאותהוענקלועלידישרהחוץשלצרפתרנארקושנרבטקסבשגרירותצרפתבתלאביב"+
+      						"נשוילבלשניתצביהולדןבתושלשמעוןפרסוהואמשמשכרופאוהאישישלפרס.";
+
+
+        Tokenizer tokenizer = new Tokenizer(null);
+        Reference<String> test = new Reference<String>("");
+        tokenizer.reset(new StringReader(text));
+
+        while (tokenizer.nextToken(test) > 0) {
+        }
+
+        assertTrue("Arrived here without throwing", true);
+    }
+
 }
