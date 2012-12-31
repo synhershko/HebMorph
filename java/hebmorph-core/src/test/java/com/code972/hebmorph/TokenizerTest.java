@@ -191,7 +191,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void IncrementsOffsetCorrectlyAlsoWhenBuffered() throws FileNotFoundException, IOException
+    public void IncrementsOffsetCorrectlyAlsoWhenBuffered() throws IOException
     {
         Reference<String> token = new Reference<String>("");
 
@@ -216,8 +216,30 @@ public class TokenizerTest {
     }
 
     @Test
+    public void IncrementsOffsetCorrectlyWithTerminatingGeresh() throws IOException {
+        final String input = "מ'מפלגות המרכז' מפגש'";
+
+        final Reference<String> test = new Reference<String>("");
+        tokenizer.reset(new StringReader(input));
+        tokenizer.nextToken(test);
+        assertEquals("מ'מפלגות", test.ref);
+        assertEquals(0, tokenizer.getOffset());
+        assertEquals(8, tokenizer.getLengthInSource());
+
+        tokenizer.nextToken(test);
+        assertEquals("המרכז'", test.ref);
+        assertEquals(9, tokenizer.getOffset());
+        assertEquals(6, tokenizer.getLengthInSource());
+
+        tokenizer.nextToken(test);
+        assertEquals("מפגש", test.ref);
+        assertEquals(16, tokenizer.getOffset());
+        assertEquals(4, tokenizer.getLengthInSource());
+    }
+
+    @Test
     public void DiscardsSurroundingGershayim() throws FileNotFoundException, IOException {
-        Reference<String> test = new Reference<String>("");
+        final Reference<String> test = new Reference<String>("");
 
         tokenizer.reset(new StringReader("\"צבא\""));
         tokenizer.nextToken(test);

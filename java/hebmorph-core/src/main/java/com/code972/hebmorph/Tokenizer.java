@@ -146,7 +146,7 @@ public class Tokenizer {
 	// This is a job for a normalizer, anyway
 	public int nextToken(Reference<String> tokenString) throws IOException {
 		byte length = 0;
-        tokenOffset = -1; // invalidate
+        tokenOffset = 0; // invalidate
 		int tokenType = 0;
         byte startedDoingCustomToken = -1;
 		while (true) {
@@ -165,6 +165,7 @@ public class Tokenizer {
                             if (b == null) {
                                 tokenString.ref = "";
                                 tokenLengthInSource = 0;
+                                tokenOffset = inputOffset;
                                 return 0;
                             }
                         }
@@ -172,6 +173,7 @@ public class Tokenizer {
 					} else {
 						tokenString.ref = "";
                         tokenLengthInSource = 0;
+                        tokenOffset = inputOffset;
 						return 0;
 					}
 				}
@@ -308,5 +310,7 @@ public class Tokenizer {
 		inputOffset = 0;
 		dataLen = 0;
 		ioBufferIndex = 0;
+        tokenOffset = 0;
+        tokenLengthInSource = 0;
 	}
 }

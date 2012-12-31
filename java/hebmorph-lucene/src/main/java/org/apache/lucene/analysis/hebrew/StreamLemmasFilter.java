@@ -67,7 +67,7 @@ public class StreamLemmasFilter extends Tokenizer
 
         _streamLemmatizer = lemmatizer;
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
-        _streamLemmatizer.setStream(input);
+        _streamLemmatizer.reset(input);
         this.lemmaFilter = lemmaFilter;
 
         charUtils = CharacterUtils.getInstance(Version.LUCENE_36);
@@ -193,13 +193,22 @@ public class StreamLemmasFilter extends Tokenizer
 	protected void createHebrewToken(HebrewToken hebToken) {
         termAtt.setTermBuffer(hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma());
 	}
+
+    @Override
+    public final void end() {
+        // set final offset
+        int finalOffset = correctOffset(_streamLemmatizer.getEndOffset());
+        offsetAtt.setOffset(finalOffset, finalOffset);
+    }
     
 	@Override
 	public void reset(Reader input) throws IOException {
 		super.reset(input);
 		stack.clear();
+        filterCache.clear();
+        previousLemmas.clear();
 		index = 0;
-		_streamLemmatizer.setStream(input);
+		_streamLemmatizer.reset(input);
 	}
 
     public void setAlwaysSaveMarkedOriginal(boolean alwaysSaveMarkedOriginal) {

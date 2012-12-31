@@ -46,7 +46,7 @@ public class StreamLemmatizer extends Lemmatizer
         _tokenizer = new Tokenizer(input, specialTokenizationCases);
     }
 
-	public void setStream(final Reader input) {
+	public void reset(final Reader input) {
         _tokenizer.reset(input);
 	}
 
@@ -76,11 +76,10 @@ public class StreamLemmatizer extends Lemmatizer
 		// Used to loop over certain noise cases
 		while (true) {
 			tokenType = _tokenizer.nextToken(nextToken);
+            _startOffset = _tokenizer.getOffset();
+            _endOffset = _startOffset + _tokenizer.getLengthInSource();
 			if (tokenType == 0)
                 break; // EOS
-
-			_startOffset = _tokenizer.getOffset();
-			_endOffset = _tokenizer.getOffset() + _tokenizer.getLengthInSource();
 
 			if ((tokenType & Tokenizer.TokenType.Hebrew) > 0) {
 				// Right now we are blindly removing all Niqqud characters. Later we will try and make some
