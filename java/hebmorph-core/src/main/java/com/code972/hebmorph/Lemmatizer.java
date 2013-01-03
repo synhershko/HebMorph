@@ -29,19 +29,14 @@ public class Lemmatizer
 {
 	private final DictRadix<MorphData> m_dict;
 	private final DictRadix<Integer> m_prefixes;
-    private final DictRadix<MorphData> customWords;
+    private DictRadix<MorphData> customWords;
 
-    public Lemmatizer(DictRadix<MorphData> dict, boolean allowHeHasheela) {
-        this(dict, null, allowHeHasheela);
-    }
-
-	public Lemmatizer(DictRadix<MorphData> dict, DictRadix<MorphData> customWords, boolean allowHeHasheela) {
-        this(dict, customWords, LingInfo.buildPrefixTree(allowHeHasheela));
+	public Lemmatizer(final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
+        this(dict, LingInfo.buildPrefixTree(allowHeHasheela));
 	}
 
-    public Lemmatizer(final DictRadix<MorphData> dict, final DictRadix<MorphData> customWords, final DictRadix<Integer> prefixes) {
+    public Lemmatizer(final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes) {
         this.m_dict = dict;
-        this.customWords = customWords;
         this.m_prefixes = prefixes;
     }
 
@@ -252,4 +247,12 @@ public class Lemmatizer
 		}
         return ret;
 	}
+
+    public DictRadix<MorphData> getCustomWords() {
+        return customWords;
+    }
+
+    public void setCustomWords(DictRadix<MorphData> customWords) {
+        this.customWords = customWords;
+    }
 }

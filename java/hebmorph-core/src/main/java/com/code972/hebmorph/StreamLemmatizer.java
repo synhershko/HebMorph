@@ -26,8 +26,7 @@ import java.io.Reader;
 import java.util.List;
 
 
-public class StreamLemmatizer extends Lemmatizer
-{
+public class StreamLemmatizer extends Lemmatizer {
 	private final Tokenizer _tokenizer;
 
     public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
@@ -42,7 +41,7 @@ public class StreamLemmatizer extends Lemmatizer
 
     public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes,
                             final DictRadix<Byte> specialTokenizationCases) {
-        super(dict, null, prefixes);
+        super(dict, prefixes);
         _tokenizer = new Tokenizer(input, specialTokenizationCases);
     }
 
