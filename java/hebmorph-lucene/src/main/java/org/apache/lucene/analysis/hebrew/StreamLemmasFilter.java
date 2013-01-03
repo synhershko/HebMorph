@@ -31,7 +31,10 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class StreamLemmasFilter extends Tokenizer
 {
@@ -96,9 +99,7 @@ public class StreamLemmasFilter extends Tokenizer
             return true;
 		}
 
-		// Reset state
-		clearAttributes();
-		index = 0;
+        index = 0;
 		stack.clear();
         previousLemmas.clear();
 
@@ -107,6 +108,9 @@ public class StreamLemmasFilter extends Tokenizer
 		final int tokenType = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack);
         if (tokenType == 0) // EOS
 			return false;
+
+        // Reset state
+        clearAttributes();
 
 		// Store the location of the word in the original stream
 		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
