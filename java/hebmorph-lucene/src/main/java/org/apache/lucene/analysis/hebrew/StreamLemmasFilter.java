@@ -118,6 +118,7 @@ public class StreamLemmasFilter extends Tokenizer
         final String word = tempRefObject.ref;
         if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
             termAtt.setTermBuffer(word);
+            stack.clear();
             return true;
         }
 
