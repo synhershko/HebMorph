@@ -58,6 +58,15 @@ public class StreamLemmatizerTest extends TestBase
 
         assertTrue(sl.getLemmatizeNextToken(token, results) > 0);
         assertEquals(3, results.size());
+        assertEquals(0, sl.getStartOffset());
+        assertEquals(4, sl.getEndOffset());
+        results.clear();
+
+        sl = new StreamLemmatizer(new StringReader("בבבי"), getDictionary(), false);
+        assertTrue(sl.getLemmatizeNextToken(token, results) > 0);
+        assertEquals(0, sl.getStartOffset());
+        assertEquals(4, sl.getEndOffset());
+        results.clear();
     }
 
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to
