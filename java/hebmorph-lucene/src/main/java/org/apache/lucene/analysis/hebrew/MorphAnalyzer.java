@@ -146,6 +146,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         synonymMap.add(new CharsRef("על ידי"), new CharsRef("ע\"י"), false);
         synonymMap.add(new CharsRef("על פי"), new CharsRef("ע\"פ"), false);
         synonymMap.add(new CharsRef("כל כך"), new CharsRef("כ\"כ"), false);
+        synonymMap.add(new CharsRef("בדרך כלל"), new CharsRef("בד\"כ"), false);
         return synonymMap.build();
     }
 
