@@ -23,28 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class LemmaFilterBase
-{
-	public List<Token> filterCollection(List<Token> collection)
-	{
+public abstract class LemmaFilterBase {
+	public List<Token> filterCollection(final List<Token> collection) {
 		return filterCollection(collection, null);
 	}
 
-	public List<Token> filterCollection(List<Token> collection, List<Token> preallocatedOut)
-	{
-		if (preallocatedOut == null)
-		{
-			preallocatedOut = new ArrayList<Token>();
-		}
-		else
-		{
+	public List<Token> filterCollection(final List<Token> collection, List<Token> preallocatedOut) {
+		if (preallocatedOut == null) {
+			preallocatedOut = new ArrayList<>();
+		} else {
 			preallocatedOut.clear();
 		}
 
-		for (Token t : collection)
-		{
-			if (isValidToken(t))
-			{
+		for (Token t : collection) {
+			if (isValidToken(t)) {
 				preallocatedOut.add(t);
 			}
 		}
@@ -52,5 +44,5 @@ public abstract class LemmaFilterBase
 		return preallocatedOut;
 	}
 
-	public abstract boolean isValidToken(Token t);
+	public abstract boolean isValidToken(final Token t);
 }

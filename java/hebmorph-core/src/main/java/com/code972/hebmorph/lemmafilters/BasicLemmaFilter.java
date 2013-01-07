@@ -29,37 +29,29 @@ import java.util.List;
  scored below 0.7 is probably a result of some heavy toleration, and will be ignored.
 
 */
-public class BasicLemmaFilter extends LemmaFilterBase
-{
+public class BasicLemmaFilter extends LemmaFilterBase {
+
 	@Override
-	public List<Token> filterCollection(List<Token> collection, List<Token> preallocatedOut)
-	{
-		if (collection.size() > 1)
-		{
+	public List<Token> filterCollection(final List<Token> collection, final List<Token> preallocatedOut) {
+		if (collection.size() > 1) {
 			return super.filterCollection(collection, preallocatedOut);
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 	}
 
 	@Override
-	public boolean isValidToken(Token t)
-	{
-		if (t instanceof HebrewToken)
-		{
-			HebrewToken ht = (HebrewToken)t;
+	public boolean isValidToken(final Token t) {
+		if (t instanceof HebrewToken) {
+			final HebrewToken ht = (HebrewToken)t;
 
 			// Pose a minimum score limit for words
-			if (ht.getScore() < 0.7f)
-			{
+			if (ht.getScore() < 0.7f) {
 				return false;
 			}
 
 			// Pose a higher threshold to verbs (easier to get irrelevant verbs from toleration)
-			if (((ht.getMask() & DMask.D_TYPEMASK) == DMask.D_VERB) && (ht.getScore() < 0.85f))
-			{
+			if (((ht.getMask() & DMask.D_TYPEMASK) == DMask.D_VERB) && (ht.getScore() < 0.85f)) {
 				return false;
 			}
 		}
