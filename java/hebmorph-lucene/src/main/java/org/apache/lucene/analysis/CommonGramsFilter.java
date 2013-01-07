@@ -128,6 +128,10 @@ public final class CommonGramsFilter extends TokenFilter {
             return false;
         }
 
+        // Skip tokens with 0 position increment, so we don't common-gram synonyms etc
+        if (posIncAttribute.getPositionIncrement() == 0)
+            return true;
+
     /* We build n-grams before and after stopwords.
      * When valid, the buffer always contains at least the separator.
      * If its empty, there is nothing before this stopword.
