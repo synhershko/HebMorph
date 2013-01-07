@@ -169,6 +169,7 @@ public class Lemmatizer
 			}
 		}
 
+        prefLen = 0;
 		while (true) {
 			// Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
 			if (word.length() - prefLen < 2)
