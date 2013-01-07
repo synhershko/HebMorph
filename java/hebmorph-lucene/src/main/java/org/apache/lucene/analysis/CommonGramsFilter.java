@@ -50,6 +50,7 @@ public final class CommonGramsFilter extends TokenFilter {
     private final TypeAttribute typeAttribute = addAttribute(TypeAttribute.class);
     private final PositionIncrementAttribute posIncAttribute = addAttribute(PositionIncrementAttribute.class);
     private final PositionLengthAttribute posLenAttribute = addAttribute(PositionLengthAttribute.class);
+    private final KeywordAttribute keywordAttribute = addAttribute(KeywordAttribute.class);
 
     private int lastStartOffset;
     private boolean lastWasCommon;
@@ -225,6 +226,7 @@ public final class CommonGramsFilter extends TokenFilter {
     boolean maintainedToken = false;
     int maintainedTokenTextLen, maintainedTokenPosInc, maintainedTokenPosLen;
     int maintainedTokenStartOffset, maintainedTokenEndOffset;
+    boolean maintainedTokenIsKeyword;
     String maintainedTokenType;
     char maintainedTokenText[] = new char[Byte.MAX_VALUE];
 
@@ -234,6 +236,7 @@ public final class CommonGramsFilter extends TokenFilter {
         maintainedTokenPosInc = posIncAttribute.getPositionIncrement();
         maintainedTokenPosLen = posLenAttribute.getPositionLength();
         maintainedTokenType = typeAttribute.type();
+        maintainedTokenIsKeyword = keywordAttribute.isKeyword();
 
         if (maintainedTokenText.length < termAttribute.length())
             maintainedTokenText = new char[termAttribute.length()];
@@ -259,6 +262,7 @@ public final class CommonGramsFilter extends TokenFilter {
         posLenAttribute.setPositionLength(maintainedTokenPosLen);
         offsetAttribute.setOffset(maintainedTokenStartOffset, maintainedTokenEndOffset);
         typeAttribute.setType(maintainedTokenType);
+        keywordAttribute.setKeyword(maintainedToken);
         buffer.setLength(0);
 
         maintainedToken = false;
