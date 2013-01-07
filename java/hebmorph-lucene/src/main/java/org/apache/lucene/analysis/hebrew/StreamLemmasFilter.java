@@ -137,6 +137,7 @@ public class StreamLemmasFilter extends Tokenizer
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
 			} else {
 				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
+                keywordAtt.setKeyword(true);
 
 				// Applying LowerCaseFilter for Non-Hebrew terms
 				char[] buffer = termAtt.termBuffer();
