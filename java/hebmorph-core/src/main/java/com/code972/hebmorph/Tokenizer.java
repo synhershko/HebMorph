@@ -227,7 +227,6 @@ public class Tokenizer {
                         break;
 
                     // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
-                    tokenType |= TokenType.Acronym;
                     appendCurrentChar = true;
                 } else if (isRecognizedException(new String(wordBuffer, 0, length) + c)) {
                     startedDoingCustomToken = length;
@@ -262,6 +261,7 @@ public class Tokenizer {
                     if (wordBuffer[length - 1] == c)
                     {
                         wordBuffer[length - 1] = '"';
+                        tokenType |= TokenType.Acronym;
                     }
                     //					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
                     //					{
