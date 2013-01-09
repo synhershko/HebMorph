@@ -117,7 +117,7 @@ public final class HebrewTokenizer extends Tokenizer
 
                     // Re-detect acronym, in case it was a false positive
                     if (nextTokenVal.indexOf('"') == -1) {
-                        tokenType |= ~com.code972.hebmorph.Tokenizer.TokenType.Acronym;
+                        tokenType &= ~com.code972.hebmorph.Tokenizer.TokenType.Acronym;
                     }
                 }
             }
