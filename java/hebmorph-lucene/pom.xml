@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>3.6.1</lucene.version>
+        <lucene.version>4.0.0</lucene.version>
     </properties>
 
     <build>
@@ -33,9 +33,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
+            <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -53,7 +52,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-memory</artifactId>
             <version>${lucene.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -74,6 +72,11 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.lucene</groupId>
+        	<artifactId>lucene-queryparser</artifactId>
+        	<version>${lucene.version}</version>
         </dependency>
     </dependencies>
 </project>

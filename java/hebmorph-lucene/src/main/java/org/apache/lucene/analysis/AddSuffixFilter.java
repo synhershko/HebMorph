@@ -18,8 +18,8 @@
  **************************************************************************/
 package org.apache.lucene.analysis;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 public final class AddSuffixFilter extends TokenFilter
 {
-    private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
 
@@ -52,7 +52,7 @@ public final class AddSuffixFilter extends TokenFilter
 	@Override
 	public final boolean incrementToken() throws IOException {
         if (tokenLen > 0) {
-            termAtt.setTermBuffer(tokenBuffer, 0, tokenLen);
+            termAtt.copyBuffer(tokenBuffer, 0, tokenLen);
             tokenLen = 0;
             posIncAtt.setPositionIncrement(0); // since we are just putting the original now
             return true;
@@ -71,14 +71,14 @@ public final class AddSuffixFilter extends TokenFilter
 			return true;
 		}
 
-		char[] buffer = termAtt.termBuffer();
-		final int length = termAtt.termLength();
+		char[] buffer = termAtt.buffer();
+		final int length = termAtt.length();
 		if (buffer.length <= length) {
-			buffer = termAtt.resizeTermBuffer(length + suffix.length);
+			buffer = termAtt.resizeBuffer(length + suffix.length);
 		}
 
 		System.arraycopy(suffix, 0, buffer, length, suffix.length);
-		termAtt.setTermLength(length + suffix.length);
+		termAtt.setLength(length + suffix.length);
 
         if (keepOrigin) {
             if (tokenBuffer == null || tokenBuffer.length < length)

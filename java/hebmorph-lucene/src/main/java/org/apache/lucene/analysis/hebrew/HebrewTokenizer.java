@@ -34,12 +34,13 @@ import java.io.Reader;
 */
 public final class HebrewTokenizer extends Tokenizer
 {
+
 	private final com.code972.hebmorph.Tokenizer hebMorphTokenizer;
 	private final DictRadix<Integer> prefixesTree;
 
-	private final TermAttribute termAtt = addAttribute(TermAttribute.class);
+	private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
 	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
-	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+//	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
 	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
@@ -126,7 +127,8 @@ public final class HebrewTokenizer extends Tokenizer
 		}
 
 		// Record the term string
-		termAtt.setTermBuffer(nextTokenVal);
+		
+		termAtt.copyBuffer(nextTokenVal.toCharArray(), 0, nextTokenVal.length());
 		offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0)
             keywordAtt.setKeyword(true);
@@ -167,9 +169,8 @@ public final class HebrewTokenizer extends Tokenizer
 	}
 
 	@Override
-	public void reset(Reader input) throws IOException
-	{
-		super.reset(input);
+	public void reset() throws IOException {
+		super.reset();
 		hebMorphTokenizer.reset(input);
 	}
 
