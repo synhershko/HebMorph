@@ -30,6 +30,6 @@ public abstract class TestBase {
 
             dict = Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
         }
-        return dict;
+        return dict; 
     }
 }

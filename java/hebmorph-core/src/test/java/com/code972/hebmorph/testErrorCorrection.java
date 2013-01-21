@@ -1,11 +1,11 @@
 package com.code972.hebmorph;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class testErrorCorrection extends TestBase {
@@ -27,9 +27,9 @@ public class testErrorCorrection extends TestBase {
 
     private void AssertWord(String word, String expectedWord) {
         System.out.println("Testing " + word + " -> " + expectedWord);
-        assertTrue(_lemmatizer.lemmatize(expectedWord).size() > 0); // make sure the expected word is legal
+        Assert.assertTrue(_lemmatizer.lemmatize(expectedWord).size() > 0); // make sure the expected word is legal
         List<HebrewToken> results = _lemmatizer.lemmatizeTolerant(word);
-        assertTrue(results.size() > 0);
+        Assert.assertTrue(results.size() > 0);
         assertEquals(expectedWord, results.get(0).getLemma());
     }
 }

@@ -21,17 +21,20 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
-import com.code972.hebmorph.datastructures.DictRadix;
-import junit.framework.Assert;
-import org.junit.*;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class LemmatizerTest extends TestBase {
-    private static DictRadix<MorphData> m_dict;
     private static StreamLemmatizer m_lemmatizer;
 
 	@BeforeClass
