@@ -23,6 +23,10 @@ public class testErrorCorrection extends TestBase {
         AssertWord("אנצקלופדיה", "אנציקלופדיה");
         AssertWord("אינציקלופדיה", "אנציקלופדיה");
         //AssertWord("פינגוין", "פינגווין");
+        //AssertNotCorrected("שלומי", "שלום");
+        // ביבי -> בבבי
+        // ביבי -> שביב
+        // ביבי -> לבייב
     }
 
     private void AssertWord(String word, String expectedWord) {

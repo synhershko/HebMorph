@@ -102,8 +102,8 @@ public class BasicHebrewTests extends TestBase {
 
 		assertFoundInText("אצטרולב", "אצטרולב"); // OOV case, should be stored as-is
 		assertFoundInText("test", "test"); // Non hebrew, should be stored as-is
+        assertFoundInText("test sun", "sun"); // Non hebrew, multiple
 		assertFoundInText("1234", "1234"); // Numeric, should be stored as-is
-
 	}
 
 
