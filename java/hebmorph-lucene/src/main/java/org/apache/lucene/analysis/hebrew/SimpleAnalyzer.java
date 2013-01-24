@@ -19,15 +19,17 @@
 package org.apache.lucene.analysis.hebrew;
 
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymMap;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
 
-public final class SimpleAnalyzer extends ReusableAnalyzerBase {
+public final class SimpleAnalyzer extends Analyzer {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 	*/
@@ -59,8 +61,8 @@ public final class SimpleAnalyzer extends ReusableAnalyzerBase {
             tok = new AddSuffixFilter(tok, suffixByTokenType);
         return new TokenStreamComponents(src, tok) {
             @Override
-            protected boolean reset(final Reader reader) throws IOException {
-                return super.reset(reader);
+            protected void setReader(final Reader reader) throws IOException {
+                super.setReader(reader);
             }
         };
     }

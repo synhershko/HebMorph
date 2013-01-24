@@ -10,6 +10,7 @@
 package org.apache.lucene.analysis;
 
 import org.apache.lucene.analysis.tokenattributes.*;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;

@@ -26,6 +26,7 @@ import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymMap;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.Version;
 
@@ -33,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
-public class MorphAnalyzer extends ReusableAnalyzerBase {
+public class MorphAnalyzer extends Analyzer {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
 	 useful for searching.
 	*/
@@ -46,6 +47,7 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
 	private final StreamLemmatizer hebMorphLemmatizer;
     private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
+    private static final String DEFAULT_HSPELL_ENV_VARIABLE = "HSPELL_DATA_FILES_PATH";
     protected final Version matchVersion;
     private Character suffixForExactMatch;
 
@@ -109,8 +111,8 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         tok = new SuffixKeywordFilter(tok, '$');
         return new TokenStreamComponents(src, tok) {
             @Override
-            protected boolean reset(final Reader reader) throws IOException {
-                return super.reset(reader);
+            protected void setReader(final Reader reader) throws IOException {
+                super.setReader(reader);
             }
         };
     }
@@ -155,7 +157,12 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         try {
             return Loader.loadDictionaryFromClasspath(pathInClasspath, true);
         } catch (IOException ex) {
-            throw new IllegalStateException("Failed to read data", ex);
+       		try {
+       			// Try to use environment variable if failed with classpath
+				return loadFromEnvVariable();
+			} catch (IOException e) {
+				throw new IllegalStateException("Failed to read data", ex);
+			}
         }
     }
 
@@ -165,5 +172,14 @@ public class MorphAnalyzer extends ReusableAnalyzerBase {
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to read data", ex);
         }
+    }
+    
+    static private DictRadix<MorphData> loadFromEnvVariable() throws IOException {
+       	String hspellPath = System.getenv(DEFAULT_HSPELL_ENV_VARIABLE);
+       	if (hspellPath == null) {
+       		throw new IllegalStateException("Failed to load hspell dictionary files. They should be configured " +
+       				"in classpath or by " + DEFAULT_HSPELL_ENV_VARIABLE + " environment variable");
+       	}
+       	return Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
     }
 }

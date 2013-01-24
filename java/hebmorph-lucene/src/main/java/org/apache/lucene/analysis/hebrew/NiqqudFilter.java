@@ -18,11 +18,11 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
+import java.io.IOException;
+
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
-
-import java.io.IOException;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 
 public final class NiqqudFilter extends TokenFilter
@@ -30,10 +30,10 @@ public final class NiqqudFilter extends TokenFilter
 	public NiqqudFilter(TokenStream input)
 	{
 		super(input);
-		termAtt = (TermAttribute)addAttribute(TermAttribute.class);
+		termAtt = (CharTermAttribute)addAttribute(CharTermAttribute.class);
 	}
 
-	private TermAttribute termAtt;
+	private CharTermAttribute termAtt;
 
 	@Override
 	public final boolean incrementToken() throws IOException
@@ -46,8 +46,8 @@ public final class NiqqudFilter extends TokenFilter
 
 		// TODO: Limit this check to Hebrew Tokens only
 
-		char[] buffer = termAtt.termBuffer();
-		int length = termAtt.termLength(), j = 0;
+		char[] buffer = termAtt.buffer();
+		int length = termAtt.length(), j = 0;
 		for (int i = 0; i < length; i++)
 		{
 			if ((buffer[i] < 1455) || (buffer[i] > 1476)) // current position is not a Niqqud character
@@ -55,7 +55,7 @@ public final class NiqqudFilter extends TokenFilter
 				buffer[j++] = buffer[i];
 			}
 		}
-		termAtt.setTermLength(j);
+		termAtt.setLength(j);
 		return true;
 	}
 }

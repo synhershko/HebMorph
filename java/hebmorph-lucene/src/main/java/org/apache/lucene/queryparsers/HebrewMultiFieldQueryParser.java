@@ -2,9 +2,9 @@ package org.apache.lucene.queryparsers;
 
 import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -33,7 +33,7 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser
         super(matchVersion, fields, analyzer);
     }
 
-    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer, Map boosts)
+    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer, Map<String, Float> boosts)
     {
         super(matchVersion, fields, analyzer, boosts);
     }
