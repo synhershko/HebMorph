@@ -18,8 +18,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -34,11 +32,9 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class BasicHebrewTest extends TestBase {
 	private Analyzer analyzer;
@@ -57,7 +53,7 @@ public class BasicHebrewTest extends TestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		analyzer = new MorphAnalyzer(Version.LUCENE_40, getDictionary(), null);
+		analyzer = new MorphAnalyzer(Version.LUCENE_41, getDictionary(), null);
 	}
 
 	@After
@@ -127,7 +123,7 @@ public class BasicHebrewTest extends TestBase {
 	{
 		final Directory d = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_41, analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 		IndexWriter writer = new IndexWriter(d, config);
 		Document doc = new Document();
@@ -136,7 +132,7 @@ public class BasicHebrewTest extends TestBase {
 		writer.close();
 
 		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(d));
-		QueryParser qp = new QueryParser(Version.LUCENE_40, "content", analyzer);
+		QueryParser qp = new QueryParser(Version.LUCENE_41, "content", analyzer);
 		Query query = qp.parse(whatToSearch);
 		ScoreDoc[] hits = searcher.search(query, null, 1000).scoreDocs;
 
