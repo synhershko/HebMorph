@@ -279,14 +279,15 @@ public class Tokenizer {
 
         // Store token's actual length in source (regardless of misc normalizations)
         if (dataLen <= 0)
-            tokenLengthInSource = inputOffset - tokenOffset;
-        else
-            tokenLengthInSource = inputOffset + ioBufferIndex - 1 - tokenOffset;
+            tokenLengthInSource = Math.max(inputOffset - tokenOffset, 0);
+        else {
+            tokenLengthInSource = Math.max(inputOffset + ioBufferIndex - 1 - tokenOffset, 0);
+        }
 
 		if (isOfChars(wordBuffer[length - 1], Gershayim))
 		{
 			wordBuffer[--length] = '\0';
-            tokenLengthInSource--; // Don't include Gershayim in the offset calculation
+            tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
 		}
 		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
 		if ((length > 2) && isOfChars(wordBuffer[length - 1], Geresh))
@@ -295,7 +296,7 @@ public class Tokenizer {
 			if (!isOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
 			{
 				wordBuffer[--length] = '\0';
-                tokenLengthInSource--; // Don't include this Geresh in the offset calculation
+                tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
 			}
 			// TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
 			// TODO: Handle ה (Hashem)
