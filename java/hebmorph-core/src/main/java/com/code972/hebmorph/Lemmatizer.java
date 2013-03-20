@@ -103,6 +103,7 @@ public class Lemmatizer
 
 	public List<HebrewToken> lemmatize(final String word) {
 		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md = null;
@@ -197,11 +198,14 @@ public class Lemmatizer
 		return ret;
 	}
 
-	public List<HebrewToken> lemmatizeTolerant(String word)
-	{
-		// TODO: Verify word to be non-empty and contain Hebrew characters?
-
+	public List<HebrewToken> lemmatizeTolerant(final String word) {
 		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+
+        // Don't try tolerating long words. Longest Hebrew word is 19 chars long
+        // http://en.wikipedia.org/wiki/Longest_words#Hebrew
+        if (word.length() > 20) {
+            return ret;
+        }
 
 		byte prefLen = 0;
 		Integer prefixMask;
