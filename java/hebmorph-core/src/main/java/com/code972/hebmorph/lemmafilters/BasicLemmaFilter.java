@@ -32,12 +32,14 @@ import java.util.List;
 public class BasicLemmaFilter extends LemmaFilterBase {
 
 	@Override
-	public List<Token> filterCollection(final List<Token> collection, final List<Token> preallocatedOut) {
+	public List<Token> filterCollection(final String word, final List<Token> collection, final List<Token> preallocatedOut) {
 		if (collection.size() > 1) {
-			return super.filterCollection(collection, preallocatedOut);
-		} else {
-			return null;
+            final List<Token> ret = super.filterCollection(word, collection, preallocatedOut);
+            if (ret != null && ret.size() > 0) {
+                return ret;
+            }
 		}
+        return null;
 	}
 
 	@Override

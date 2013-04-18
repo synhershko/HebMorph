@@ -158,7 +158,7 @@ public class StreamLemmasFilter extends Tokenizer
         // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
 
 		// Do some filtering if requested...
-		if (lemmaFilter != null && lemmaFilter.filterCollection(stack, filterCache) != null) {
+		if (lemmaFilter != null && lemmaFilter.filterCollection(word, stack, filterCache) != null) {
 			stack.clear();
 			stack.addAll(filterCache);
 		}

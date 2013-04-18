@@ -19,23 +19,15 @@
 package com.code972.hebmorph.lemmafilters;
 
 import com.code972.hebmorph.Token;
-import java.util.ArrayList;
+
 import java.util.List;
 
 
 public abstract class LemmaFilterBase {
-	public List<Token> filterCollection(final List<Token> collection) {
-		return filterCollection(collection, null);
-	}
+	public List<Token> filterCollection(final String word, final List<Token> collection, final List<Token> preallocatedOut) {
+        preallocatedOut.clear();
 
-	public List<Token> filterCollection(final List<Token> collection, List<Token> preallocatedOut) {
-		if (preallocatedOut == null) {
-			preallocatedOut = new ArrayList<>();
-		} else {
-			preallocatedOut.clear();
-		}
-
-		for (Token t : collection) {
+		for (final Token t : collection) {
 			if (isValidToken(t)) {
 				preallocatedOut.add(t);
 			}
