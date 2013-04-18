@@ -1,16 +1,16 @@
 package com.code972.hebmorph;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.lucene.analysis.charfilter.BaseCharFilter;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.apache.lucene.analysis.charfilter.BaseCharFilter;
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TokenizerTest {
 
@@ -103,6 +103,7 @@ public class TokenizerTest {
         assertTokenizesTo("C++", "C");
         tokenizer.addSpecialCase("C++");
         assertTokenizesTo("C++", "C++");
+        assertTokenizesTo("c++", "c");
         assertTokenizesTo("C++x0", new String[] { "C", "x0" });
 
         assertTokenizesTo("B+++", "B");

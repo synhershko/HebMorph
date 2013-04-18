@@ -18,7 +18,12 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
+import com.code972.hebmorph.StreamLemmatizer;
+import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SuffixKeywordFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.TextField;
@@ -33,6 +38,12 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.junit.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -107,6 +118,35 @@ public class BasicHebrewTest extends TestBase {
 		assertFoundInText("1234", "1234"); // Numeric, should be stored as-is
 	}
 
+    @Test
+    public void testLemmatization() throws Exception {
+        analyzer = new testAnalyzer();
+        final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
+
+        Set<String> terms = new HashSet<>();
+        while (ts.incrementToken()) {
+            CharTermAttribute att = ts.getAttribute(CharTermAttribute.class);
+            terms.add(new String(att.buffer(), 0, att.length()));
+            System.out.println(new String(att.buffer(), 0, att.length()));
+        }
+    }
+
+    class testAnalyzer extends Analyzer {
+
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+            StreamLemmasFilter src = null;
+            try {
+                src = new StreamLemmasFilter(reader, new StreamLemmatizer(null, getDictionary(), false), null, new BasicLemmaFilter());
+                src.setAlwaysSaveMarkedOriginal(true);
+                src.setSuffixForExactMatch('$');
+            } catch (IOException e) {
+            }
+
+            TokenStream tok = new SuffixKeywordFilter(src, '$');
+            return new TokenStreamComponents(src, tok);
+        }
+    }
 
 	protected void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception
 	{
