@@ -128,15 +128,13 @@ namespace Lucene.Net.Analysis.Hebrew
                 if (tkn.IsNumeric)
                     typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric);
                 else
-                {
                     typeAtt.Type = HebrewTokenizer.TokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew);
-
-                    // Applying LowerCaseFilter for Non-Hebrew terms
-                    char[] buffer = termAtt.TermBuffer();
-                    int length = termAtt.TermLength();
-                    for (int i = 0; i < length; i++)
-                        buffer[i] = System.Char.ToLower(buffer[i]);
-                }
+                    
+                // Applying LowerCaseFilter for Non-Hebrew terms
+                char[] buffer = termAtt.TermBuffer();
+                int length = termAtt.TermLength();
+                for (int i = 0; i < length; i++)
+                    buffer[i] = System.Char.ToLower(buffer[i]);
 
                 stack.Clear();
                 return true;
