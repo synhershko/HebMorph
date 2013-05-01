@@ -128,32 +128,33 @@ public class StreamLemmasFilter extends Tokenizer
             keywordAtt.setKeyword(true);
         }
 
-		// A non-Hebrew word
-		if (stack.size() == 1 && !(stack.get(0) instanceof HebrewToken)) {
-            termAtt.copyBuffer(word.toCharArray(), 0, word.length());
+        // A non-Hebrew word
+        if (stack.size() == 1 && !(stack.get(0) instanceof HebrewToken)) {
+                termAtt.copyBuffer(word.toCharArray(), 0, word.length());
 
-			final Token tkn = stack.get(0);
-			if (tkn.isNumeric()) {
-				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
-			} else {
-				typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
-                keywordAtt.setKeyword(true);
-
-				// Applying LowerCaseFilter for Non-Hebrew terms
-				char[] buffer = termAtt.buffer();
-				int length = termAtt.length();
+                final Token tkn = stack.get(0);
+                if (tkn.isNumeric()) {
+                        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
+                } else {
+                        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
+                        keywordAtt.setKeyword(true);
+                }
+			
+                // Applying LowerCaseFilter for Non-Hebrew terms
+                char[] buffer = termAtt.buffer();
+                int length = termAtt.length();
                 for (int i = 0; i < length;) {
                     i += Character.toChars(
                             Character.toLowerCase(
                                     charUtils.codePointAt(buffer, i)), buffer, i);
                 }
-			}
 
-			stack.clear();
-			return true;
-		}
 
-		// If we arrived here, we hit a Hebrew word
+                stack.clear();
+                return true;
+        }
+
+        // If we arrived here, we hit a Hebrew word
         typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
         // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
 
