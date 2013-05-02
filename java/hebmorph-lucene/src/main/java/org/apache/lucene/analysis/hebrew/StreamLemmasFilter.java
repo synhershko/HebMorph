@@ -130,28 +130,20 @@ public class StreamLemmasFilter extends Tokenizer
 
         // A non-Hebrew word
         if (stack.size() == 1 && !(stack.get(0) instanceof HebrewToken)) {
-                termAtt.copyBuffer(word.toCharArray(), 0, word.length());
+            termAtt.copyBuffer(word.toCharArray(), 0, word.length());
 
-                final Token tkn = stack.get(0);
-                if (tkn.isNumeric()) {
-                        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
-                } else {
-                        typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
-                        keywordAtt.setKeyword(true);
-                }
-			
-                // Applying LowerCaseFilter for Non-Hebrew terms
-                char[] buffer = termAtt.buffer();
-                int length = termAtt.length();
-                for (int i = 0; i < length;) {
-                    i += Character.toChars(
-                            Character.toLowerCase(
-                                    charUtils.codePointAt(buffer, i)), buffer, i);
-                }
+            final Token tkn = stack.get(0);
+            if (tkn.isNumeric()) {
+                typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
+            } else {
+                typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
+                keywordAtt.setKeyword(true);
+            }
 
+            applyLowercaseFilter();
 
-                stack.clear();
-                return true;
+            stack.clear();
+            return true;
         }
 
         // If we arrived here, we hit a Hebrew word
@@ -167,6 +159,9 @@ public class StreamLemmasFilter extends Tokenizer
 		// OOV case -- for now store word as-is and return true
 		if (stack.isEmpty()) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
+
+            applyLowercaseFilter();
+
             keywordAtt.setKeyword(true);
 			return true;
 		}
@@ -198,7 +193,17 @@ public class StreamLemmasFilter extends Tokenizer
 		return true;
 	}
 
-	protected void createHebrewToken(HebrewToken hebToken) {
+    private void applyLowercaseFilter() {
+        char[] buffer = termAtt.buffer();
+        int length = termAtt.length();
+        for (int i = 0; i < length;) {
+            i += Character.toChars(
+                    Character.toLowerCase(
+                            charUtils.codePointAt(buffer, i)), buffer, i);
+        }
+    }
+
+    protected void createHebrewToken(HebrewToken hebToken) {
         String tokenVal = hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma();
 		termAtt.copyBuffer(tokenVal.toCharArray(), 0, tokenVal.length());
 	}
