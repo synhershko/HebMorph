@@ -75,7 +75,7 @@ public class TokenizerTest {
         assertTokenizesTo("בדיקה-שניה", new String[] {"בדיקה", "שניה"});
         assertTokenizesTo("בדיקה\u05BEשניה", new String[] {"בדיקה", "שניה"});
 
-        assertTokenizesTo("(\"דייט בחשיכה\",פרק 5)", new String[] {"דייט", "בחשיכה", "פרק", "5"});
+        assertTokenizesTo(" (\"דייט בחשיכה\",פרק 5) ", new String[] {"דייט", "בחשיכה", "פרק", "5"});
 
         assertTokenizesTo("בדיקה\"", "בדיקה");
 
@@ -88,6 +88,7 @@ public class TokenizerTest {
 
         assertTokenizesTo("שלומי999", "שלומי999");
         assertTokenizesTo("שלומיabc", "שלומיabc");
+        assertTokenizesTo("אימג’בנק", "אימג'בנק");
 
         assertTokenizesTo("בלונים$", "בלונים", Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact);
         assertTokenizesTo("test$", "test", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Exact );

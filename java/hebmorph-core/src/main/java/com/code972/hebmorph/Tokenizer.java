@@ -38,7 +38,7 @@ public class Tokenizer {
         public static int Custom = 128;
 	}
 
-	public static final char[] Geresh = { '\'', '\u05F3' };
+	public static final char[] Geresh = { '\'', '\u05F3', '’' };
 	public static final char[] Gershayim = { '\"', '\u05F4' };
     public static final char[] Makaf = { '-', '\u05BE' };
 	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
@@ -214,6 +214,7 @@ public class Tokenizer {
                         tokenType |= TokenType.Mixed;
                     appendCurrentChar = true;
                 } else if (isOfChars(c, Gershayim)) {
+                    c = '"';
                     // Tokenize if previous char wasn't part of a word
                     if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1]))
                         break;
@@ -222,6 +223,7 @@ public class Tokenizer {
                     tokenType |= TokenType.Acronym;
                     appendCurrentChar = true;
                 } else if (isOfChars(c, Geresh)) {
+                    c = '\'';
                     // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
                     if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
                             && !isOfChars(wordBuffer[length - 1], Geresh))
@@ -237,6 +239,7 @@ public class Tokenizer {
                     // Flag makaf connected words as constructs
                     if (isOfChars(c, Makaf)) {
                         tokenType |= TokenType.Construct;
+                        c = '-';
                         // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
                     } else if (suffixForExactMatch != null && suffixForExactMatch.equals(c)) {
                         tokenType |= TokenType.Exact;
