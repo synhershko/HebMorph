@@ -40,7 +40,7 @@ public class Tokenizer {
 
 	public static final char[] Geresh = { '\'', '\u05F3' };
 	public static final char[] Gershayim = { '\"', '\u05F4' };
-    public static final char[] Makaf = { '-' };
+    public static final char[] Makaf = { '-', '\u05BE' };
 	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
 	public static final char[] LettersAcceptingGeresh = { 'ז', 'ג', 'ץ', 'צ', 'ח' };
 
@@ -78,7 +78,7 @@ public class Tokenizer {
     }
 	public static boolean isNiqqudChar(char c)
 	{
-		return ((c >= 1455) && (c <= 1476));
+		return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BC' || c == '\u05BC');
 	}
 
 	private Reader input;

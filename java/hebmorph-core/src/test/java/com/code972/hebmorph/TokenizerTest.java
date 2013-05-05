@@ -73,6 +73,9 @@ public class TokenizerTest {
         assertTokenizesTo("בדיקה,שניה", new String[] {"בדיקה", "שניה"});
         assertTokenizesTo("בדיקה+שניה", new String[] {"בדיקה", "שניה"});
         assertTokenizesTo("בדיקה-שניה", new String[] {"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה\u05BEשניה", new String[] {"בדיקה", "שניה"});
+
+        assertTokenizesTo("(\"דייט בחשיכה\",פרק 5)", new String[] {"דייט", "בחשיכה", "פרק", "5"});
 
         assertTokenizesTo("בדיקה\"", "בדיקה");
 
