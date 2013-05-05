@@ -103,6 +103,28 @@ public class StreamLemmatizer extends Lemmatizer {
                     break; // report this as an OOV, will force treating as Exact
                 }
 
+                // Strip Hebrew prefixes for mixed words, only if the word itself is a Non-Hebrew word
+                // Useful for English company names or numbers that have Hebrew prefixes stuck to them without
+                // proper separation
+                if ((tokenType & Tokenizer.TokenType.Mixed) > 0) {
+                    int curChar = 0, startOfNonHebrew;
+                    while (curChar < nextToken.ref.length() && Tokenizer.isHebrewLetter(nextToken.ref.charAt(curChar))) {
+                        curChar++;
+                    }
+                    if (curChar > 0 && curChar < nextToken.ref.length() - 1 && isLegalPrefix(nextToken.ref.substring(0, curChar))) {
+                        startOfNonHebrew = curChar;
+                        while (curChar < nextToken.ref.length() && !Tokenizer.isHebrewLetter(nextToken.ref.charAt(curChar))) {
+                            curChar++;
+                        }
+                        if (curChar == nextToken.ref.length()) {
+                            nextToken.ref = nextToken.ref.substring(startOfNonHebrew,  nextToken.ref.length());
+                            tokenType = Tokenizer.TokenType.NonHebrew;
+                            retTokens.add(new Token(nextToken.ref));
+                            break;
+                        }
+                    }
+                }
+
 				// This second case is a bit more complex. We take a risk of splitting a valid acronym or
 				// abbrevated word into two, so we send it to an external function to analyze the word, and
 				// get a possibly corrected word. Examples for words we expect to simplify by this operation

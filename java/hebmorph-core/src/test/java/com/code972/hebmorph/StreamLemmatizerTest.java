@@ -69,6 +69,39 @@ public class StreamLemmatizerTest extends TestBase
         results.clear();
     }
 
+    @Test
+    public void testAutoStripMixed() throws IOException {
+        Reference<String> token = new Reference<String>("");
+        List<Token> results = new ArrayList<Token>();
+
+        testAutoStripMixedImpl("בcellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
+        testAutoStripMixedImpl("והcellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
+        testAutoStripMixedImpl("תחcellcom", "תחcellcom", Tokenizer.TokenType.Mixed | Tokenizer.TokenType.Hebrew);
+        testAutoStripMixedImpl("הcellcomג", "הcellcomג", Tokenizer.TokenType.Mixed | Tokenizer.TokenType.Hebrew);
+        testAutoStripMixedImpl("cellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
+    }
+
+    private void testAutoStripMixedImpl(String word, String expected, int expectedType) throws IOException {
+        Reference<String> token = new Reference<String>("");
+        List<Token> results = new ArrayList<Token>();
+
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , true);
+        int tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(expectedType, tokenType);
+        assertEquals(expected, token.ref);
+
+        sl = new StreamLemmatizer(new StringReader(word + " בדיקה"), getDictionary() , true);
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(expectedType, tokenType);
+        assertEquals(expected, token.ref);
+
+        sl = new StreamLemmatizer(new StringReader("בדיקה " + word), getDictionary() , true);
+        sl.getLemmatizeNextToken(token, results);
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(expectedType, tokenType);
+        assertEquals(expected, token.ref);
+    }
+
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to
     // provide (a TODO in its own), and lastly based on custom lists.
     // We cannot just remove all HebrewToken.Mask == 0, since this can also mean private names and such...

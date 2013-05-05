@@ -210,7 +210,8 @@ public class Tokenizer {
                 } else if (isHebrewLetter(c) || isNiqqudChar(c)) {
                     appendCurrentChar = true;
                 } else if (Character.isLetterOrDigit(c)) {
-                    // TODO
+                    if (tokenType == TokenType.Hebrew)
+                        tokenType |= TokenType.Mixed;
                     appendCurrentChar = true;
                 } else if (isOfChars(c, Gershayim)) {
                     // Tokenize if previous char wasn't part of a word
