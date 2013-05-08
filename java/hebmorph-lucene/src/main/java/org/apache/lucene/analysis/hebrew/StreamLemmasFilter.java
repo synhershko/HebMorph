@@ -23,18 +23,15 @@ import com.code972.hebmorph.Reference;
 import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.Token;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.*;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.CharacterUtils;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StreamLemmasFilter extends Tokenizer
 {
@@ -73,7 +70,7 @@ public class StreamLemmasFilter extends Tokenizer
         _streamLemmatizer.reset(input);
         this.lemmaFilter = lemmaFilter;
 
-        charUtils = CharacterUtils.getInstance(Version.LUCENE_40);
+        charUtils = CharacterUtils.getInstance(Version.LUCENE_42);
     }
 
     public void setSuffixForExactMatch(Character c){
@@ -137,7 +134,6 @@ public class StreamLemmasFilter extends Tokenizer
                 typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric));
             } else {
                 typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew));
-                keywordAtt.setKeyword(true);
             }
 
             applyLowercaseFilter();
@@ -156,13 +152,16 @@ public class StreamLemmasFilter extends Tokenizer
 			stack.addAll(filterCache);
 		}
 
-		// OOV case -- for now store word as-is and return true
+		// OOV case - store the word as-is, and also output a suffixed version of it
 		if (stack.isEmpty()) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
-
-            applyLowercaseFilter();
-
+            if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Mixed) > 0) {
+                typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed));
+                applyLowercaseFilter();
+                return true;
+            }
             keywordAtt.setKeyword(true);
+            stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
 			return true;
 		}
 

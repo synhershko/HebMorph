@@ -68,6 +68,7 @@ public final class HebrewTokenizer extends Tokenizer
 		public static final int Numeric = 2;
 		public static final int Construct = 3;
 		public static final int Acronym = 4;
+        public static final int Mixed = 5;
 	}
 
 	public static final String[] TOKEN_TYPE_SIGNATURES = new String[] {
@@ -76,6 +77,7 @@ public final class HebrewTokenizer extends Tokenizer
 		"<NUM>",
 		"<CONSTRUCT>",
 		"<ACRONYM>",
+        "<MIXED>",
 		null
 	};
 
