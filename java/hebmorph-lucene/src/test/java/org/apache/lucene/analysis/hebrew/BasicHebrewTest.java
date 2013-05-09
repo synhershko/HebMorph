@@ -64,7 +64,7 @@ public class BasicHebrewTest extends TestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		analyzer = new MorphAnalyzer(Version.LUCENE_41, getDictionary(), null);
+		analyzer = new MorphAnalyzer(Version.LUCENE_43, getDictionary(), null);
 	}
 
 	@After
@@ -172,7 +172,7 @@ public class BasicHebrewTest extends TestBase {
 		writer.close();
 
 		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(d));
-		QueryParser qp = new QueryParser(Version.LUCENE_41, "content", analyzer);
+		QueryParser qp = new QueryParser(Version.LUCENE_43, "content", analyzer);
 		Query query = qp.parse(whatToSearch);
 		ScoreDoc[] hits = searcher.search(query, null, 1000).scoreDocs;
 

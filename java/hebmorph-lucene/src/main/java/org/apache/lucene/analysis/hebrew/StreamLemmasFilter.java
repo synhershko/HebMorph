@@ -70,7 +70,7 @@ public class StreamLemmasFilter extends Tokenizer
         _streamLemmatizer.reset(input);
         this.lemmaFilter = lemmaFilter;
 
-        charUtils = CharacterUtils.getInstance(Version.LUCENE_42);
+        charUtils = CharacterUtils.getInstance(Version.LUCENE_43);
     }
 
     public void setSuffixForExactMatch(Character c){
