@@ -85,7 +85,7 @@ public class StreamLemmatizerTest extends TestBase
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , true);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , false);
         int tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(expectedType, tokenType);
         assertEquals(expected, token.ref);
@@ -107,13 +107,31 @@ public class StreamLemmatizerTest extends TestBase
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("בדיקה$"), getDictionary() , true);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("בדיקה$"), getDictionary() , false);
         sl.setSuffixForExactMatch('$');
         int tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
         assertEquals("בדיקה", token.ref);
         assertEquals(0, sl.getLemmatizeNextToken(token, results));
     }
+
+    @Test
+    public void testPreservesAcronyms() throws IOException {
+        Reference<String> token = new Reference<>("");
+        List<Token> results = new ArrayList<>();
+
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(), false);
+        int tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
+        assertEquals("מב\"ל", token.ref);
+
+        sl = new StreamLemmatizer(new StringReader("ה\"מכונית"), getDictionary(), false);
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Hebrew, tokenType);
+        assertEquals("מכונית", token.ref);
+    }
+
+
 
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to
     // provide (a TODO in its own), and lastly based on custom lists.
