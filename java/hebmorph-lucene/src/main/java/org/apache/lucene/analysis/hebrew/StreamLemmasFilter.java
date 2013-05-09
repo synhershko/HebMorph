@@ -155,12 +155,16 @@ public class StreamLemmasFilter extends Tokenizer
 		// OOV case - store the word as-is, and also output a suffixed version of it
 		if (stack.isEmpty()) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
+            keywordAtt.setKeyword(true);
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Mixed) > 0) {
                 typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed));
                 applyLowercaseFilter();
                 return true;
             }
-            keywordAtt.setKeyword(true);
+            if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
+                applyLowercaseFilter();
+                return true;
+            }
             stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
 			return true;
 		}

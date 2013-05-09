@@ -102,6 +102,19 @@ public class StreamLemmatizerTest extends TestBase
         assertEquals(expected, token.ref);
     }
 
+    @Test
+    public void testRespectsExactOperator() throws IOException {
+        Reference<String> token = new Reference<String>("");
+        List<Token> results = new ArrayList<Token>();
+
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("בדיקה$"), getDictionary() , true);
+        sl.setSuffixForExactMatch('$');
+        int tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
+        assertEquals("בדיקה", token.ref);
+        assertEquals(0, sl.getLemmatizeNextToken(token, results));
+    }
+
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to
     // provide (a TODO in its own), and lastly based on custom lists.
     // We cannot just remove all HebrewToken.Mask == 0, since this can also mean private names and such...
