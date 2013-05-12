@@ -125,6 +125,12 @@ public class StreamLemmatizerTest extends TestBase
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("מב\"ל", token.ref);
 
+        sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(), false);
+        sl.setSuffixForExactMatch('$');
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
+        assertEquals("מב\"ל", token.ref);
+
         sl = new StreamLemmatizer(new StringReader("ה\"מכונית"), getDictionary(), false);
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew, tokenType);

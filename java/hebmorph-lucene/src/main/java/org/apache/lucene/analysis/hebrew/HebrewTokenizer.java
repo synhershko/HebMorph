@@ -193,7 +193,7 @@ public final class HebrewTokenizer extends Tokenizer
 
 		int firstQuote = word.indexOf('"');
 
-		if (firstQuote > -1)
+		if (firstQuote > -1 && firstQuote < word.length() - 2)
 		{
 			if (isLegalPrefix(word.substring(0, firstQuote)))
 			{
