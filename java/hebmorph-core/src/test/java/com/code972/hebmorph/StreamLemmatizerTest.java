@@ -113,6 +113,24 @@ public class StreamLemmatizerTest extends TestBase
         assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
         assertEquals("בדיקה", token.ref);
         assertEquals(0, sl.getLemmatizeNextToken(token, results));
+
+        sl = new StreamLemmatizer(new StringReader("בדיקות$"), getDictionary() , false);
+        sl.setSuffixForExactMatch('$');
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
+        assertEquals("בדיקות", token.ref);
+        assertEquals(0, sl.getLemmatizeNextToken(token, results));
+
+        sl = new StreamLemmatizer(new StringReader("\"בין$ תחומי$\""), getDictionary() , false);
+        sl.setSuffixForExactMatch('$');
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
+        assertEquals("בין", token.ref);
+        tokenType = sl.getLemmatizeNextToken(token, results);
+        assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
+        assertEquals("תחומי", token.ref);
+
+        assertEquals(0, sl.getLemmatizeNextToken(token, results));
     }
 
     @Test
