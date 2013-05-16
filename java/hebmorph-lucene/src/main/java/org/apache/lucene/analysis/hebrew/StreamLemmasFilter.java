@@ -112,17 +112,23 @@ public class StreamLemmasFilter extends Tokenizer
 		// Store the location of the word in the original stream
 		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
 
-        // Mark request for exact matches in queries, if configured in the tokenizer
-        if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
-            keywordAtt.setKeyword(true);
-        }
-
         final String word = tempRefObject.ref;
         if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
             typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
+            keywordAtt.setKeyword(true);
             stack.clear();
+
+            if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) == 0) {
+                stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
+            }
+
             return true;
+        }
+
+        // Mark request for exact matches in queries, if configured in the tokenizer
+        if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
+            keywordAtt.setKeyword(true);
         }
 
         // A non-Hebrew word
