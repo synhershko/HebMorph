@@ -78,7 +78,7 @@ public class Tokenizer {
     }
 	public static boolean isNiqqudChar(char c)
 	{
-		return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BC' || c == '\u05BC');
+		return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BB' || c == '\u05BC');
 	}
 
 	private Reader input;
