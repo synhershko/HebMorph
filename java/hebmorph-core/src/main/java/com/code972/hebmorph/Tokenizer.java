@@ -130,7 +130,7 @@ public class Tokenizer {
 
     public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
         this.input = input;
-        this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>();
+        this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>(false);
     }
 
     private boolean isRecognizedException(final String prefix) {
@@ -144,7 +144,7 @@ public class Tokenizer {
 
 	// Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
 	// This is a job for a normalizer, anyway
-	public int nextToken(Reference<String> tokenString) throws IOException {
+	public int nextToken(final Reference<String> tokenString) throws IOException {
 		byte length = 0;
         tokenOffset = 0; // invalidate
 		int tokenType = 0;

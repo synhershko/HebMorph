@@ -234,9 +234,16 @@ public class DictRadix<T> implements Iterable<T>
     public boolean getAllowValueOverride() { return m_bAllowValueOverride; }
     public void setAllowValueOverride(boolean val) { m_bAllowValueOverride = val; }
 
+    private final boolean caseSensitiveKeys;
+
 	public DictRadix() {
-		m_root = new DictNode();
+		this(true);
 	}
+
+    public DictRadix(boolean caseSensitiveKeys) {
+        m_root = new DictNode();
+        this.caseSensitiveKeys = caseSensitiveKeys;
+    }
 
     public T lookup(final String key) {
         return lookup(key.toCharArray(), false);
@@ -272,7 +279,9 @@ public class DictRadix<T> implements Iterable<T>
 
 				// Do key matching
 				n = 0;
-				while ((n < childKey.length) && (keyPos < keyLength) && (childKey[n] == key[keyPos])) {
+				while ((n < childKey.length) && (keyPos < keyLength) &&
+                        ((childKey[n] == key[keyPos]) || (!caseSensitiveKeys && childKey[n] == Character.toLowerCase(key[keyPos]))))
+                {
 					keyPos++;
 					n++;
 				}
@@ -292,7 +301,7 @@ public class DictRadix<T> implements Iterable<T>
                     return null;
                 }
 				else if ((n > 0) || (childPos + 1 == cur.getChildren().length)) { // We looked at all the node's children -  Incomplete match to child's key (worths nothing)
-                    throw new IllegalArgumentException("key could not be found: " + new String(key));
+                    throw new IllegalArgumentException("key could not be found: " + new String(key) + ", case sensitivity: " + caseSensitiveKeys);
 				}
 			}
 		}
@@ -357,13 +366,19 @@ public class DictRadix<T> implements Iterable<T>
 		return i;
 	}
 
-	public void addNode(String key, T data)
-	{
+	public void addNode(final String key, final T data) {
 		addNode(key.toCharArray(), data);
 	}
 
-	public void addNode(char[] key, T data)
-	{
+	public void addNode(final char[] key, final T data) {
+        // Support case insensitive lookups if requested - this will collapse
+        // same keys with the different case into one, overriding values
+        if (!caseSensitiveKeys) {
+            for (int i = 0; i < key.length; i++) {
+                key[i] = Character.toLowerCase(key[i]);
+            }
+        }
+
 		// Since key might be a buffer array which is longer than the actual word in it, we can't
 		// just use key.Length
 		int keyLength = getCharArrayLength(key);
