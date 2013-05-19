@@ -254,11 +254,11 @@ public class DictRadix<T> implements Iterable<T>
 	}
 
     public T lookup(final char[] key, final boolean allowPartial) throws IllegalArgumentException {
-        return lookup(key, getCharArrayLength(key), allowPartial);
+        return lookup(key, 0, getCharArrayLength(key), allowPartial);
     }
 
-    public T lookup(final char[] key, final int keyLength, final boolean allowPartial) throws IllegalArgumentException {
-        final DictNode dn = lookupImpl(key, keyLength, allowPartial);
+    public T lookup(final char[] key, final int keyPos, final int keyLength, final boolean allowPartial) throws IllegalArgumentException {
+        final DictNode dn = lookupImpl(key, keyPos, keyLength, allowPartial);
         if (dn == null)
             return null;
 
@@ -271,8 +271,8 @@ public class DictRadix<T> implements Iterable<T>
 	 @param key
 	 @return
 	*/
-	private final DictNode lookupImpl(final char[] key, final int keyLength, final boolean allowPartial) {
-        int keyPos = 0, n;
+	private final DictNode lookupImpl(final char[] key, int keyPos, final int keyLength, final boolean allowPartial) {
+        int n;
 
 		DictNode cur = m_root;
 		while ((cur != null) && (cur.getChildren() != null)) {

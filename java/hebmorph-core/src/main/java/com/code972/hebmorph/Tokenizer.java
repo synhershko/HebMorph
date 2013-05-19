@@ -24,7 +24,6 @@ import com.code972.hebmorph.hspell.LingInfo;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
 
 public class Tokenizer {
 
@@ -122,7 +121,7 @@ public class Tokenizer {
 
     public static boolean isLegalPrefix(final char[] prefix, int length, final DictRadix<Integer> prefixesTree) {
         try {
-            prefixesTree.lookup(prefix, length, false);
+            prefixesTree.lookup(prefix, 0, length, false);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -162,15 +161,8 @@ public class Tokenizer {
             i++;
         }
 
-        if (i > 0) {
-            char[] tmp = Arrays.copyOf(prefix, length - i);
-            System.arraycopy(prefix, i, tmp, 0, length - i);
-            prefix = tmp;
-            length = (byte)(length - i);
-        }
-
         try {
-            specialCases.lookup(prefix, length, true);
+            specialCases.lookup(prefix, i, length, true);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
