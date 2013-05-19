@@ -253,13 +253,17 @@ public class DictRadix<T> implements Iterable<T>
 		return lookup(key.toCharArray(), allowPartial);
 	}
 
-	public T lookup(final char[] key, final boolean allowPartial) throws IllegalArgumentException {
-		final DictNode dn = lookupImpl(key, allowPartial);
-		if (dn == null)
-			return null;
+    public T lookup(final char[] key, final boolean allowPartial) throws IllegalArgumentException {
+        return lookup(key, getCharArrayLength(key), allowPartial);
+    }
 
-		return dn.getValue();
-	}
+    public T lookup(final char[] key, final int keyLength, final boolean allowPartial) throws IllegalArgumentException {
+        final DictNode dn = lookupImpl(key, keyLength, allowPartial);
+        if (dn == null)
+            return null;
+
+        return dn.getValue();
+    }
 
 	/**
 	 Simple, efficient method for exact lookup in the radix
@@ -267,8 +271,7 @@ public class DictRadix<T> implements Iterable<T>
 	 @param key
 	 @return
 	*/
-	private final DictNode lookupImpl(final char[] key, final boolean allowPartial) {
-		final int keyLength = getCharArrayLength(key);
+	private final DictNode lookupImpl(final char[] key, final int keyLength, final boolean allowPartial) {
         int keyPos = 0, n;
 
 		DictNode cur = m_root;

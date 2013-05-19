@@ -98,6 +98,7 @@ public class TokenizerTest {
         assertTokenizesTo("צה\"ל", "צה\"ל");
         assertTokenizesTo("צה''ל", "צה\"ל");
         assertTokenizesTo("צה\u05F3\u05F3ל", "צה\"ל");
+        assertTokenizesTo("צה\u201Cל", "צה\"ל");
     }
 
     @Test
@@ -107,7 +108,8 @@ public class TokenizerTest {
         assertTokenizesTo("C++", "C");
         tokenizer.addSpecialCase("C++");
         assertTokenizesTo("C++", "C++");
-        assertTokenizesTo("c++", "c");
+        assertTokenizesTo("c++", "c++");
+        assertTokenizesTo("בC++", "בC++");
         assertTokenizesTo("C++x0", new String[] { "C", "x0" });
 
         assertTokenizesTo("B+++", "B");

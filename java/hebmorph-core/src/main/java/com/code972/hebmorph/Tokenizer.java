@@ -20,6 +20,7 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants;
+import com.code972.hebmorph.hspell.LingInfo;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -112,10 +113,20 @@ public class Tokenizer {
         this.suffixForExactMatch = suffixForExactMatch;
     }
 
+    private final DictRadix<Integer> hebrewPrefixes;
     private final DictRadix<Byte> specialCases;
     private static final Byte dummyData = new Byte((byte)0);
     public void addSpecialCase(final String token) {
         specialCases.addNode(token, dummyData);
+    }
+
+    public static boolean isLegalPrefix(final char[] prefix, int length, final DictRadix<Integer> prefixesTree) {
+        try {
+            prefixesTree.lookup(prefix, length, false);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private static final int IO_BUFFER_SIZE = 4096;
@@ -131,11 +142,35 @@ public class Tokenizer {
     public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
         this.input = input;
         this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>(false);
+        hebrewPrefixes = LingInfo.buildPrefixTree(false);
     }
 
-    private boolean isRecognizedException(final String prefix) {
+    private boolean isRecognizedException(char[] prefix, byte length, char c) {
+        char[] tmp = new char[length + 1];
+        System.arraycopy(prefix, 0, tmp, 0, length);
+        tmp[length] = c;
+        return isRecognizedException(tmp, (byte)(length + 1));
+    }
+
+    private boolean isRecognizedException(char[] prefix, byte length) {
+        int i = 0;
+        while (isHebrewLetter(prefix[i])) {
+            if (i >= prefix.length || !isLegalPrefix(prefix, i + 1, hebrewPrefixes)) {
+                i = 0;
+                break;
+            }
+            i++;
+        }
+
+        if (i > 0) {
+            char[] tmp = Arrays.copyOf(prefix, length - i);
+            System.arraycopy(prefix, i, tmp, 0, length - i);
+            prefix = tmp;
+            length = (byte)(length - i);
+        }
+
         try {
-            specialCases.lookup(prefix, true);
+            specialCases.lookup(prefix, length, true);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -157,12 +192,7 @@ public class Tokenizer {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
 					if (length > 0) {
                         if ((tokenType & TokenType.Custom) > 0) {
-                            Byte b = null;
-                            try {
-                                b = specialCases.lookup(Arrays.copyOf(wordBuffer, length), true);
-                            } catch (IllegalArgumentException e) {
-                            }
-                            if (b == null) {
+                            if (!isRecognizedException(wordBuffer, length)) {
                                 tokenString.ref = "";
                                 tokenLengthInSource = 0;
                                 tokenOffset = inputOffset;
@@ -199,8 +229,8 @@ public class Tokenizer {
                 // Everything else will be ignored
             } else { // we should consume every letter or digit, and tokenize on everything else
                 if ((tokenType & TokenType.Custom) > 0) {
-                    final String s = new String(wordBuffer, 0, length) + c;
-                    if (!isRecognizedException(s)) {
+                    wordBuffer[length] = c;
+                    if (!isRecognizedException(wordBuffer, (byte)(length + 1))) {
                         tokenType &= ~TokenType.Custom;
                         length = startedDoingCustomToken;
                         ioBufferIndex--;
@@ -231,7 +261,7 @@ public class Tokenizer {
 
                     // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
                     appendCurrentChar = true;
-                } else if (isRecognizedException(new String(wordBuffer, 0, length) + c)) {
+                } else if (isRecognizedException(wordBuffer, length, c)) {
                     startedDoingCustomToken = length;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
@@ -254,7 +284,7 @@ public class Tokenizer {
                 // Consume normally
                 if (length == 0) { // mark the start of a new token
                     tokenOffset = inputOffset + ioBufferIndex - 1;
-                } else if (length == wordBuffer.length) { // clip lengthy tokens
+                } else if (length == wordBuffer.length - 1) { // clip lengthy tokens
                     continue;
                 }
                 // Note that tokens larger than 128 chars will get clipped.
@@ -310,7 +340,7 @@ public class Tokenizer {
 		return tokenType;
 	}
 
-	public final void reset(Reader _input) {
+    public final void reset(Reader _input) {
 		input = _input;
 		inputOffset = 0;
 		dataLen = 0;
