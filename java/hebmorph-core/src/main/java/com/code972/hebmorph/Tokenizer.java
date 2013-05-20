@@ -162,7 +162,7 @@ public class Tokenizer {
         }
 
         try {
-            specialCases.lookup(prefix, i, length, true);
+            specialCases.lookup(prefix, i, length - i, true);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -220,7 +220,7 @@ public class Tokenizer {
                 }
                 // Everything else will be ignored
             } else { // we should consume every letter or digit, and tokenize on everything else
-                if ((tokenType & TokenType.Custom) > 0) {
+                if ((tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
                     wordBuffer[length] = c;
                     if (!isRecognizedException(wordBuffer, (byte)(length + 1))) {
                         tokenType &= ~TokenType.Custom;
@@ -253,7 +253,7 @@ public class Tokenizer {
 
                     // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
                     appendCurrentChar = true;
-                } else if (isRecognizedException(wordBuffer, length, c)) {
+                } else if (!Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
                     startedDoingCustomToken = length;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;

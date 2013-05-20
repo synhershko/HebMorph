@@ -1,5 +1,6 @@
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.datastructures.DictRadix;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -79,27 +80,37 @@ public class StreamLemmatizerTest extends TestBase
         testAutoStripMixedImpl("תחcellcom", "תחcellcom", Tokenizer.TokenType.Mixed | Tokenizer.TokenType.Hebrew);
         testAutoStripMixedImpl("הcellcomג", "הcellcomג", Tokenizer.TokenType.Mixed | Tokenizer.TokenType.Hebrew);
         testAutoStripMixedImpl("cellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
+
+        DictRadix<Byte> specialTokenizationCases = new DictRadix<>(false);
+        specialTokenizationCases.addNode("C++", new Byte((byte)0));
+        testAutoStripMixedImpl("בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
+        testAutoStripMixedImpl("בc++ ", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
+        testAutoStripMixedImpl(" בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
     }
 
     private void testAutoStripMixedImpl(String word, String expected, int expectedType) throws IOException {
+        testAutoStripMixedImpl(word, expected, expectedType, null);
+    }
+
+    private void testAutoStripMixedImpl(String word, String expected, int expectedType, DictRadix<Byte> specialTokenizationCases) throws IOException {
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , false);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , false, specialTokenizationCases);
         int tokenType = sl.getLemmatizeNextToken(token, results);
-        assertEquals(expectedType, tokenType);
         assertEquals(expected, token.ref);
+        assertEquals(expectedType, tokenType);
 
-        sl = new StreamLemmatizer(new StringReader(word + " בדיקה"), getDictionary() , true);
+        sl = new StreamLemmatizer(new StringReader(word + " בדיקה"), getDictionary() , true, specialTokenizationCases);
         tokenType = sl.getLemmatizeNextToken(token, results);
-        assertEquals(expectedType, tokenType);
         assertEquals(expected, token.ref);
+        assertEquals(expectedType, tokenType);
 
-        sl = new StreamLemmatizer(new StringReader("בדיקה " + word), getDictionary() , true);
+        sl = new StreamLemmatizer(new StringReader("בדיקה " + word), getDictionary() , true, specialTokenizationCases);
         sl.getLemmatizeNextToken(token, results);
         tokenType = sl.getLemmatizeNextToken(token, results);
-        assertEquals(expectedType, tokenType);
         assertEquals(expected, token.ref);
+        assertEquals(expectedType, tokenType);
     }
 
     @Test

@@ -106,11 +106,16 @@ public class TokenizerTest {
         tokenizesCorrectly();
 
         assertTokenizesTo("C++", "C");
+        assertTokenizesTo("C++ ", "C");
         tokenizer.addSpecialCase("C++");
-        assertTokenizesTo("C++", "C++");
-        assertTokenizesTo("c++", "c++");
+        assertTokenizesTo("C++", "C++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("c++", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("C++ ", "C++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("c++ ", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
         assertTokenizesTo("בC++", "בC++");
+        assertTokenizesTo("בC++ ", "בC++");
         assertTokenizesTo("C++x0", new String[] { "C", "x0" });
+        assertTokenizesTo("C++x0 ", new String[] { "C", "x0" });
 
         assertTokenizesTo("B+++", "B");
         tokenizer.addSpecialCase("B+++");
