@@ -304,7 +304,7 @@ public class DictRadix<T> implements Iterable<T>
                     return null;
                 }
 				else if ((n > 0) || (childPos + 1 == cur.getChildren().length)) { // We looked at all the node's children -  Incomplete match to child's key (worths nothing)
-                    throw new IllegalArgumentException("key could not be found: " + new String(key) + ", case sensitivity: " + caseSensitiveKeys);
+                    throw new IllegalArgumentException();
 				}
 			}
 		}
@@ -312,7 +312,7 @@ public class DictRadix<T> implements Iterable<T>
         if (allowPartial && keyLength == keyPos)
 		    return null;
 
-        throw new IllegalArgumentException("key could not be found: " + new String(key));
+        throw new IllegalArgumentException();
 	}
 
 	public class LookupResult
