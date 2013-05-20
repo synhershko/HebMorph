@@ -106,7 +106,7 @@ public class StreamLemmatizer extends Lemmatizer {
                 // Strip Hebrew prefixes for mixed words, only if the word itself is a Non-Hebrew word
                 // Useful for English company names or numbers that have Hebrew prefixes stuck to them without
                 // proper separation
-                if ((tokenType & Tokenizer.TokenType.Mixed) > 0) {
+                if ((tokenType & Tokenizer.TokenType.Mixed) > 0 || (tokenType & Tokenizer.TokenType.Custom) > 0) {
                     int curChar = 0, startOfNonHebrew;
                     while (curChar < nextToken.ref.length() && Tokenizer.isHebrewLetter(nextToken.ref.charAt(curChar))) {
                         curChar++;
