@@ -332,7 +332,7 @@ public class Tokenizer {
 		return tokenType;
 	}
 
-    public final void reset(Reader _input) {
+    public final void reset(final Reader _input) {
 		input = _input;
 		inputOffset = 0;
 		dataLen = 0;

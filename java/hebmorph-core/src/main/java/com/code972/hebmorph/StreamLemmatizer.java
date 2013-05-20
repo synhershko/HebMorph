@@ -47,6 +47,8 @@ public class StreamLemmatizer extends Lemmatizer {
 
 	public void reset(final Reader input) {
         _tokenizer.reset(input);
+        _startOffset = 0;
+        _endOffset = 0;
 	}
 
 	private int _startOffset, _endOffset;

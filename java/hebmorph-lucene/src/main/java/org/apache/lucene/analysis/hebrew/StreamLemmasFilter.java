@@ -226,7 +226,6 @@ public class StreamLemmasFilter extends Tokenizer
     
 	@Override
 	public void reset() throws IOException {
-		super.reset();
 		stack.clear();
         filterCache.clear();
         previousLemmas.clear();
