@@ -9,6 +9,7 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparsers.HebrewQueryParser;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -23,6 +24,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TermPositionVectorTest extends TestBase {
     Analyzer analyzer;
@@ -86,7 +90,7 @@ public class TermPositionVectorTest extends TestBase {
     private void runQuery(String query, int expectedPosition) throws ParseException, IOException
     {
         HebrewQueryParser hqp =
-            new HebrewQueryParser(Version.LUCENE_41, "Text", analyzer);
+            new HebrewQueryParser(Version.LUCENE_43, "Text", analyzer);
 
         Query q = hqp.parse(query);
 
@@ -97,13 +101,19 @@ public class TermPositionVectorTest extends TestBase {
         
         Set<Term> trms_list = new HashSet<Term>();
         q.extractTerms(trms_list);
+
         for (Term t : trms_list) {
         	TermsEnum termsEnum = terms.iterator(TermsEnum.EMPTY);
         	boolean isFound = termsEnum.seekExact(t.bytes(), false);
         	Assert.assertTrue(isFound);
-        	
-        	DocsAndPositionsEnum docsPosEnum = termsEnum.docsAndPositions(reader.getLiveDocs(), null);
-        	int pos = docsPosEnum.nextPosition();
+
+            DocsAndPositionsEnum dpEnum = termsEnum.docsAndPositions(null, null);
+            assertTrue(dpEnum.nextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+            int pos = dpEnum.nextPosition();
+            //assertEquals(expectedPosition, dpEnum.startOffset());
+            //assertEquals(??, dpEnum.endOffset());
+            assertEquals(DocIdSetIterator.NO_MORE_DOCS, dpEnum.nextDoc());
+
         	Assert.assertEquals(pos, expectedPosition);
         }
     }
