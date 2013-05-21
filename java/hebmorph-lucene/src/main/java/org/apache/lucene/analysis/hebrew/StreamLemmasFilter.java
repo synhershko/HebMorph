@@ -115,9 +115,16 @@ public class StreamLemmasFilter extends Tokenizer
         if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
             typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-            keywordAtt.setKeyword(true);
             stack.clear();
 
+            if (!keepOriginalWord) {
+                if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0) {
+                    keywordAtt.setKeyword(true);
+                }
+                return true;
+            }
+
+            keywordAtt.setKeyword(true);
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) == 0) {
                 stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
             }
