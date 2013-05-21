@@ -38,7 +38,7 @@ public class TermPositionVectorTest extends TestBase {
 	@Before
 	public void setUp() throws Exception {
 		fieldType = initFieldType();
-		analyzer = new MorphAnalyzer(Version.LUCENE_41, getDictionary(), null);
+		analyzer = new MorphAnalyzer(Version.LUCENE_43, getDictionary(), null);
 	}
 
 	@After
@@ -53,7 +53,7 @@ public class TermPositionVectorTest extends TestBase {
 	public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_41, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(indexDirectory, config);
 

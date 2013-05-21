@@ -40,7 +40,7 @@ public class MorphAnalyzer extends Analyzer {
 	*/
     private final CharArraySet commonWords;
 
-	private boolean alwaysSaveMarkedOriginal = false;
+	private boolean keepOriginalWord = false;
 
 	private LemmaFilterBase lemmaFilter;
 
@@ -102,7 +102,7 @@ public class MorphAnalyzer extends Analyzer {
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, commonWords, lemmaFilter);
-        src.setAlwaysSaveMarkedOriginal(alwaysSaveMarkedOriginal);
+        src.setKeepOriginalWord(keepOriginalWord);
         src.setSuffixForExactMatch(suffixForExactMatch);
 
         TokenStream tok = new SynonymFilter(src, acronymMergingMap, false);
@@ -136,8 +136,8 @@ public class MorphAnalyzer extends Analyzer {
      way, make sure to turn this on only while indexing, so searches don't get slower.
      Default is false to save some index space.
      */
-    public void setAlwaysSaveMarkedOriginal(boolean alwaysSaveMarkedOriginal) {
-        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
+    public void setKeepOriginalWord(boolean keepOriginalWord) {
+        this.keepOriginalWord = keepOriginalWord;
     }
 
     public static SynonymMap buildAcronymsMergingMap() throws IOException {

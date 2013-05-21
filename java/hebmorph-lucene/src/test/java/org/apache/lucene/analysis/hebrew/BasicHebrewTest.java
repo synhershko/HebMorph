@@ -138,7 +138,7 @@ public class BasicHebrewTest extends TestBase {
             StreamLemmasFilter src = null;
             try {
                 src = new StreamLemmasFilter(reader, new StreamLemmatizer(null, getDictionary(), false), null, new BasicLemmaFilter());
-                src.setAlwaysSaveMarkedOriginal(true);
+                src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {
             }
@@ -163,7 +163,7 @@ public class BasicHebrewTest extends TestBase {
 	{
 		final Directory d = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_41, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 		IndexWriter writer = new IndexWriter(d, config);
 		Document doc = new Document();

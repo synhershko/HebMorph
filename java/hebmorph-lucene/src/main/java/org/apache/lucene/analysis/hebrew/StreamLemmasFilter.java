@@ -46,15 +46,14 @@ public class StreamLemmasFilter extends Tokenizer
 
     private final CharacterUtils charUtils;
 
-	private boolean alwaysSaveMarkedOriginal;
 	private final LemmaFilterBase lemmaFilter;
-
 	private final List<Token> stack = new ArrayList<Token>();
 	private final List<Token> filterCache = new ArrayList<Token>();
 	private int index = 0;
     private final Set<String> previousLemmas = new HashSet<String>();
+    private boolean keepOriginalWord;
 
-	public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer) {
+    public StreamLemmasFilter(final Reader input, final StreamLemmatizer _lemmatizer) {
 		this(input, _lemmatizer, null);
 	}
 
@@ -161,7 +160,11 @@ public class StreamLemmasFilter extends Tokenizer
 		// OOV case - store the word as-is, and also output a suffixed version of it
 		if (stack.isEmpty()) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
-            keywordAtt.setKeyword(true);
+
+            if (keepOriginalWord) {
+                keywordAtt.setKeyword(true);
+            }
+
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Mixed) > 0) {
                 typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed));
                 applyLowercaseFilter();
@@ -171,33 +174,30 @@ public class StreamLemmasFilter extends Tokenizer
                 applyLowercaseFilter();
                 return true;
             }
-            stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
+
+            if (keepOriginalWord)
+                stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
+
 			return true;
 		}
 
-		// If only one lemma was returned for this word
-		if (stack.size() == 1) {
-			final HebrewToken hebToken = (HebrewToken)((stack.get(0) instanceof HebrewToken) ? stack.get(0) : null);
-
-			// Index the lemma alone if it exactly matches the word minus prefixes
-			if (!alwaysSaveMarkedOriginal && hebToken.getLemma().equals(word.substring(hebToken.getPrefixLength()))) {
-				createHebrewToken(hebToken);
-				stack.clear();
-				return true;
-			} else { // Otherwise, index the lemma plus the original word marked with a unique flag to increase precision
-				// DILEMMA: Does indexing word.Substring(hebToken.PrefixLength) + "$" make more or less sense?
-				// For now this is kept the way it is below to support duality of SimpleAnalyzer and MorphAnalyzer
-                termAtt.copyBuffer(word.toCharArray(), 0, word.length());
-                keywordAtt.setKeyword(true);
-			}
-		}
-
-		// More than one lemma exist. Mark and store the original term to increase precision, while all
-		// lemmas will be popped out of the stack and get stored at the next call to IncrementToken.
-		else {
+        // Mark and store the original term to increase precision, while all lemmas
+        // will be popped out of the stack and get stored at the next call to IncrementToken.
+        if (keepOriginalWord) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
             keywordAtt.setKeyword(true);
-		}
+            return true;
+        }
+
+        // If !keepOriginalWord
+        final HebrewToken hebToken = (HebrewToken)stack.get(0);
+        if (stack.size() == 1) { // only one lemma was found
+            stack.clear();
+        } else { // // more than one lemma exist.
+            index = 1;
+            previousLemmas.add(hebToken.getLemma());
+        }
+        createHebrewToken(hebToken);
 
 		return true;
 	}
@@ -233,7 +233,7 @@ public class StreamLemmasFilter extends Tokenizer
 		_streamLemmatizer.reset(input);
 	}
 
-    public void setAlwaysSaveMarkedOriginal(boolean alwaysSaveMarkedOriginal) {
-        this.alwaysSaveMarkedOriginal = alwaysSaveMarkedOriginal;
+    public void setKeepOriginalWord(boolean keepOriginalWord) {
+        this.keepOriginalWord = keepOriginalWord;
     }
 }

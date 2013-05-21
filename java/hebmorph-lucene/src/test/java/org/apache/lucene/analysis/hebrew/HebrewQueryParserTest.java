@@ -14,7 +14,7 @@ public class HebrewQueryParserTest
 {
     @Test
     public void ParsesAcronymsCorrectly() throws ParseException, IOException {
-        QueryParser qp = new HebrewQueryParser(Version.LUCENE_41, "f", new SimpleAnalyzer(Version.LUCENE_41));
+        QueryParser qp = new HebrewQueryParser(Version.LUCENE_43, "f", new SimpleAnalyzer(Version.LUCENE_43));
         qp.parse("צה\"ל");
         qp.parse("\"צהל\"");
         qp.parse("כל הכבוד לצה\"ל");
