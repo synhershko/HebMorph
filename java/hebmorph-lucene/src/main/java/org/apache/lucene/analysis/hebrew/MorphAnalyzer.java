@@ -19,12 +19,13 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
-import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.synonym.SynonymFilter;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SuffixKeywordFilter;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.synonym.SynonymMap;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.CharsRef;
@@ -44,27 +45,32 @@ public class MorphAnalyzer extends Analyzer {
 
 	private LemmaFilterBase lemmaFilter;
 
-	private final StreamLemmatizer hebMorphLemmatizer;
-    private final SynonymMap acronymMergingMap;
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
     private static final String DEFAULT_HSPELL_ENV_VARIABLE = "HSPELL_DATA_FILES_PATH";
     protected final Version matchVersion;
+    private final DictRadix<MorphData> dictRadix;
+    private final DictRadix<Integer> prefixes;
+    private DictRadix<Byte> specialTokenizationCases;
     private Character suffixForExactMatch;
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Byte> specialTokenizationCases,
                          final CharArraySet commonWords) throws IOException {
-        this(matchVersion, new StreamLemmatizer(null, dict, false, specialTokenizationCases), commonWords);
+        this(matchVersion, dict, LingInfo.buildPrefixTree(false), commonWords, specialTokenizationCases);
+    }
+
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes) throws IOException {
+        this(matchVersion, dict, prefixes, null, null);
     }
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
-        this(matchVersion, new StreamLemmatizer(null, dict, false), commonWords);
+        this(matchVersion, dict, LingInfo.buildPrefixTree(false), commonWords, null);
     }
 
     /**
      * Initializes using data files at the default location on the classpath.
      */
     public MorphAnalyzer(final Version version) throws IOException {
-        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH), null);
+        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH), null, null);
     }
 
     /**
@@ -92,23 +98,20 @@ public class MorphAnalyzer extends Analyzer {
         this(version, loadFromPath(hspellPath), commonWords);
     }
 
-    public MorphAnalyzer(final Version matchVersion, final StreamLemmatizer hml, final CharArraySet commonWords) throws IOException {
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes, final CharArraySet commonWords, final DictRadix<Byte> specialTokenizationCases) throws IOException {
         this.matchVersion = matchVersion;
-        hebMorphLemmatizer = hml;
-        acronymMergingMap = buildAcronymsMergingMap();
+        this.dictRadix = dictRadix;
+        this.prefixes = prefixes;
+        this.specialTokenizationCases = specialTokenizationCases;
         this.commonWords = commonWords;
     }
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, commonWords, lemmaFilter);
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixes, specialTokenizationCases, commonWords, lemmaFilter);
         src.setKeepOriginalWord(keepOriginalWord);
         src.setSuffixForExactMatch(suffixForExactMatch);
-
-        TokenStream tok = new SynonymFilter(src, acronymMergingMap, false);
-        if (commonWords != null && commonWords.size() > 0)
-            tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
-        tok = new SuffixKeywordFilter(tok, '$');
+        TokenStream tok = new SuffixKeywordFilter(src, '$');
         return new TokenStreamComponents(src, tok) {
             @Override
             protected void setReader(final Reader reader) throws IOException {

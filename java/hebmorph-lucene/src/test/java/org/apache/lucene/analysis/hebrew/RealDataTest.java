@@ -1,11 +1,10 @@
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.StreamLemmatizer;
+import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SuffixKeywordFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.Term;
@@ -14,6 +13,7 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.Version;
 import org.junit.Test;
 
 import java.io.File;
@@ -39,22 +39,25 @@ import static org.junit.Assert.fail;
  */
 public class RealDataTest extends TestBase {
     public static class TestSimpleHebrewAnalyzer extends Analyzer {
-        private final StreamLemmatizer hebMorphLemmatizer;
+        private final DictRadix<MorphData> dictRadix;
+        private final DictRadix<Integer> prefixes;
+        private final DictRadix<Byte> specialTokenizationCases;
         private final CharArraySet commonWords;
 
-        public TestSimpleHebrewAnalyzer(final StreamLemmatizer hml, final CharArraySet commonWords) throws IOException {
-            this.hebMorphLemmatizer = hml;
+        public TestSimpleHebrewAnalyzer(final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes,
+                                        final DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords) throws IOException {
+            this.dictRadix = dictRadix;
+            this.prefixes = prefixes;
+            this.specialTokenizationCases = specialTokenizationCases;
             this.commonWords = commonWords;
         }
 
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final StreamLemmasFilter src = new StreamLemmasFilter(reader, hebMorphLemmatizer, commonWords, new BasicLemmaFilter());
+            final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixes, specialTokenizationCases, commonWords, new BasicLemmaFilter());
             src.setKeepOriginalWord(true);
 
-            TokenStream tok = new ASCIIFoldingFilter(src);
-            tok = new SuffixKeywordFilter(tok, '$');
-            return new TokenStreamComponents(src, tok) {
+            return new TokenStreamComponents(src) {
                 @Override
                 protected void setReader(final Reader reader) throws IOException {
                     super.setReader(reader);
@@ -65,7 +68,7 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(new StreamLemmatizer(null, getDictionary(), false), null);
+        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
         System.out.println("Dictionary initialized");
 
         final HashSet<String> results = performSearch(a);
@@ -80,8 +83,8 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testMultiThreaded() throws IOException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(new StreamLemmatizer(null, getDictionary(), false), null);
-        //final Analyzer a = new StandardAnalyzer(Version.LUCENE_43);
+        //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
+        final Analyzer a = new MorphAnalyzer(Version.LUCENE_43, getDictionary(), LingInfo.buildPrefixTree(false));
         System.out.println("Dictionary initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);
@@ -100,8 +103,8 @@ public class RealDataTest extends TestBase {
                             System.out.println("Go " + tmp.size() + " results, expected " + results.size());
                             fail("Go " + tmp.size() + " results, expected " + results.size());
                         }
-                    } catch (IOException e) {
-                        System.out.println(e.getMessage());
+                    } catch (Throwable e) {
+                        e.printStackTrace();
                         fail(e.getMessage());
                     }
                     counter.decrementAndGet();
@@ -109,12 +112,12 @@ public class RealDataTest extends TestBase {
                 }
             });
         }
+        executorService.shutdown();
         try {
-            executorService.awaitTermination(1, TimeUnit.MINUTES);
+            executorService.awaitTermination(15, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             fail();
         }
-        executorService.shutdown();
         if (counter.intValue() != 0) fail("Not all threads finished in the allotted time");
     }
 
