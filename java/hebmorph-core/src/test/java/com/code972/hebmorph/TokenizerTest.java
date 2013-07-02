@@ -53,6 +53,8 @@ public class TokenizerTest {
     public void tokenizesCorrectly() throws IOException {
         // NonHebrew
         assertTokenizesTo("test", "test");
+        assertTokenizesTo("test's", "test's");
+        assertTokenizesTo("tests'", "tests");
         assertTokenizesTo("test123", "test123");
         assertTokenizesTo("test two", new String[] { "test", "two" });
 
@@ -99,6 +101,13 @@ public class TokenizerTest {
         assertTokenizesTo("צה''ל", "צה\"ל");
         assertTokenizesTo("צה\u05F3\u05F3ל", "צה\"ל");
         assertTokenizesTo("צה\u201Cל", "צה\"ל");
+
+        // Geresh
+        assertTokenizesTo("ד'אור", "ד'אור");
+        assertTokenizesTo("אורנג'", "אורנג'");
+        assertTokenizesTo("אורנג\u05F3", "אורנג'");
+        assertTokenizesTo("אורנג' שלום",  new String[] {"אורנג'", "שלום"});
+        assertTokenizesTo("סמית'", "סמית");
     }
 
     @Test

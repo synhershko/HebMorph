@@ -247,11 +247,14 @@ public class Tokenizer {
                 } else if (isOfChars(c, Geresh)) {
                     c = '\'';
                     // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
-                    if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
-                            && !isOfChars(wordBuffer[length - 1], Geresh))
-                        break;
+                    // and only do this for Hebrew tokens
+                    if ((tokenType & TokenType.Hebrew) > 0) {
+                        // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
+                        if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
+                                && !isOfChars(wordBuffer[length - 1], Geresh))
+                            break;
+                    }
 
-                    // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
                     appendCurrentChar = true;
                 } else if (!Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
                     startedDoingCustomToken = length;
@@ -316,10 +319,10 @@ public class Tokenizer {
             tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
 		}
 		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-		if ((length > 2) && isOfChars(wordBuffer[length - 1], Geresh))
+		if ((length > 2) && wordBuffer[length - 1] == '\'')
 		{
 			// All letters which this Geresh may mean something for
-			if (!isOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
+			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
 			{
 				wordBuffer[--length] = '\0';
                 tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
