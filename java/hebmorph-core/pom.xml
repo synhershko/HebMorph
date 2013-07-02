@@ -22,7 +22,27 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>hebmorph-core</name>
+  <description>Tools for tokenization and lemmatization of Hebrew texts. Part of the HebMorph project, for making Hebrew properly searchable</description>
   <url>http://code972.com/</url>
+  <licenses>
+      <license>
+          <name>Affero GPL3</name>
+          <url>http://www.gnu.org/licenses/agpl.html</url>
+          <distribution>repo</distribution>
+          <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of works, specifically designed to ensure cooperation with the community in the case of network server software.</comments>
+      </license>
+  </licenses>
+    <developers>
+        <developer>
+            <id>synhershko</id>
+            <name>Itamar Syn-Hershko</name>
+            <url>http://code972.com</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>git@github.com:synhershko/HebMorph.git</connection>
+        <url>https://github.com/synhershko/HebMorph</url>
+    </scm>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
