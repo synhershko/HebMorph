@@ -109,7 +109,7 @@ public class TokenizerTest {
         assertTokenizesTo("אורנג' שלום",  new String[] {"אורנג'", "שלום"});
         assertTokenizesTo("סמית'", "סמית");
 
-        assertTokenizesTo("ומש\"א$", "ומש\"א$");
+        assertTokenizesTo("ומש\"א$", "ומש\"א");
     }
 
     @Test
