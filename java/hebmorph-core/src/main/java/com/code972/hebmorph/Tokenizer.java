@@ -256,7 +256,7 @@ public class Tokenizer {
                     }
 
                     appendCurrentChar = true;
-                } else if (c != suffixForExactMatch && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
+                } else if (!isSffixForExactMath(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
                     startedDoingCustomToken = length;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
@@ -334,6 +334,12 @@ public class Tokenizer {
 		tokenString.ref = new String(wordBuffer, 0, length);
 		return tokenType;
 	}
+
+    private boolean isSffixForExactMath(char c) {
+        if (suffixForExactMatch == null)
+            return false;
+        return c == suffixForExactMatch;
+    }
 
     public final void reset(final Reader _input) {
 		input = _input;
