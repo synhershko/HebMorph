@@ -256,7 +256,7 @@ public class Tokenizer {
                     }
 
                     appendCurrentChar = true;
-                } else if (!Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
+                } else if (c != suffixForExactMatch && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
                     startedDoingCustomToken = length;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;

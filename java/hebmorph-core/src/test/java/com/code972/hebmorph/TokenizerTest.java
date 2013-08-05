@@ -108,6 +108,8 @@ public class TokenizerTest {
         assertTokenizesTo("אורנג\u05F3", "אורנג'");
         assertTokenizesTo("אורנג' שלום",  new String[] {"אורנג'", "שלום"});
         assertTokenizesTo("סמית'", "סמית");
+
+        assertTokenizesTo("ומש\"א$", "ומש\"א$");
     }
 
     @Test
