@@ -72,7 +72,7 @@ public class RealDataTest extends TestBase {
         System.out.println("Dictionary initialized");
 
         final HashSet<String> results = performSearch(a);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 10; i++) {
             HashSet<String> tmp = performSearch(a);
             if (results.size() != tmp.size()) {
                 fail("Go " + tmp.size() + " results, expected " + results.size());
@@ -90,7 +90,7 @@ public class RealDataTest extends TestBase {
         final ExecutorService executorService = Executors.newFixedThreadPool(16);
         final HashSet<String> results = performSearch(a);
         final AtomicInteger counter = new AtomicInteger(0);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 10; i++) {
             final int threadId = i;
             executorService.submit(new Runnable() {
                 @Override

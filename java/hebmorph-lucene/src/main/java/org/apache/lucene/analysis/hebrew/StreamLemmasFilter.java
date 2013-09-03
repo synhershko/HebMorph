@@ -212,13 +212,7 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
     private void applyLowercaseFilter() {
-        char[] buffer = termAtt.buffer();
-        int length = termAtt.length();
-        for (int i = 0; i < length;) {
-            i += Character.toChars(
-                    Character.toLowerCase(
-                            charUtils.codePointAt(buffer, i)), buffer, i);
-        }
+        charUtils.toLowerCase(termAtt.buffer(), 0, termAtt.length());
     }
 
     protected void createHebrewToken(HebrewToken hebToken) {
