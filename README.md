@@ -16,7 +16,7 @@ More details at http://code972.com/HebMorph
 	<tbody>
 		<tr>
 			<td>1.2.0-SNAPSHOT (master)</td>
-			<td>4.5.0</td>
+			<td>4.5.x</td>
 			<td>0.90.6 -> master</td>
 			<td>(not yet released)</td>
 		</tr>
