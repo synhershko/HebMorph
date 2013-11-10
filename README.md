@@ -15,10 +15,10 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
-			<td>1.2.0-SNAPSHOT (master)</td>
+			<td>1.2.0</td>
 			<td>4.5.x</td>
-			<td>0.90.6 -> master</td>
-			<td>(not yet released)</td>
+			<td>0.90.6</td>
+			<td>10/11/2013</td>
 		</tr>
     <tr>
 			<td>1.1.0</td>
