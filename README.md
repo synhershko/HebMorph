@@ -61,6 +61,10 @@ Direct reference to hebmorph-core is only needed if you need to use internal Heb
         </dependency>
 ```
 
+## Lucene.NET compatibility
+
+The .NET version of the library is compatible with Lucene.NET version 3.0.3, but has some known bugs that were fixed in the Java version and haven't been ported back yet.
+
 ## License
 
 HebMorph is copyright (C) 2010-2013, Itamar Syn-Hershko.
