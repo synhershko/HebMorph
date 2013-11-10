@@ -1,0 +1,8 @@
+On both hebmorph-core and hebmorph-lucene (until it aches enough I'll test this with the parent pom):
+
+mvn release:clean &&  mvn release:prepare
+mvn release:perform
+
+See 8a. Release It in https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+You can check the actual artifacts at https://oss.sonatype.org/content/groups/public/com/code972/hebmorph/
