@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>4.4.0</lucene.version>
+        <lucene.version>4.5.0</lucene.version>
     </properties>
 
   <parent>

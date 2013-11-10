@@ -33,28 +33,25 @@ public class TermPositionVectorTest extends TestBase {
     Analyzer analyzer;
     Directory indexDirectory;
     IndexSearcher searcher;
-    AtomicReader reader;
     FieldType fieldType;
 
 	@Before
 	public void setUp() throws Exception {
 		fieldType = initFieldType();
-		analyzer = new MorphAnalyzer(Version.LUCENE_43, getDictionary(), LingInfo.buildPrefixTree(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_45, getDictionary(), LingInfo.buildPrefixTree(false));
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		if (analyzer != null)
 			analyzer.close();
-		if (reader != null)
-			reader.close();
 	}
 
 	@Test
 	public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(indexDirectory, config);
 
@@ -65,8 +62,7 @@ public class TermPositionVectorTest extends TestBase {
         writer.addDocument(doc);
         writer.close();
 
-        reader = new SlowCompositeReaderWrapper( DirectoryReader.open(indexDirectory));
-        searcher = new IndexSearcher(reader);
+        searcher = new IndexSearcher(DirectoryReader.open(indexDirectory));
 
         runQuery("\"קשת\"", 0);
         runQuery("\"אינציקלופדיה\"", 8);
@@ -91,11 +87,11 @@ public class TermPositionVectorTest extends TestBase {
     private void runQuery(String query, int expectedPosition) throws ParseException, IOException
     {
         HebrewQueryParser hqp =
-            new HebrewQueryParser(Version.LUCENE_43, "Text", analyzer);
+            new HebrewQueryParser(Version.LUCENE_45, "Text", analyzer);
 
         Query q = hqp.parse(query);
 
-        TopDocs td = searcher.search(q, reader.maxDoc());
+        TopDocs td = searcher.search(q, searcher.getIndexReader().maxDoc());
 
         int num = td.scoreDocs[0].doc;
         Terms terms = searcher.getIndexReader().getTermVectors(num).terms("Text");
@@ -105,7 +101,7 @@ public class TermPositionVectorTest extends TestBase {
 
         for (Term t : trms_list) {
         	TermsEnum termsEnum = terms.iterator(TermsEnum.EMPTY);
-        	boolean isFound = termsEnum.seekExact(t.bytes(), false);
+        	boolean isFound = termsEnum.seekExact(t.bytes());
         	Assert.assertTrue(isFound);
 
             DocsAndPositionsEnum dpEnum = termsEnum.docsAndPositions(null, null);
