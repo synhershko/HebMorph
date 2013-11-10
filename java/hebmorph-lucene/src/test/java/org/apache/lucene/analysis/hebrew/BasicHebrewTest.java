@@ -107,9 +107,9 @@ public class BasicHebrewTest extends TestBase {
 		assertFoundInText("לתפילתנו", "תפילה");
 		assertFoundInText("תפילתנו", "לתפילתי");
 
-		//assertFoundInText("אחשוורוש", "אחשורוש"); // consonant vav tolerance
-		//assertFoundInText("לאחשוורוש", "אחשורוש"); // consonant vav tolerance + prefix
-		//assertFoundInText("אימא", "אמא"); // yud tolerance (yep, this is the correct spelling...)
+		assertFoundInText("אחשוורוש", "אחשורוש"); // consonant vav tolerance
+		assertFoundInText("לאחשוורוש", "אחשורוש"); // consonant vav tolerance + prefix
+		assertFoundInText("אימא", "אמא"); // yud tolerance (yep, this is the correct spelling...)
 		assertFoundInText("אמא", "אמא"); // double tolerance - both in indexing and QP
 
 		assertFoundInText("אצטרולב", "אצטרולב"); // OOV case, should be stored as-is
