@@ -25,7 +25,10 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 public final class Loader {
@@ -226,4 +229,91 @@ public final class Loader {
 		}
 		return ' ';
 	}
+
+    private final static Integer[] descFlags_noun;
+    private final static Integer[] descFlags_person_name;
+    private final static Integer[] descFlags_place_name;
+    private final static Integer[] descFlags_empty;
+    static {
+        descFlags_noun = new Integer[] { 69 };
+        descFlags_person_name = new Integer[] { 262145 };
+        descFlags_place_name = new Integer[] { 262153 };
+        descFlags_empty = new Integer[] { 0 };
+    }
+    private static DictRadix<MorphData> loadCustomWords(final Path customWordsFile, final DictRadix<MorphData> dictRadix) throws IOException {
+        final List<String> lines = Files.readAllLines(customWordsFile, Charset.forName("UTF-8"));
+
+        final Hashtable<String, String> secondPass = new Hashtable<>();
+        final DictRadix<MorphData> custom = new DictRadix<>();
+        for (final String line : lines) {
+            String[] cells = line.split(" ");
+            if (cells.length < 2)
+                continue;
+
+            MorphData md = null;
+            switch (cells[1]) {
+                case "שםעצם":
+                    md = new MorphData();
+                    md.setPrefixes((short) 63);
+                    md.setLemmas(new String[]{cells[0]});
+                    md.setDescFlags(descFlags_noun);
+                    break;
+                case "שםחברה":
+                case "שםפרטי":
+                    md = new MorphData();
+                    md.setPrefixes((short) 8);
+                    md.setLemmas(new String[]{cells[0]});
+                    md.setDescFlags(descFlags_person_name);
+                    break;
+                case "שםמקום":
+                    md = new MorphData();
+                    md.setPrefixes((short) 8);
+                    md.setLemmas(new String[]{cells[0]});
+                    md.setDescFlags(descFlags_place_name);
+                    break;
+                case "שםמדויק":
+                    md = new MorphData();
+                    md.setPrefixes((short) 0);
+                    md.setLemmas(new String[]{cells[0]});
+                    md.setDescFlags(descFlags_empty);
+                    break;
+            }
+
+            if (md == null) { // allow to associate new entries with other custom entries
+                try {
+                    md = custom.lookup(cells[1], false);
+                } catch (IllegalArgumentException ignored_ex) {
+                }
+            }
+
+            if (md == null) {
+                try {
+                    md = dictRadix.lookup(cells[1], false);
+                } catch (IllegalArgumentException ignored_ex) {
+                }
+            }
+
+            if (md != null) {
+                custom.addNode(cells[0], md);
+            } else {
+                secondPass.put(cells[0], cells[1]);
+            }
+        }
+
+        for (final Map.Entry<String, String> entry : secondPass.entrySet()) {
+            try {
+                custom.lookup(entry.getKey(), false);
+                continue; // we already stored this word somehow
+            } catch (IllegalArgumentException expected_ex) {
+            }
+
+            try {
+                final MorphData md = custom.lookup(entry.getValue(), false);
+                if (md != null) custom.addNode(entry.getKey(), md);
+            } catch (IllegalArgumentException ignored_ex) {
+            }
+        }
+
+        return custom;
+    }
 }
