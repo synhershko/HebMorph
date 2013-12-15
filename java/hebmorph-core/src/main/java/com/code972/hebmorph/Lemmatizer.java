@@ -253,6 +253,125 @@ public class Lemmatizer
         return ret;
 	}
 
+    public final WordType isRecognizedWord(final String word, final boolean tolerate) {
+        byte prefLen = 0;
+        Integer prefixMask;
+        MorphData md;
+
+        try {
+            if (customWords.lookup(word) != null) return WordType.CUSTOM;
+        } catch (IllegalArgumentException e) {
+        }
+
+        while (true) {
+            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+            if (word.length() - prefLen < 2)
+                break;
+
+            try {
+                prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+            } catch (IllegalArgumentException e) {
+                break;
+            }
+
+            try {
+                md = customWords.lookup(word.substring(prefLen));
+            } catch (IllegalArgumentException e) {
+                md = null;
+            }
+            if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
+                for (int result = 0; result < md.getLemmas().length; result++) {
+                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                        return WordType.CUSTOM_WITH_PREFIX;
+                    }
+                }
+            }
+        }
+
+        try {
+            if (m_dict.lookup(word) != null) return WordType.HEBREW;
+        } catch (IllegalArgumentException e) {
+        }
+
+        if (word.endsWith("'")) { // Try ommitting closing Geresh
+            try {
+                if (m_dict.lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        prefLen = 0;
+        while (true) {
+            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+            if (word.length() - prefLen < 2)
+                break;
+
+            try {
+                prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+            } catch (IllegalArgumentException e) {
+                break;
+            }
+
+            try {
+                md = m_dict.lookup(word.substring(prefLen));
+            } catch (IllegalArgumentException e) {
+                md = null;
+            }
+            if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
+                for (int result = 0; result < md.getLemmas().length; result++) {
+                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                        return WordType.HEBREW_WITH_PREFIX;
+                    }
+                }
+            }
+        }
+
+        if (tolerate) {
+            // Don't try tolerating long words. Longest Hebrew word is 19 chars long
+            // http://en.wikipedia.org/wiki/Longest_words#Hebrew
+            if (word.length() > 20) {
+                return WordType.UNRECOGNIZED;
+            }
+
+            List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+            if (tolerated != null && tolerated.size() > 0)
+            {
+                return WordType.HEBREW_TOLERATED;
+            }
+
+            prefLen = 0;
+            while (true)
+            {
+                // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+                if (word.length() - prefLen < 2)
+                    break;
+
+                try {
+                    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
+                } catch (IllegalArgumentException e) {
+                    break;
+                }
+
+                tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
+                if (tolerated != null)
+                {
+                    for (DictRadix<MorphData>.LookupResult lr : tolerated)
+                    {
+                        for (int result = 0; result < lr.getData().getLemmas().length; result++)
+                        {
+                            if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0)
+                            {
+                                return WordType.HEBREW_TOLERATED_WITH_PREFIX;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return WordType.UNRECOGNIZED;
+    }
+
     public DictRadix<MorphData> getCustomWords() {
         return customWords;
     }
