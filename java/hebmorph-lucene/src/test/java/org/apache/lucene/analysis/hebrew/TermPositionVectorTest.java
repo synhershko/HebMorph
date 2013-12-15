@@ -38,7 +38,7 @@ public class TermPositionVectorTest extends TestBase {
 	@Before
 	public void setUp() throws Exception {
 		fieldType = initFieldType();
-		analyzer = new MorphAnalyzer(Version.LUCENE_45, getDictionary(), LingInfo.buildPrefixTree(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LingInfo.buildPrefixTree(false));
 	}
 
 	@After
@@ -51,7 +51,7 @@ public class TermPositionVectorTest extends TestBase {
 	public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_45, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(indexDirectory, config);
 
@@ -87,7 +87,7 @@ public class TermPositionVectorTest extends TestBase {
     private void runQuery(String query, int expectedPosition) throws ParseException, IOException
     {
         HebrewQueryParser hqp =
-            new HebrewQueryParser(Version.LUCENE_45, "Text", analyzer);
+            new HebrewQueryParser(Version.LUCENE_46, "Text", analyzer);
 
         Query q = hqp.parse(query);
 

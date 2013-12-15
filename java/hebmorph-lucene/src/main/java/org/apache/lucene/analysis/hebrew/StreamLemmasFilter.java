@@ -71,7 +71,7 @@ public class StreamLemmasFilter extends Tokenizer
         _streamLemmatizer = new StreamLemmatizer(input, dictRadix, prefixes, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
-        charUtils = CharacterUtils.getInstance(Version.LUCENE_45);
+        charUtils = CharacterUtils.getInstance(Version.LUCENE_46);
     }
 
     public void setSuffixForExactMatch(Character c){
@@ -221,14 +221,16 @@ public class StreamLemmasFilter extends Tokenizer
 	}
 
     @Override
-    public final void end() {
+    public final void end() throws IOException {
         // set final offset
         int finalOffset = correctOffset(_streamLemmatizer.getEndOffset());
         offsetAtt.setOffset(finalOffset, finalOffset);
+        super.end();
     }
     
 	@Override
 	public void reset() throws IOException {
+        super.reset();
 		stack.clear();
         filterCache.clear();
         previousLemmas.clear();

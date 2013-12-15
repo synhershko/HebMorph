@@ -84,7 +84,7 @@ public class RealDataTest extends TestBase {
     @Test
     public void testMultiThreaded() throws IOException {
         //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        final Analyzer a = new MorphAnalyzer(Version.LUCENE_45, getDictionary(), LingInfo.buildPrefixTree(false));
+        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LingInfo.buildPrefixTree(false));
         System.out.println("Dictionary initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);
