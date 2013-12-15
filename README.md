@@ -15,9 +15,15 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
+			<td>1.3.0</td>
+			<td>4.6.0</td>
+			<td>0.90.8</td>
+			<td>(not yet released)</td>
+		</tr>	
+		<tr>
 			<td>1.2.0</td>
 			<td>4.5.x</td>
-			<td>0.90.6</td>
+			<td>0.90.6, 0.90.7</td>
 			<td>10/11/2013</td>
 		</tr>
     <tr>
