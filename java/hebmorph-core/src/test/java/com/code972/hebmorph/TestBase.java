@@ -32,7 +32,8 @@ public abstract class TestBase {
             if (hspellPath == null)
                 throw new IllegalArgumentException("path to hspell data folder couldn't be found");
 
-            dict = Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
+            Loader loader = new Loader(new File(hspellPath), true);
+            dict = loader.loadDictionaryFromHSpellData();
         }
         return dict; 
     }

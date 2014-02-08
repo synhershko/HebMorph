@@ -26,49 +26,76 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 public final class Loader {
+    protected List<String> dmasks;
+    protected final boolean loadMorphData;
+    private int lookupLen;
 
-    public static DictRadix<MorphData> loadDictionaryFromClasspath(String pathInClasspath, boolean bLoadMorphData) throws IOException {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        final URL url = cl.getResource(pathInClasspath);
-        if(url == null)
-            throw new FileNotFoundException("Cannot find '" + pathInClasspath + "' in classpath.");
-        return loadDictionaryFromHSpellData(new File(url.toString()), bLoadMorphData);
-    }
+    protected InputStream fdict, fprefixes;
+    protected InputStream fdesc = null, fstem = null;
 
-    public static int getWordCountInHSpellFolder(File path) throws IOException {
-        int tmp;
-        String sizes = Files.readAllLines(new File(path, Constants.sizesFile).toPath(), Charset.defaultCharset()).get(1);
-        tmp = sizes.indexOf(' ', sizes.indexOf('\n'));
-        tmp = Integer.parseInt(sizes.substring(tmp + 1).trim());
-        return tmp - 1; // hspell stores the actual word count + 1
-    }
+    public Loader(File hspellFolder, boolean loadMorphData) throws IOException {
+        this(new FileInputStream(new File(hspellFolder, Constants.sizesFile)), new FileInputStream(new File(hspellFolder, Constants.dmaskFile)),
+                new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)), new FileInputStream(new File(hspellFolder, Constants.prefixesFile)),
+                new FileInputStream(new File(hspellFolder, Constants.descFile)), new FileInputStream(new File(hspellFolder, Constants.stemsFile)), loadMorphData);
 
-    protected final List<String> dmasks;
-    protected Loader(File hspellFolder) throws IOException {
-        dmasks = Files.readAllLines(new File(hspellFolder, Constants.dmaskFile).toPath(), Charset.defaultCharset());
-        while (!dmasks.get(0).contains("dmasks[]"))
-            dmasks.remove(0);
-        dmasks.remove(0);
-    }
-	
-	public static DictRadix<MorphData> loadDictionaryFromHSpellData(final File hspellFolder, boolean loadMorphData) throws IOException {
         if (!hspellFolder.exists() || !hspellFolder.isDirectory())
             throw new IllegalArgumentException("Invalid hspell data folder provided");
+    }
+
+    /**
+     *
+     * @param classloader
+     * @param hspellFolder      resources folder in which the hspell data is in; must end with /
+     * @param loadMorphData
+     * @throws IOException
+     */
+    public Loader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
+        this(classloader.getResourceAsStream(hspellFolder + Constants.sizesFile), classloader.getResourceAsStream(hspellFolder + Constants.dmaskFile),
+                classloader.getResourceAsStream(hspellFolder + Constants.dictionaryFile), classloader.getResourceAsStream(hspellFolder + Constants.prefixesFile),
+                classloader.getResourceAsStream(hspellFolder + Constants.descFile), classloader.getResourceAsStream(hspellFolder + Constants.stemsFile), loadMorphData);
+    }
+
+    public Loader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
+        fdict = new GZIPInputStream(dictFile);
+        fprefixes = new GZIPInputStream(prefixesFile);
+        this.loadMorphData = loadMorphData;
+
+        if (loadMorphData) {
+            dmasks = new ArrayList<>();
+            boolean foundStartLine = false;
+            String line;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(dmasksFile));
+            while ((line = reader.readLine()) != null) {
+                if (!foundStartLine) {
+                    if (line.contains("dmasks[]")) {
+                        foundStartLine = true;
+                    }
+                    continue;
+                }
+                dmasks.add(line);
+            }
+            reader.close();
+
+            lookupLen = getWordCountInHSpellFolder(sizesFile);
+            fdesc = new GZIPInputStream(descFile);
+            fstem = new GZIPInputStream(stemsFile);
+        }
+    }
+	
+	public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
 
 		if (loadMorphData) {
             // Load the count of morphological data slots required
-            int lookupLen = getWordCountInHSpellFolder(hspellFolder);
 			final String lookup[] = new String[lookupLen + 1];
 
-            InputStream fdict = null;
             try {
-                fdict = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)));
                 final char[] sbuf = new char[Constants.MaxWordLength];
                 int c = 0, n, slen = 0, i = 0;
                 while ((c = fdict.read()) > -1) {
@@ -92,19 +119,13 @@ public final class Loader {
             }
 
             final DictRadix<MorphData> ret = new DictRadix<MorphData>();
-            InputStream fprefixes = null, fdesc = null, fstem = null;
             try {
-                fprefixes = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.prefixesFile)));
-                fdesc = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.descFile)));
-                fstem = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.stemsFile)));
-
-                final Loader loader = new Loader(hspellFolder);
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
-                    data.setDescFlags(loader.readDescFile(fdesc));
+                    data.setDescFlags(readDescFile(fdesc));
 
-                    final List<Integer> stemReferences = loader.readStemFile(fstem);
+                    final List<Integer> stemReferences = readStemFile(fstem);
                     final String[] lemmas = new String[stemReferences.size()];
                     int stemPosition = 0;
                     for (int r : stemReferences) {
@@ -132,9 +153,6 @@ public final class Loader {
 
             InputStream fprefixes = null, fdict = null;
             try {
-                fdict = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)));
-                fprefixes = new GZIPInputStream(new FileInputStream(new File(hspellFolder, Constants.prefixesFile)));
-
                 final char[] sbuf = new char[Constants.MaxWordLength];
                 int c = 0, n, slen = 0;
                 while ((c = fdict.read()) > -1) {
@@ -168,6 +186,22 @@ public final class Loader {
 			return ret;
 		}
 	}
+
+    public static int getWordCountInHSpellFolder(File path) throws IOException {
+        return getWordCountInHSpellFolder(new FileInputStream(new File(path, Constants.sizesFile)));
+    }
+
+    public static int getWordCountInHSpellFolder(InputStream inputStream) throws IOException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()));
+        reader.readLine();
+        final String sizes = reader.readLine();
+        reader.close();
+
+        int tmp;
+        tmp = sizes.indexOf(' ', sizes.indexOf('\n'));
+        tmp = Integer.parseInt(sizes.substring(tmp + 1).trim());
+        return tmp - 1; // hspell stores the actual word count + 1
+    }
 
     private int bufPos = 0;
     private final int[] buf = new int[5];
@@ -240,12 +274,15 @@ public final class Loader {
         descFlags_place_name = new Integer[] { 262153 };
         descFlags_empty = new Integer[] { 0 };
     }
-    private static DictRadix<MorphData> loadCustomWords(final Path customWordsFile, final DictRadix<MorphData> dictRadix) throws IOException {
-        final List<String> lines = Files.readAllLines(customWordsFile, Charset.forName("UTF-8"));
+    public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
+        if (customWordsStream == null)
+            return null;
 
+        final BufferedReader input = new BufferedReader(new InputStreamReader(customWordsStream, Charset.forName("UTF-8")));
         final Hashtable<String, String> secondPass = new Hashtable<>();
         final DictRadix<MorphData> custom = new DictRadix<>();
-        for (final String line : lines) {
+        String line;
+        while ((line = input.readLine()) != null) {
             String[] cells = line.split(" ");
             if (cells.length < 2)
                 continue;
