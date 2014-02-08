@@ -158,7 +158,8 @@ public class MorphAnalyzer extends Analyzer {
 
     static private DictRadix<MorphData> loadFromClasspath(final String pathInClasspath) {
         try {
-            return Loader.loadDictionaryFromClasspath(pathInClasspath, true);
+            Loader loader = new Loader(Thread.currentThread().getContextClassLoader(), pathInClasspath, true);
+            return loader.loadDictionaryFromHSpellData();
         } catch (IOException ex) {
        		try {
        			// Try to use environment variable if failed with classpath
@@ -171,7 +172,8 @@ public class MorphAnalyzer extends Analyzer {
 
     static private DictRadix<MorphData> loadFromPath(final File path) {
         try {
-            return Loader.loadDictionaryFromHSpellData(path, true);
+            Loader loader = new Loader(path, true);
+            return loader.loadDictionaryFromHSpellData();
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to read data", ex);
         }
@@ -183,6 +185,7 @@ public class MorphAnalyzer extends Analyzer {
        		throw new IllegalStateException("Failed to load hspell dictionary files. They should be configured " +
        				"in classpath or by " + DEFAULT_HSPELL_ENV_VARIABLE + " environment variable");
        	}
-       	return Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
+       	Loader loader = new Loader(new File(hspellPath), true);
+        return loader.loadDictionaryFromHSpellData();
     }
 }
