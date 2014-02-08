@@ -29,7 +29,7 @@ public class TestBase {
             if (hspellPath == null)
                 throw new IllegalArgumentException("path to hspell data folder couldn't be found");
 
-            dict = Loader.loadDictionaryFromHSpellData(new File(hspellPath), true);
+            dict = new Loader(new File(hspellPath), true).loadDictionaryFromHSpellData();
         }
         return dict;
     }
