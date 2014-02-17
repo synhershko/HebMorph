@@ -78,6 +78,10 @@ public class StreamLemmasFilter extends Tokenizer
         _streamLemmatizer.setSuffixForExactMatch(c);
     }
 
+    public void setCustomWords(DictRadix<MorphData> customWords) {
+        _streamLemmatizer.setCustomWords(customWords);
+    }
+
     private final Reference<String> tempRefObject = new Reference<>("");
 
 	@Override
