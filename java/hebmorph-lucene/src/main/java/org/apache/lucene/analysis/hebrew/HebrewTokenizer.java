@@ -163,8 +163,8 @@ public final class HebrewTokenizer extends Tokenizer
 	}
 
 	@Override
-	public void end()
-	{
+	public void end() throws IOException {
+        super.end();
 		// set final offset
 		int finalOffset = correctOffset(hebMorphTokenizer.getOffset());
 		offsetAtt.setOffset(finalOffset, finalOffset);
