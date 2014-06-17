@@ -226,10 +226,10 @@ public class StreamLemmasFilter extends Tokenizer
 
     @Override
     public final void end() throws IOException {
+        super.end();
         // set final offset
         int finalOffset = correctOffset(_streamLemmatizer.getEndOffset());
         offsetAtt.setOffset(finalOffset, finalOffset);
-        super.end();
     }
     
 	@Override

@@ -24,6 +24,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SuffixKeywordFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.TextField;
@@ -129,6 +130,17 @@ public class BasicHebrewTest extends TestBase {
             terms.add(new String(att.buffer(), 0, att.length()));
             System.out.println(new String(att.buffer(), 0, att.length()));
         }
+    }
+
+    @Test
+    public void testFinalOffset() throws Exception {
+        analyzer = new testAnalyzer();
+        final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
+        OffsetAttribute offsetAttribute = ts.addAttribute(OffsetAttribute.class);
+        while (ts.incrementToken()) {
+        }
+        ts.end();
+        assertEquals(5, offsetAttribute.endOffset());
     }
 
     class testAnalyzer extends Analyzer {
