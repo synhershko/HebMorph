@@ -16,8 +16,8 @@ More details at http://code972.com/HebMorph
 	<tbody>
 		<tr>
 			<td>1.3.x</td>
-			<td>4.6.0, 4.6.1</td>
-			<td>0.90.8 -> 0.90.11</td>
+			<td>4.6.x</td>
+			<td>0.90.8 -> 0.90.13</td>
 			<td>09/02/2014</td>
 		</tr>	
 		<tr>
