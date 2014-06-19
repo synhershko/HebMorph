@@ -170,6 +170,12 @@ public final class HebrewTokenizer extends Tokenizer
 		offsetAtt.setOffset(finalOffset, finalOffset);
 	}
 
+    @Override
+    public void close() throws IOException {
+        super.close();
+        hebMorphTokenizer.reset(input);
+    }
+
 	@Override
 	public void reset() throws IOException {
 		super.reset();
