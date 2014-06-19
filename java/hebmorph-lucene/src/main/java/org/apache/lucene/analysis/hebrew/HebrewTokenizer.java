@@ -54,7 +54,7 @@ public final class HebrewTokenizer extends Tokenizer
 
 	public HebrewTokenizer(final Reader _input, final DictRadix<Integer> _prefixesTree, final DictRadix<Byte> specialCases) {
         super(_input);
-		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(_input, specialCases);
+		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(input, specialCases);
 		prefixesTree = _prefixesTree;
 	}
 
