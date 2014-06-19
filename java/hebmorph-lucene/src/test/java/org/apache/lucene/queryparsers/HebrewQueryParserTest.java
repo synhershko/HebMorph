@@ -1,8 +1,8 @@
-package org.apache.lucene.analysis.hebrew;
+package org.apache.lucene.queryparsers;
 
+import org.apache.lucene.analysis.hebrew.SimpleAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.queryparsers.HebrewQueryParser;
 import org.apache.lucene.util.Version;
 import org.junit.Test;
 
