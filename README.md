@@ -2,6 +2,8 @@ HebMorph is an open-source effort for making Hebrew properly searchable by vario
 
 More details at http://code972.com/HebMorph
 
+![](https://travis-ci.org/synhershko/HebMorph.svg?branch=master)
+
 ## Lucene / Elasticsearch compatibility
 
 <table>
