@@ -66,8 +66,8 @@ public class StreamLemmasFilter extends Tokenizer
         this(input, dictRadix, prefixes, null, commonWords, lemmaFilter);
     }
 
-    public StreamLemmasFilter(Reader input, DictRadix<MorphData> dictRadix, DictRadix<Integer> prefixes, DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
-        super(input);
+    public StreamLemmasFilter(Reader _input, DictRadix<MorphData> dictRadix, DictRadix<Integer> prefixes, DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
+        super(_input);
         _streamLemmatizer = new StreamLemmatizer(input, dictRadix, prefixes, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
@@ -231,8 +231,14 @@ public class StreamLemmasFilter extends Tokenizer
         int finalOffset = correctOffset(_streamLemmatizer.getEndOffset());
         offsetAtt.setOffset(finalOffset, finalOffset);
     }
-    
-	@Override
+
+    @Override
+        public void close() throws IOException {
+            super.close();
+            _streamLemmatizer.reset(input);
+    }
+
+    @Override
 	public void reset() throws IOException {
         super.reset();
 		stack.clear();
