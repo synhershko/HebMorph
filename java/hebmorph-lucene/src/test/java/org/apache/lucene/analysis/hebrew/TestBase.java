@@ -3,11 +3,12 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Loader;
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
-public class TestBase {
+public class TestBase extends BaseTokenStreamTestCase {
     private static DictRadix<MorphData> dict;
 
     protected synchronized DictRadix<MorphData> getDictionary() throws IOException {

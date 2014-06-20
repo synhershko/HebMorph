@@ -1,22 +1,25 @@
 package org.apache.lucene.analysis.hebrew;
 
+import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
 /**
- * Created by synhershko on 19/06/14.
+ * Created by synhershko on 20/06/14.
  */
-public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
-
+public class TestStreamLemmasFilter extends TestBase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final HebrewTokenizer src = new HebrewTokenizer(reader);
+            Tokenizer src = null;
+            try {
+                src = new StreamLemmasFilter(reader, getDictionary(), LingInfo.buildPrefixTree(false));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return new Analyzer.TokenStreamComponents(src);
         }
     };
@@ -39,15 +42,5 @@ public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
         checkOneTerm(a, "צה''ל", "צה\"ל");
 
         checkAnalysisConsistency(random(), a, true, "בדיקה אחת שתיים", true);
-    }
-
-    public void testHyphen() throws Exception {
-        assertTokenStreamContents(tokenStream("some-dashed-phrase"),
-                new String[] { "some", "dashed", "phrase" });
-    }
-
-    TokenStream tokenStream(String text) throws IOException {
-        Reader reader = new StringReader(text);
-        return a.tokenStream("foo", reader);
     }
 }
