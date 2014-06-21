@@ -1,24 +1,23 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import com.carrotsearch.randomizedtesting.annotations.Seed;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Tokenizer;
 
 import java.io.IOException;
 import java.io.Reader;
 
 /**
- * Created by synhershko on 20/06/14.
+ * Created by synhershko on 22/06/14.
  */
-public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCase {
+public class TestStreamLemmasFilterWithOrigin extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            Tokenizer src = null;
+            StreamLemmasFilter src = null;
             try {
                 src = new StreamLemmasFilter(reader, getDictionary(), LingInfo.buildPrefixTree(false));
+                src.setKeepOriginalWord(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -31,23 +30,20 @@ public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCas
         checkRandomData(random(), a, 1000*RANDOM_MULTIPLIER);
     }
 
-    /** test stopwords and stemming */
+    /** test basic cases */
     @Repeat(iterations = 100)
     public void testBasics() throws IOException {
+
         checkOneTerm(a, "books", "books");
         checkOneTerm(a, "book", "book");
         checkOneTerm(a, "steven's", "steven's");
         checkOneTerm(a, "steven\u2019s", "steven's");
         //checkOneTerm(a, "steven\uFF07s", "steven's");
 
-        checkOneTerm(a, "בדיקה", "בדיקה");
-        checkOneTerm(a, "צה\"ל", "צה\"ל");
-        checkOneTerm(a, "צה''ל", "צה\"ל");
+        assertAnalyzesTo(a, "בדיקה", new String[]{"בדיקה", "בדיקה"}, new int[] {0, 0}, new int[]{5 ,5}, new int[]{1,0});
+        assertAnalyzesTo(a, "צה\"ל", new String[]{"צה\"ל", "צה\"ל"}, new int[]{0, 0}, new int[]{4, 4}, new int[]{1, 0});
+        assertAnalyzesTo(a, "צה''ל", new String[]{"צה\"ל", "צה\"ל"}, new int[]{0, 0}, new int[]{5, 5}, new int[]{1, 0});
 
         checkAnalysisConsistency(random(), a, true, "בדיקה אחת שתיים", true);
-    }
-
-    public void testLemmatization() throws IOException {
-        assertAnalyzesTo(a, "בדיקה", new String[]{"בדיקה"}, new int[] {0}, new int[]{5});
     }
 }
