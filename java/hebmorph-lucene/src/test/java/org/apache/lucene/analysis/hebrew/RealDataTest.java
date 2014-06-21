@@ -69,16 +69,17 @@ public class RealDataTest extends TestBase {
     @Test
     public void testSequentially() throws IOException, InterruptedException {
         final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        System.out.println("Dictionary initialized");
+        System.out.print("Dictionary initialized;");
 
         final HashSet<String> results = performSearch(a);
         for (int i = 0; i < 10; i++) {
             HashSet<String> tmp = performSearch(a);
             if (results.size() != tmp.size()) {
-                fail("Go " + tmp.size() + " results, expected " + results.size());
+                fail("Got " + tmp.size() + " results, expected " + results.size());
             }
-            System.out.println(i);
+            System.out.print(" " + i);
         }
+        System.out.println();
     }
 
     @Test
@@ -123,6 +124,7 @@ public class RealDataTest extends TestBase {
 
     private static HashSet<String> performSearch(Analyzer a) throws IOException {
         HashSet<String> results = new HashSet<>();
+        assert new File("../test-files").exists();
         File[] files = new File("../test-files").listFiles();
         for (File file : files) {
             MemoryIndex memoryIndex = new MemoryIndex(true);
