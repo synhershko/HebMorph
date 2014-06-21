@@ -123,8 +123,8 @@ public class RealDataTest extends TestBase {
 
     private static HashSet<String> performSearch(Analyzer a) throws IOException {
         HashSet<String> results = new HashSet<>();
-        File files = new File("./../../test-files");
-        for (File file : files.listFiles()) {
+        File[] files = new File("../test-files").listFiles();
+        for (File file : files) {
             MemoryIndex memoryIndex = new MemoryIndex(true);
             final List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
 
