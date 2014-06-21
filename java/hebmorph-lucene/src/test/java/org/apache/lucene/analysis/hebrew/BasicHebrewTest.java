@@ -130,7 +130,7 @@ public class BasicHebrewTest extends TestBase {
         while (ts.incrementToken()) {
             CharTermAttribute att = ts.getAttribute(CharTermAttribute.class);
             terms.add(new String(att.buffer(), 0, att.length()));
-            System.out.println(new String(att.buffer(), 0, att.length()));
+            //System.out.println(new String(att.buffer(), 0, att.length()));
         }
     }
 
