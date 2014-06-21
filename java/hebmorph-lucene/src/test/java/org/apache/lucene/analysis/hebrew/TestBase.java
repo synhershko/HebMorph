@@ -4,6 +4,7 @@ import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Loader;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.junit.AfterClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,5 +34,13 @@ public class TestBase extends BaseTokenStreamTestCase {
             dict = new Loader(new File(hspellPath), true).loadDictionaryFromHSpellData();
         }
         return dict;
+    }
+
+    @AfterClass
+    private static void cleanup() {
+        if (dict != null) {
+            dict.clear();
+            dict = null;
+        }
     }
 }
