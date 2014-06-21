@@ -84,12 +84,16 @@ public class StreamLemmasFilter extends Tokenizer
 
     private final Reference<String> tempRefObject = new Reference<>("");
 
+    private int currentStartOffset, currentEndOffset;
+
 	@Override
 	public final boolean incrementToken() throws IOException {
-        keywordAtt.setKeyword(false); // since this is also the Tokenizer, this only manages internal state
+        clearAttributes();
 
 		// Index all unique lemmas at the same position
 		while (index < stack.size()) {
+            offsetAtt.setOffset(currentStartOffset, currentEndOffset);
+
 			final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
 			index++;
 
@@ -101,6 +105,7 @@ public class StreamLemmasFilter extends Tokenizer
             return true;
 		}
 
+        // Reset state
         index = 0;
 		stack.clear();
         previousLemmas.clear();
@@ -108,14 +113,14 @@ public class StreamLemmasFilter extends Tokenizer
 		// Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
 		// an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
 		final int tokenType = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack);
-        if (tokenType == 0) // EOS
+        if (tokenType == 0) { // EOS
 			return false;
-
-        // Reset state
-        clearAttributes();
+        }
 
 		// Store the location of the word in the original stream
-		offsetAtt.setOffset(correctOffset(_streamLemmatizer.getStartOffset()), correctOffset(_streamLemmatizer.getEndOffset()));
+        currentStartOffset = correctOffset(_streamLemmatizer.getStartOffset());
+        currentEndOffset = correctOffset(_streamLemmatizer.getEndOffset());
+		offsetAtt.setOffset(currentStartOffset, currentEndOffset);
 
         final String word = tempRefObject.ref;
         if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
@@ -229,6 +234,7 @@ public class StreamLemmasFilter extends Tokenizer
         super.end();
         // set final offset
         int finalOffset = correctOffset(_streamLemmatizer.getEndOffset());
+        currentStartOffset = currentEndOffset = finalOffset;
         offsetAtt.setOffset(finalOffset, finalOffset);
     }
 
@@ -249,6 +255,7 @@ public class StreamLemmasFilter extends Tokenizer
         filterCache.clear();
         previousLemmas.clear();
 		index = 0;
+        currentStartOffset = currentEndOffset = 0;
 		_streamLemmatizer.reset(input);
 	}
 
