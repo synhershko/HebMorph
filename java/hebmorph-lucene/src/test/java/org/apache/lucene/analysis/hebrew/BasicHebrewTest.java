@@ -119,6 +119,7 @@ public class BasicHebrewTest extends TestBase {
 		assertFoundInText("1234", "1234"); // Numeric, should be stored as-is
 	}
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Test
     public void testLemmatization() throws Exception {
         analyzer = new testAnalyzer();
@@ -133,6 +134,7 @@ public class BasicHebrewTest extends TestBase {
         }
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Test
     public void testFinalOffset() throws Exception {
         analyzer = new testAnalyzer();
@@ -155,6 +157,7 @@ public class BasicHebrewTest extends TestBase {
                 src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {
+                e.printStackTrace();
             }
 
             TokenStream tok = new SuffixKeywordFilter(src, '$');
@@ -164,7 +167,7 @@ public class BasicHebrewTest extends TestBase {
 
 	protected void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception
 	{
-		System.out.println(whatToIndex);
+		//System.out.println(whatToIndex);
 		assertEquals(1, findInText(whatToIndex, whatToSearch));
 	}
 
