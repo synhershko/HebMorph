@@ -233,9 +233,13 @@ public class StreamLemmasFilter extends Tokenizer
     }
 
     @Override
-        public void close() throws IOException {
-            super.close();
-            _streamLemmatizer.reset(input);
+    public void close() throws IOException {
+        super.close();
+        stack.clear();
+        filterCache.clear();
+        previousLemmas.clear();
+        index = 0;
+        _streamLemmatizer.reset(input);
     }
 
     @Override
