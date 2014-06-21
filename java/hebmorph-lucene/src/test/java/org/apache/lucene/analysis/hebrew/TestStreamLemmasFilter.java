@@ -1,5 +1,6 @@
 package org.apache.lucene.analysis.hebrew;
 
+import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Analyzer;
@@ -31,6 +32,7 @@ public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCas
     }
 
     /** test stopwords and stemming */
+    @Repeat(iterations = 100)
     public void testBasics() throws IOException {
         checkOneTerm(a, "books", "books");
         checkOneTerm(a, "book", "book");

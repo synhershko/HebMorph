@@ -1,5 +1,6 @@
 package org.apache.lucene.analysis.hebrew;
 
+import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
@@ -27,6 +28,7 @@ public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
     }
 
     /** test stopwords and stemming */
+    @Repeat(iterations = 100)
     public void testBasics() throws IOException {
         checkOneTerm(a, "books", "books");
         checkOneTerm(a, "book", "book");
