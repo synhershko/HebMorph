@@ -9,7 +9,10 @@ import org.junit.AfterClass;
 import java.io.File;
 import java.io.IOException;
 
-public abstract class TestBase {
+/**
+ * Created by synhershko on 21/06/14.
+ */
+public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStreamTestCase {
     private static DictRadix<MorphData> dict;
 
     protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
@@ -37,7 +40,7 @@ public abstract class TestBase {
     }
 
     @AfterClass
-    public static void cleanupDictionary() {
+    public static void cleanup() {
         if (dict != null) {
             dict.clear();
             dict = null;

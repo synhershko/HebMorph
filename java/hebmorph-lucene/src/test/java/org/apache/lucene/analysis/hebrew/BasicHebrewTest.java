@@ -123,6 +123,7 @@ public class BasicHebrewTest extends TestBase {
     public void testLemmatization() throws Exception {
         analyzer = new testAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
+        ts.reset();
 
         Set<String> terms = new HashSet<>();
         while (ts.incrementToken()) {
@@ -137,6 +138,7 @@ public class BasicHebrewTest extends TestBase {
         analyzer = new testAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
         OffsetAttribute offsetAttribute = ts.addAttribute(OffsetAttribute.class);
+        ts.reset();
         while (ts.incrementToken()) {
         }
         ts.end();

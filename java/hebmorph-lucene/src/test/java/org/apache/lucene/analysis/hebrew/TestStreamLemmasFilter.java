@@ -10,7 +10,7 @@ import java.io.Reader;
 /**
  * Created by synhershko on 20/06/14.
  */
-public class TestStreamLemmasFilter extends TestBase {
+public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
