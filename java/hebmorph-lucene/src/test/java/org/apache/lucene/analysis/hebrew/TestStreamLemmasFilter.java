@@ -1,5 +1,6 @@
 package org.apache.lucene.analysis.hebrew;
 
+import com.carrotsearch.randomizedtesting.annotations.Seed;
 import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;

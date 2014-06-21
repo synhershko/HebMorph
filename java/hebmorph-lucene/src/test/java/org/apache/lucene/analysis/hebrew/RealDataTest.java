@@ -124,9 +124,7 @@ public class RealDataTest extends TestBase {
 
     private static HashSet<String> performSearch(Analyzer a) throws IOException {
         HashSet<String> results = new HashSet<>();
-        assert new File("../test-files").exists();
-        File[] files = new File("../test-files").listFiles();
-        for (File file : files) {
+        for (File file : getTestFiles()) {
             MemoryIndex memoryIndex = new MemoryIndex(true);
             final List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
 

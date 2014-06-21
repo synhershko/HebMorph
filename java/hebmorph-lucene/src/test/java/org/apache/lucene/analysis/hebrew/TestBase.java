@@ -8,6 +8,8 @@ import org.junit.AfterClass;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class TestBase {
     private static DictRadix<MorphData> dict;
@@ -34,6 +36,16 @@ public abstract class TestBase {
             dict = new Loader(new File(hspellPath), true).loadDictionaryFromHSpellData();
         }
         return dict;
+    }
+
+    protected static File[] getTestFiles() throws IOException {
+        List<String> lookedAt = new ArrayList<>();
+        for (String s : new String[] { ".", "..", "../.." }){
+            File f = new File(s + "/test-files");
+            if (f.exists()) return f.listFiles();
+            lookedAt.add(f.getCanonicalPath());
+        }
+        throw new IOException("Cannot find test data, looked at " + lookedAt);
     }
 
     @AfterClass
