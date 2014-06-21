@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import java.io.File;
 import java.io.IOException;
 
-public class TestBase extends BaseTokenStreamTestCase {
+public abstract class TestBase extends BaseTokenStreamTestCase {
     private static DictRadix<MorphData> dict;
 
     protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
