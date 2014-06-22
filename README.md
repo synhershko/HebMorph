@@ -64,7 +64,7 @@ Direct reference to hebmorph-core is only needed if you need to use internal Heb
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-core</artifactId>
-            <version>1.3.4</version>
+            <version>1.3</version>
             <scope>compile</scope>
         </dependency>
 ```
