@@ -91,19 +91,20 @@ public class StreamLemmasFilter extends Tokenizer
         clearAttributes();
 
 		// Index all unique lemmas at the same position
-		while (index < stack.size()) {
-            offsetAtt.setOffset(currentStartOffset, currentEndOffset);
-
-			final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
-			index++;
+        while (index < stack.size()) {
+            final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
+            index++;
 
             if ((res == null) || !previousLemmas.add(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
-				continue;
+                continue;
 
-			createHebrewToken(res);
+            createHebrewToken(res);
+            offsetAtt.setOffset(currentStartOffset, currentEndOffset);
+            typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
             posIncrAtt.setPositionIncrement(0);
+
             return true;
-		}
+        }
 
         // Reset state
         index = 0;
