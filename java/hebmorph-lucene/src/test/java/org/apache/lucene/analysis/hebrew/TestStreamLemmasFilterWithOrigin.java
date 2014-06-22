@@ -46,4 +46,11 @@ public class TestStreamLemmasFilterWithOrigin extends BaseTokenStreamWithDiction
 
         checkAnalysisConsistency(random(), a, true, "בדיקה אחת שתיים", true);
     }
+
+    public void testLemmatization() throws IOException {
+        assertAnalyzesTo(a, "בדיקה", new String[]{"בדיקה", "בדיקה"}, new int[] {0, 0}, new int[]{5, 5});
+        assertAnalyzesTo(a, "בדיקות", new String[]{"בדיקות", "בדיקה"}, new int[] {0, 0}, new int[]{6, 6});
+        assertAnalyzesTo(a, "אימא", new String[]{"אימא", "אימא"}, new int[] {0, 0}, new int[]{4, 4});
+        assertAnalyzesTo(a, "בדיקות אמא", new String[]{"בדיקות", "בדיקה", "אמא", "אימא"}, new int[] {0, 0, 7, 7}, new int[]{6, 6, 10, 10});
+    }
 }

@@ -49,5 +49,7 @@ public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCas
 
     public void testLemmatization() throws IOException {
         assertAnalyzesTo(a, "בדיקה", new String[]{"בדיקה"}, new int[] {0}, new int[]{5});
+        assertAnalyzesTo(a, "בדיקות", new String[]{"בדיקה"}, new int[] {0}, new int[]{6});
+        assertAnalyzesTo(a, "אימא", new String[]{"אימא"}, new int[] {0}, new int[]{4});
     }
 }
