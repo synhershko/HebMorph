@@ -38,7 +38,7 @@ public class Tokenizer {
         public static int Custom = 128;
 	}
 
-	public static final char[] Geresh = { '\'', '\u05F3', '\u2018', '\u2019', '\u201B' };
+	public static final char[] Geresh = { '\'', '\u05F3', '\u2018', '\u2019', '\u201B', '\uFF07' };
 	public static final char[] Gershayim = { '\"', '\u05F4', '\u201C', '\u201D', '\u201F', '\u275E', '\uFF02' };
     public static final char[] Makaf = { '-', '\u2012', '\u2013', '\u2014', '\u2015', '\u05BE' };
 	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
