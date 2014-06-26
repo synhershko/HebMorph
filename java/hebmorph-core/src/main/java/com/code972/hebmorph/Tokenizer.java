@@ -118,6 +118,9 @@ public class Tokenizer {
     public void addSpecialCase(final String token) {
         specialCases.addNode(token, dummyData);
     }
+    public void clearSpecialCases() {
+        specialCases.clear();
+    }
 
     public static boolean isLegalPrefix(final char[] prefix, int length, final DictRadix<Integer> prefixesTree) {
         try {

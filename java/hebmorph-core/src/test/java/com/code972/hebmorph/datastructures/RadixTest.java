@@ -11,28 +11,50 @@ import static org.junit.Assert.*;
 
 public class RadixTest extends TestBase {
 	@Test
-    public void DoesAddNodesCorrectlyWithReferenceTypes()
-    {
+    public void DoesAddNodesCorrectlyWithReferenceTypes() {
         DictRadix<UuidObject> d = new DictRadix<UuidObject>();
         doAddNodesTest(d, new GuidGenerator());
+        doDoubleAddTest(d, new GuidGenerator());
     }
 
 	@Test
-    public void doesAddNodesCorrectlyWithNullableTypes()
-    {
+    public void doesAddNodesCorrectlyWithNullableTypes() {
         DictRadix<Integer> d = new DictRadix<Integer>();
         doAddNodesTest(d, new RandomGenerator());
+        doDoubleAddTest(d, new RandomGenerator());
     }
 
 	@Test
-    public void doesAddNodesCorrectlyWithNativeTypes()
-    {
+    public void doesAddNodesCorrectlyWithNativeTypes() {
         DictRadix<Integer> d = new DictRadix<Integer>();
         doAddNodesTest(d, new RandomGenerator());
+        doDoubleAddTest(d, new RandomGenerator());
     }
 
-    <T>void doAddNodesTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator)
-    {
+    <T>void doDoubleAddTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
+        d.clear();
+
+        try {
+            d.lookup("abcdef");
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+        }
+
+        d.addNode("abcdef", dataGenerator.generate());
+        d.addNode("abcdef", dataGenerator.generate());
+
+        assertEquals(1, d.getCount());
+        assertNotNull(d.lookup("abcdef", false));
+        assertNull(d.lookup("abcde", true));
+        assertNull(d.lookup("abcd", true));
+        assertNull(d.lookup("abc", true));
+        assertNull(d.lookup("ab", true));
+        assertNull(d.lookup("a", true));
+    }
+
+    <T>void doAddNodesTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
+        d.clear();
+
         IntBox counter = new IntBox(0);
 
         try {
@@ -166,17 +188,20 @@ public class RadixTest extends TestBase {
             _guid = UUID.randomUUID();
         }
 
-        public @Override boolean equals(Object obj)
+        @Override
+        public boolean equals(Object obj)
         {
+            if (!(obj instanceof UuidObject))
+                return false;
+
             UuidObject o = (UuidObject)obj;
 
-            if (o != null && this._guid.equals(o._guid))
-                return true;
+            return this._guid.equals(o._guid);
 
-            return false;
         }
 
-        public @Override int hashCode()
+        @Override
+        public int hashCode()
         {
             return _guid.hashCode();
         }
