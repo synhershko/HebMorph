@@ -114,7 +114,7 @@ public class Tokenizer {
 
     private final DictRadix<Integer> hebrewPrefixes;
     private final DictRadix<Byte> specialCases;
-    private static final Byte dummyData = new Byte((byte)0);
+    private static final Byte dummyData = (byte) 0;
     public void addSpecialCase(final String token) {
         specialCases.addNode(token, dummyData);
     }

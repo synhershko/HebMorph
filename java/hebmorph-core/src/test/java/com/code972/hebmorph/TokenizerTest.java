@@ -54,8 +54,6 @@ public class TokenizerTest {
         // NonHebrew
         assertTokenizesTo("test", "test");
         assertTokenizesTo("test's", "test's");
-        //assertTokenizesTo("test\05F3s", "test's");
-        //assertTokenizesTo("test\uFF07s", "test's");
         assertTokenizesTo("tests'", "tests");
         assertTokenizesTo("test123", "test123");
         assertTokenizesTo("test two", new String[] { "test", "two" });
@@ -148,7 +146,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void incrementsOffsetCorrectly() throws FileNotFoundException, IOException
+    public void incrementsOffsetCorrectly() throws IOException
     {
         int[] expectedOffsets = { 0, 5, 10, 15 };
         int curPos = 0;
@@ -261,7 +259,7 @@ public class TokenizerTest {
     }
 
     @Test
-    public void DiscardsSurroundingGershayim() throws FileNotFoundException, IOException {
+    public void DiscardsSurroundingGershayim() throws IOException {
         final Reference<String> test = new Reference<String>("");
 
         tokenizer.reset(new StringReader("\"צבא\""));
