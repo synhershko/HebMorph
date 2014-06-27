@@ -64,7 +64,6 @@ public class RandomizedTokenizerTests {
             tokenizer.addSpecialCase(wordAndPosition.getWord());
             lastPos = wordAndPosition.getPosition() + 1;
         }
-        System.out.println(sb.toString());
 
         Reference<String> test = new Reference<String>("");
         tokenizer.reset(new StringReader(sb.toString()));
