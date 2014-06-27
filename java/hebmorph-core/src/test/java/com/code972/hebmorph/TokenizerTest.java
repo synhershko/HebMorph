@@ -112,6 +112,10 @@ public class TokenizerTest {
         assertTokenizesTo("סמית'", "סמית");
 
         assertTokenizesTo("ומש\"א$", "ומש\"א");
+
+        assertTokenizesTo("של", "של");
+        assertTokenizesTo("שלך", "שלך");
+        assertTokenizesTo("לשלם", "לשלם");
     }
 
     @Test

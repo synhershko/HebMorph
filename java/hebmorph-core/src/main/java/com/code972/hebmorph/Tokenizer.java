@@ -116,6 +116,10 @@ public class Tokenizer {
     private final DictRadix<Byte> specialCases;
     private static final Byte dummyData = (byte) 0;
     public void addSpecialCase(final String token) {
+        if (token.length() > TOKENIZATION_EXCEPTION_MAX_LENGTH)
+            throw new IllegalArgumentException("Special tokenization rule must be at most "
+                    + TOKENIZATION_EXCEPTION_MAX_LENGTH + " in length");
+
         specialCases.addNode(token, dummyData);
     }
     public void clearSpecialCases() {
@@ -147,17 +151,26 @@ public class Tokenizer {
         hebrewPrefixes = LingInfo.buildPrefixTree(false);
     }
 
+    final static int TOKENIZATION_EXCEPTION_MAX_LENGTH = 25;
+    private char[] tokenizationExceptionBuffer = new char[TOKENIZATION_EXCEPTION_MAX_LENGTH];
     private boolean isRecognizedException(char[] prefix, byte length, char c) {
-        char[] tmp = new char[length + 1];
-        System.arraycopy(prefix, 0, tmp, 0, length);
-        tmp[length] = c;
-        return isRecognizedException(tmp, (byte)(length + 1));
+        if (length > TOKENIZATION_EXCEPTION_MAX_LENGTH)
+            return false; // custom tokenization exceptions are limited in length
+
+        System.arraycopy(prefix, 0, tokenizationExceptionBuffer, 0, length);
+        tokenizationExceptionBuffer[length] = c;
+        return isRecognizedException(tokenizationExceptionBuffer, length + 1, (byte)(length + 1));
     }
 
-    private boolean isRecognizedException(char[] prefix, byte length) {
+    private boolean isRecognizedException(char c) {
+        tokenizationExceptionBuffer[0] = c;
+        return isRecognizedException(tokenizationExceptionBuffer, 1, (byte)(1));
+    }
+
+    private boolean isRecognizedException(char[] token, int tokenLen, byte length) {
         int i = 0;
-        while (isHebrewLetter(prefix[i])) {
-            if (i >= prefix.length || !isLegalPrefix(prefix, i + 1, hebrewPrefixes)) {
+        while (i < tokenLen && isHebrewLetter(token[i])) {
+            if (!isLegalPrefix(token, i + 1, hebrewPrefixes)) {
                 i = 0;
                 break;
             }
@@ -165,7 +178,7 @@ public class Tokenizer {
         }
 
         try {
-            specialCases.lookup(prefix, i, length - i, true);
+            specialCases.lookup(token, i, length - i, true);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -187,7 +200,7 @@ public class Tokenizer {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
 					if (length > 0) {
                         if ((tokenType & TokenType.Custom) > 0) {
-                            if (!isRecognizedException(wordBuffer, length)) {
+                            if (!isRecognizedException(wordBuffer, wordBuffer.length, length)) {
                                 tokenString.ref = "";
                                 tokenLengthInSource = 0;
                                 tokenOffset = inputOffset;
@@ -225,7 +238,7 @@ public class Tokenizer {
             } else { // we should consume every letter or digit, and tokenize on everything else
                 if ((tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
                     wordBuffer[length] = c;
-                    if (!isRecognizedException(wordBuffer, (byte)(length + 1))) {
+                    if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte)(length + 1))) {
                         tokenType &= ~TokenType.Custom;
                         length = startedDoingCustomToken;
                         ioBufferIndex--;
