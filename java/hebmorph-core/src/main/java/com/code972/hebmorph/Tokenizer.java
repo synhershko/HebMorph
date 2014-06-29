@@ -195,22 +195,18 @@ public class Tokenizer {
 				dataLen = input.read(ioBuffer, 0, ioBuffer.length);
 				if (dataLen <= 0) {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
-					if (currentTokenLength > 0) {
-                        if ((tokenType & TokenType.Custom) > 0) {
-                            if (!isRecognizedException(wordBuffer, wordBuffer.length, currentTokenLength, true)) {
-                                tokenString.ref = "";
-                                tokenLengthInSource = 0;
-                                tokenOffset = inputOffset;
-                                return 0;
-                            }
-                        }
-						break;
-					} else {
+                    if ((tokenType & TokenType.Custom) > 0 && currentTokenLength > 0
+                            && !isRecognizedException(wordBuffer, wordBuffer.length, currentTokenLength, true)) {
+
+                        abortCustomToken();
+                    }
+                    if (currentTokenLength == 0) {
 						tokenString.ref = "";
                         tokenLengthInSource = 0;
                         tokenOffset = inputOffset;
 						return 0;
 					}
+                    break; // return what we have collected so far as a token
 				}
 				ioBufferIndex = 0;
 			}
