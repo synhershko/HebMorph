@@ -37,7 +37,7 @@ public class TokenizerTest {
     private void assertTokenizesTo(String text, String[] tokens, int[] tokenTypes) throws IOException {
         assert tokenTypes == null || tokens.length == tokenTypes.length;
 
-        for (int j = 0; j < 4096 * 2; j++) {
+        for (int j = 4096 - text.length() - 3; j < 4096 + text.length() + 2; j++) {
             tokenizer.reset(new StringReader(StringUtils.repeat(" ", j) + text));
             int i = 0, tokenType;
             Reference<String> test = new Reference<String>("");
