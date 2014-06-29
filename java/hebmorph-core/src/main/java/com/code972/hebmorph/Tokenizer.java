@@ -44,8 +44,7 @@ public class Tokenizer {
 	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
 	public static final char[] LettersAcceptingGeresh = { 'ז', 'ג', 'ץ', 'צ', 'ח' };
 
-	public static boolean isOfChars(char c, char[] options)
-	{
+	public static boolean isOfChars(char c, char[] options) {
 		for (char o : options) {
 			if (c == o) return true;
 		}
@@ -72,12 +71,10 @@ public class Tokenizer {
 	{
 		return ((c >= 1488) && (c <= 1514));
 	}
-    public static boolean isFinalHebrewLetter(char c)
-    {
+    public static boolean isFinalHebrewLetter(char c) {
         return (c == 1507 || c == 1498 || c == 1501 || c == 1509 || c == 1503);
     }
-	public static boolean isNiqqudChar(char c)
-	{
+	public static boolean isNiqqudChar(char c) {
 		return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BB' || c == '\u05BC');
 	}
 
@@ -88,20 +85,11 @@ public class Tokenizer {
     /// it isn't always possible to get correct end-offset by looking at the length of the returned token
     /// string
     private int tokenOffset = 0, tokenLengthInSource = 0;
-	public final int getOffset()
-	{
+	public final int getOffset() {
 		return tokenOffset;
 	}
-	public void setOffset(int offset)
-	{
-		tokenOffset = offset;
-	}
-
     public int getLengthInSource() {
         return tokenLengthInSource;
-    }
-    public void setLengthInSource(int length) {
-        tokenLengthInSource = length;
     }
 
     private Character suffixForExactMatch = null;
@@ -200,7 +188,6 @@ public class Tokenizer {
         currentTokenLength = 0;
         tokenOffset = 0; // invalidate
 		tokenType = 0;
-        byte startedDoingCustomToken = -1;
         boolean avoidTryingCustom = false;
 		while (true) {
 			if (ioBufferIndex >= dataLen) {
@@ -246,7 +233,6 @@ public class Tokenizer {
                 } else if (!avoidTryingCustom && !Character.isWhitespace(c) && isRecognizedException(c)) {
                     tokenType |= TokenType.NonHebrew;
                     tokenType |= TokenType.Custom;
-                    startedDoingCustomToken = currentTokenLength;
                     appendCurrentChar = true;
                 }
                 // Everything else will be ignored
@@ -299,7 +285,6 @@ public class Tokenizer {
 
                     appendCurrentChar = true;
                 } else if (!avoidTryingCustom && !isSuffixForExactMatch(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, currentTokenLength, c)) {
-                    startedDoingCustomToken = currentTokenLength;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
                 } else {
@@ -327,8 +312,7 @@ public class Tokenizer {
                 // Note that tokens larger than 128 chars will get clipped.
 
                 // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
-                if (isOfChars(c, Geresh))
-                {
+                if (isOfChars(c, Geresh)) {
                     if (wordBuffer[currentTokenLength - 1] == c)
                     {
                         wordBuffer[currentTokenLength - 1] = '"';
@@ -340,9 +324,7 @@ public class Tokenizer {
                     //					}
                     else
                         wordBuffer[currentTokenLength++] = c;
-                }
-                else
-                {
+                } else {
                     wordBuffer[currentTokenLength++] = c; // TODO: Normalize c
                 }
             }
@@ -355,17 +337,14 @@ public class Tokenizer {
             tokenLengthInSource = Math.max(inputOffset + ioBufferIndex - 1 - tokenOffset, 0);
         }
 
-		if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim))
-		{
+		if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim)) {
 			wordBuffer[--currentTokenLength] = '\0';
             tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
 		}
 		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-		if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'')
-		{
+		if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'') {
 			// All letters which this Geresh may mean something for
-			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh))
-			{
+			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh)) {
 				wordBuffer[--currentTokenLength] = '\0';
                 tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
 			}
