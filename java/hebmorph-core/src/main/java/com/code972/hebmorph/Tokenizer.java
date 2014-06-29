@@ -120,6 +120,9 @@ public class Tokenizer {
             throw new IllegalArgumentException("Special tokenization rule must be at most "
                     + TOKENIZATION_EXCEPTION_MAX_LENGTH + " in length");
 
+        if (token.contains(" "))
+            throw new IllegalArgumentException("Special tokenization rule cannot contain spaces");
+
         specialCases.addNode(token, dummyData);
     }
     public void clearSpecialCases() {
