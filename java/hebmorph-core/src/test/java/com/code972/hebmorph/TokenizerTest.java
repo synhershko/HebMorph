@@ -134,6 +134,11 @@ public class TokenizerTest {
         assertTokenizesTo("C++x0", new String[] { "C", "x0" });
         assertTokenizesTo("C++x0 ", new String[] { "C", "x0" });
 
+        assertTokenizesTo(".NET", "NET");
+        tokenizer.addSpecialCase(".NET");
+        assertTokenizesTo(".NET", ".NET");
+        assertTokenizesTo(".NETify", "NETify");
+
         assertTokenizesTo("B+++", "B");
         tokenizer.addSpecialCase("B+++");
         assertTokenizesTo("B+++", "B+++");

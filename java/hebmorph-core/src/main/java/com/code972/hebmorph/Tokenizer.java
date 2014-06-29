@@ -140,8 +140,10 @@ public class Tokenizer {
 	private int ioBufferIndex = 0;
 
 	private final char[] wordBuffer = new char[Constants.MaxWordLength];
+    private byte currentTokenLength = 0;
+    private int tokenType = 0;
 
-	public Tokenizer(final Reader input) {
+    public Tokenizer(final Reader input) {
 		this(input, null);
 	}
 
@@ -168,6 +170,10 @@ public class Tokenizer {
     }
 
     private boolean isRecognizedException(char[] token, int tokenLen, byte length) {
+        return isRecognizedException(token, tokenLen, length, false);
+    }
+
+    private boolean isRecognizedException(char[] token, int tokenLen, byte length, boolean exact) {
         int i = 0;
         while (i < tokenLen && isHebrewLetter(token[i])) {
             if (!isLegalPrefix(token, i + 1, hebrewPrefixes)) {
@@ -178,7 +184,7 @@ public class Tokenizer {
         }
 
         try {
-            specialCases.lookup(token, i, length - i, true);
+            specialCases.lookup(token, i, length - i, i, !exact);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -188,19 +194,20 @@ public class Tokenizer {
 	// Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
 	// This is a job for a normalizer, anyway
 	public int nextToken(final Reference<String> tokenString) throws IOException {
-		byte length = 0;
+        currentTokenLength = 0;
         tokenOffset = 0; // invalidate
-		int tokenType = 0;
+		tokenType = 0;
         byte startedDoingCustomToken = -1;
+        boolean avoidTryingCustom = false;
 		while (true) {
 			if (ioBufferIndex >= dataLen) {
 				inputOffset += dataLen;
 				dataLen = input.read(ioBuffer, 0, ioBuffer.length);
 				if (dataLen <= 0) {
 					dataLen = 0; // so next offset += dataLen won't decrement offset
-					if (length > 0) {
+					if (currentTokenLength > 0) {
                         if ((tokenType & TokenType.Custom) > 0) {
-                            if (!isRecognizedException(wordBuffer, wordBuffer.length, length)) {
+                            if (!isRecognizedException(wordBuffer, wordBuffer.length, currentTokenLength, true)) {
                                 tokenString.ref = "";
                                 tokenLengthInSource = 0;
                                 tokenOffset = inputOffset;
@@ -221,7 +228,7 @@ public class Tokenizer {
 			char c = ioBuffer[ioBufferIndex++];
 			boolean appendCurrentChar = false;
 
-            if (length == 0) { // first char, figure out what it is
+            if (currentTokenLength == 0) { // first char, figure out what it is
                 if (isHebrewLetter(c)) {
                     if (!isFinalHebrewLetter(c)) {
                         tokenType |= TokenType.Hebrew;
@@ -233,16 +240,24 @@ public class Tokenizer {
                         tokenType |= TokenType.Numeric;
 
                     appendCurrentChar = true;
+                } else if (!avoidTryingCustom && !Character.isWhitespace(c) && isRecognizedException(c)) {
+                    tokenType |= TokenType.NonHebrew;
+                    tokenType |= TokenType.Custom;
+                    startedDoingCustomToken = currentTokenLength;
+                    appendCurrentChar = true;
                 }
                 // Everything else will be ignored
             } else { // we should consume every letter or digit, and tokenize on everything else
-                if ((tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
-                    wordBuffer[length] = c;
-                    if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte)(length + 1))) {
+                if (!avoidTryingCustom && (tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
+                    wordBuffer[currentTokenLength] = c;
+                    if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte)(currentTokenLength + 1))) {
                         tokenType &= ~TokenType.Custom;
-                        length = startedDoingCustomToken;
                         ioBufferIndex--;
-                        break;
+                        if (ioBufferIndex >= currentTokenLength)
+                            ioBufferIndex -= currentTokenLength;
+                        currentTokenLength = 0; //startedDoingCustomToken;
+                        avoidTryingCustom = true;
+                        continue;
                     }
                     appendCurrentChar = true;
                 } else if (isHebrewLetter(c) || isNiqqudChar(c)) {
@@ -254,7 +269,7 @@ public class Tokenizer {
                 } else if (isOfChars(c, Gershayim)) {
                     c = '"';
                     // Tokenize if previous char wasn't part of a word
-                    if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1]))
+                    if (!isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !isNiqqudChar(wordBuffer[currentTokenLength - 1]))
                         break;
 
                     // TODO: Is it possible to support cases like שה"שםעצם in the tokenizer?
@@ -266,14 +281,14 @@ public class Tokenizer {
                     // and only do this for Hebrew tokens
                     if ((tokenType & TokenType.Hebrew) > 0) {
                         // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
-                        if (!isHebrewLetter(wordBuffer[length - 1]) && !isNiqqudChar(wordBuffer[length - 1])
-                                && !isOfChars(wordBuffer[length - 1], Geresh))
+                        if (!isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !isNiqqudChar(wordBuffer[currentTokenLength - 1])
+                                && !isOfChars(wordBuffer[currentTokenLength - 1], Geresh))
                             break;
                     }
 
                     appendCurrentChar = true;
-                } else if (!isSffixForExactMath(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, length, c)) {
-                    startedDoingCustomToken = length;
+                } else if (!avoidTryingCustom && !isSffixForExactMath(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, currentTokenLength, c)) {
+                    startedDoingCustomToken = currentTokenLength;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
                 } else {
@@ -293,9 +308,9 @@ public class Tokenizer {
 
 			if (appendCurrentChar) {
                 // Consume normally
-                if (length == 0) { // mark the start of a new token
+                if (currentTokenLength == 0) { // mark the start of a new token
                     tokenOffset = inputOffset + ioBufferIndex - 1;
-                } else if (length == wordBuffer.length - 1) { // clip lengthy tokens
+                } else if (currentTokenLength == wordBuffer.length - 1) { // clip lengthy tokens
                     continue;
                 }
                 // Note that tokens larger than 128 chars will get clipped.
@@ -303,9 +318,9 @@ public class Tokenizer {
                 // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
                 if (isOfChars(c, Geresh))
                 {
-                    if (wordBuffer[length - 1] == c)
+                    if (wordBuffer[currentTokenLength - 1] == c)
                     {
-                        wordBuffer[length - 1] = '"';
+                        wordBuffer[currentTokenLength - 1] = '"';
                         tokenType |= TokenType.Acronym;
                     }
                     //					else if (isOfChars(wordBuffer[length - 1], LettersAcceptingGeresh))
@@ -313,11 +328,11 @@ public class Tokenizer {
                     //						wordBuffer[length++] = c;
                     //					}
                     else
-                        wordBuffer[length++] = c;
+                        wordBuffer[currentTokenLength++] = c;
                 }
                 else
                 {
-                    wordBuffer[length++] = c; // TODO: Normalize c
+                    wordBuffer[currentTokenLength++] = c; // TODO: Normalize c
                 }
             }
         }
@@ -329,25 +344,25 @@ public class Tokenizer {
             tokenLengthInSource = Math.max(inputOffset + ioBufferIndex - 1 - tokenOffset, 0);
         }
 
-		if (isOfChars(wordBuffer[length - 1], Gershayim))
+		if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim))
 		{
-			wordBuffer[--length] = '\0';
+			wordBuffer[--currentTokenLength] = '\0';
             tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
 		}
 		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-		if ((length > 2) && wordBuffer[length - 1] == '\'')
+		if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'')
 		{
 			// All letters which this Geresh may mean something for
-			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[length - 2], LettersAcceptingGeresh))
+			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh))
 			{
-				wordBuffer[--length] = '\0';
+				wordBuffer[--currentTokenLength] = '\0';
                 tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
 			}
 			// TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
 			// TODO: Handle ה (Hashem)
 		}
 
-		tokenString.ref = new String(wordBuffer, 0, length);
+		tokenString.ref = new String(wordBuffer, 0, currentTokenLength);
 		return tokenType;
 	}
 
