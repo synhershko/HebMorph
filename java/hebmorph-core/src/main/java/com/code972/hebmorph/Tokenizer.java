@@ -295,7 +295,7 @@ public class Tokenizer {
                     }
 
                     appendCurrentChar = true;
-                } else if (!avoidTryingCustom && !isSffixForExactMath(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, currentTokenLength, c)) {
+                } else if (!avoidTryingCustom && !isSuffixForExactMatch(c) && !Character.isSpaceChar(c) && isRecognizedException(wordBuffer, currentTokenLength, c)) {
                     startedDoingCustomToken = currentTokenLength;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
@@ -408,7 +408,7 @@ public class Tokenizer {
         currentTokenLength = (byte) (pos);
     }
 
-    private boolean isSffixForExactMath(char c) {
+    private boolean isSuffixForExactMatch(char c) {
         if (suffixForExactMatch == null)
             return false;
         return c == suffixForExactMatch;
