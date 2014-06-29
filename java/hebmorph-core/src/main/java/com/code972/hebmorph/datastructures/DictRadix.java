@@ -258,7 +258,11 @@ public class DictRadix<T> implements Iterable<T>
     }
 
     public T lookup(final char[] key, final int keyPos, final int keyLength, final boolean allowPartial) throws IllegalArgumentException {
-        final DictNode dn = lookupImpl(key, keyPos, keyLength, allowPartial);
+        return lookup(key, keyPos, keyLength, 0, allowPartial);
+    }
+
+    public T lookup(final char[] key, final int keyPos, final int keyLength, final int keyOffset, final boolean allowPartial) throws IllegalArgumentException {
+        final DictNode dn = lookupImpl(key, keyPos, keyLength, keyOffset, allowPartial);
         if (dn == null)
             return null;
 
@@ -271,7 +275,7 @@ public class DictRadix<T> implements Iterable<T>
 	 @param key
 	 @return
 	*/
-	private final DictNode lookupImpl(final char[] key, int keyPos, final int keyLength, final boolean allowPartial) {
+	private DictNode lookupImpl(final char[] key, int keyPos, final int keyLength, final int keyOffset, final boolean allowPartial) {
         int n;
 
 		DictNode cur = m_root;
@@ -282,7 +286,7 @@ public class DictRadix<T> implements Iterable<T>
 
 				// Do key matching
 				n = 0;
-				while ((n < childKey.length) && (keyPos < keyLength) &&
+				while ((n < childKey.length) && (keyPos - keyOffset < keyLength) &&
                         ((childKey[n] == key[keyPos]) || (!caseSensitiveKeys && childKey[n] == Character.toLowerCase(key[keyPos]))))
                 {
 					keyPos++;
@@ -291,16 +295,16 @@ public class DictRadix<T> implements Iterable<T>
 
 				if (n == childKey.length) { // We consumed the child's key, and so far it matches our key
 					// We consumed both the child's key and the requested key, meaning we found the requested node
-					if (keyLength == keyPos) {
+					if (keyLength == keyPos - keyOffset) {
 						return child;
 					}
 					// We consumed this child's key, but the key we are looking for isn't over yet
-					else if (keyLength > keyPos) {
+					else if (keyLength > keyPos - keyOffset) {
 						cur = child;
 						break;
 					}
 				}
-                else if (allowPartial && keyPos == keyLength) {
+                else if (allowPartial && keyPos - keyOffset == keyLength) {
                     return null;
                 }
 				else if ((n > 0) || (childPos + 1 == cur.getChildren().length)) { // We looked at all the node's children -  Incomplete match to child's key (worths nothing)
@@ -309,7 +313,7 @@ public class DictRadix<T> implements Iterable<T>
 			}
 		}
 
-        if (allowPartial && keyLength == keyPos)
+        if (allowPartial && keyLength == keyPos - keyOffset)
 		    return null;
 
         throw new IllegalArgumentException();
