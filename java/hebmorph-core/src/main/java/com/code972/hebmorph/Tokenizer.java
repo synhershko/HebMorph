@@ -251,13 +251,21 @@ public class Tokenizer {
                 if (!avoidTryingCustom && (tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
                     wordBuffer[currentTokenLength] = c;
                     if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte)(currentTokenLength + 1))) {
+                        // Tokenize on non-alphanumeric
+                        if (!Character.isLetterOrDigit(c))
+                            break;
+
                         tokenType &= ~TokenType.Custom;
-                        ioBufferIndex--;
-                        if (ioBufferIndex >= currentTokenLength)
-                            ioBufferIndex -= currentTokenLength;
-                        currentTokenLength = 0; //startedDoingCustomToken;
                         avoidTryingCustom = true;
-                        continue;
+                        ioBufferIndex--;
+                        if (ioBufferIndex >= currentTokenLength) {
+                            ioBufferIndex -= currentTokenLength;
+                            currentTokenLength = 0;
+                            continue;
+                        } else {
+                            abortCustomToken();
+                            continue;
+                        }
                     }
                     appendCurrentChar = true;
                 } else if (isHebrewLetter(c) || isNiqqudChar(c)) {
@@ -366,6 +374,40 @@ public class Tokenizer {
 		return tokenType;
 	}
 
+    private void abortCustomToken() {
+        int start = 0, pos = 0;
+        boolean started = false;
+        while (pos + start < currentTokenLength) {
+            if (!started && !isHebrewLetter(wordBuffer[start]) &&
+                    !isNiqqudChar(wordBuffer[start]) && !Character.isLetterOrDigit(wordBuffer[start])) {
+                start++;
+                continue;
+            }
+
+            started = true;
+
+            Character c = wordBuffer[pos + start];
+            if (isHebrewLetter(c) || isNiqqudChar(c)) {
+                TokenType.Hebrew |= TokenType.Hebrew;
+            } else if (Character.isLetterOrDigit(c)) {
+                if (tokenType == TokenType.Hebrew)
+                    tokenType |= TokenType.Mixed;
+            } else if (isOfChars(c, Gershayim)) {
+                c = '"';
+                tokenType |= TokenType.Acronym;
+            } else if (isOfChars(c, Geresh)) {
+                c = '\'';
+            } else {
+                break;
+            }
+
+            wordBuffer[pos] = c;
+            pos++;
+        }
+
+        currentTokenLength = (byte) (pos);
+    }
+
     private boolean isSffixForExactMath(char c) {
         if (suffixForExactMatch == null)
             return false;
@@ -379,5 +421,7 @@ public class Tokenizer {
 		ioBufferIndex = 0;
         tokenOffset = 0;
         tokenLengthInSource = 0;
+        currentTokenLength = 0;
+        tokenType = 0;
 	}
 }

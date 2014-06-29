@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 @TimeoutSuite(millis = 10000000)
 public class RandomizedTokenizerTests {
 
-    String[] customWords = new String[] { "C++", "C++X0", "i-phone", "i-pad",
+    String[] customWords = new String[] { "C++", "C++X0", "i-phone", "i-pad", ".NET",
             "VB.NET", "F#", "C#", "נביעות+", "Google+"};
 
     @Test
