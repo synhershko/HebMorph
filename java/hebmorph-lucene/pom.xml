@@ -50,7 +50,7 @@
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>hebmorph-lucene</artifactId>
     <packaging>jar</packaging>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
     <name>hebmorph-lucene</name>
     <description>Enabling Hebrew search through Lucene. Part of the HebMorph project, for making Hebrew properly searchable</description>
     <url>http://code972.com/</url>
