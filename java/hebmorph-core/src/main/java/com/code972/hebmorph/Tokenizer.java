@@ -365,10 +365,12 @@ public class Tokenizer {
 
             Character c = wordBuffer[pos + start];
             if (isHebrewLetter(c) || isNiqqudChar(c)) {
-                TokenType.Hebrew |= TokenType.Hebrew;
+                tokenType |= TokenType.Hebrew;
             } else if (Character.isLetterOrDigit(c)) {
                 if (tokenType == TokenType.Hebrew)
                     tokenType |= TokenType.Mixed;
+                else
+                    tokenType |= TokenType.NonHebrew;
             } else if (isOfChars(c, Gershayim)) {
                 c = '"';
                 tokenType |= TokenType.Acronym;
