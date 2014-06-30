@@ -27,20 +27,16 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public final class NiqqudFilter extends TokenFilter
 {
-	public NiqqudFilter(TokenStream input)
-	{
+	public NiqqudFilter(TokenStream input) {
 		super(input);
-		termAtt = (CharTermAttribute)addAttribute(CharTermAttribute.class);
+		termAtt = addAttribute(CharTermAttribute.class);
 	}
 
 	private CharTermAttribute termAtt;
 
 	@Override
-	public final boolean incrementToken() throws IOException
-	{
-		if (!input.incrementToken())
-			// reached EOS -- return null
-		{
+	public final boolean incrementToken() throws IOException {
+		if (!input.incrementToken()) { // reached EOS -- return null
 			return false;
 		}
 
@@ -48,10 +44,8 @@ public final class NiqqudFilter extends TokenFilter
 
 		char[] buffer = termAtt.buffer();
 		int length = termAtt.length(), j = 0;
-		for (int i = 0; i < length; i++)
-		{
-			if ((buffer[i] < 1455) || (buffer[i] > 1476)) // current position is not a Niqqud character
-			{
+		for (int i = 0; i < length; i++) {
+			if ((buffer[i] < 1455) || (buffer[i] > 1476)) { // current position is not a Niqqud character
 				buffer[j++] = buffer[i];
 			}
 		}
