@@ -151,7 +151,6 @@ public final class Loader {
 		} else { // Use optimized version for loading HSpell's dictionary files
 			DictRadix<MorphData> ret = new DictRadix<MorphData>();
 
-            InputStream fprefixes = null, fdict = null;
             try {
                 final char[] sbuf = new char[Constants.MaxWordLength];
                 int c = 0, n, slen = 0;
