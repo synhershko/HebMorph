@@ -227,7 +227,6 @@ public class Tokenizer {
 
                     appendCurrentChar = true;
                 } else if (!avoidTryingCustom && !Character.isWhitespace(c) && isRecognizedException(c)) {
-                    tokenType |= TokenType.NonHebrew;
                     tokenType |= TokenType.Custom;
                     appendCurrentChar = true;
                 }
