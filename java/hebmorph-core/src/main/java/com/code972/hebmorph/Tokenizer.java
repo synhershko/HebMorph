@@ -147,7 +147,7 @@ public class Tokenizer {
     final static int TOKENIZATION_EXCEPTION_MAX_LENGTH = 25;
     private char[] tokenizationExceptionBuffer = new char[TOKENIZATION_EXCEPTION_MAX_LENGTH];
     private boolean isRecognizedException(char[] prefix, byte length, char c) {
-        if (length > TOKENIZATION_EXCEPTION_MAX_LENGTH)
+        if (length >= TOKENIZATION_EXCEPTION_MAX_LENGTH)
             return false; // custom tokenization exceptions are limited in length
 
         System.arraycopy(prefix, 0, tokenizationExceptionBuffer, 0, length);

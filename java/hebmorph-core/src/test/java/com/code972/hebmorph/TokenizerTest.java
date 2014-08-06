@@ -59,6 +59,7 @@ public class TokenizerTest {
         assertTokenizesTo("tests'", "tests");
         assertTokenizesTo("test123", "test123");
         assertTokenizesTo("test two", new String[] { "test", "two" });
+        assertTokenizesTo("jkldfjksdlfjsldfsdfsdfsdf", "jkldfjksdlfjsldfsdfsdfsdf");
 
         // NonHebrew, non-English
         assertTokenizesTo("décimo", "décimo");
