@@ -17,11 +17,23 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
+			<td>1.5.0</td>
+			<td>4.9.0</td>
+			<td>1.3.x</td>
+			<td>9/9/2014</td>
+		</tr>
+		<tr>
+			<td>1.4.x</td>
+			<td>4.8.x</td>
+			<td>1.x -> 1.2.x</td>
+			<td>August 2014</td>
+		</tr>
+		<tr>
 			<td>1.3.x</td>
 			<td>4.6.x</td>
 			<td>0.90.8 -> 0.90.13</td>
 			<td>June 2014</td>
-		</tr>	
+		</tr>
 		<tr>
 			<td>1.2.0</td>
 			<td>4.5.x</td>
