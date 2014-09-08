@@ -23,6 +23,7 @@ import com.code972.hebmorph.hspell.Constants.DMask;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -39,7 +40,7 @@ public class StreamLemmatizer extends Lemmatizer {
 		_tokenizer = new Tokenizer(input, specialTokenizationCases);
 	}
 
-    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes,
+    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes,
                             final DictRadix<Byte> specialTokenizationCases) {
         super(dict, prefixes);
         _tokenizer = new Tokenizer(input, specialTokenizationCases);

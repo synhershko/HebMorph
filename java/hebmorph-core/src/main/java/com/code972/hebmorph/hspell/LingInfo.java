@@ -22,9 +22,11 @@ import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants.DMask;
 import com.code972.hebmorph.hspell.Constants.PrefixType;
 
+import java.util.HashMap;
+
 public class LingInfo
 {
-	public static DictRadix<Integer> buildPrefixTree(boolean allowHeHasheela)
+	public static HashMap<String, Integer> buildPrefixTree(boolean allowHeHasheela)
 	{
 		String[] prefixes;
 		int[] masks;
@@ -39,10 +41,10 @@ public class LingInfo
 			masks = Constants.masks_noH;
 		}
 
-		DictRadix<Integer> ret = new DictRadix<Integer>();
+        HashMap<String, Integer> ret = new HashMap<>();
 		for (int i = 0; prefixes[i] != null; i++)
 		{
-			ret.addNode(prefixes[i], masks[i]);
+			ret.put(prefixes[i], masks[i]);
 		}
 
 		return ret;

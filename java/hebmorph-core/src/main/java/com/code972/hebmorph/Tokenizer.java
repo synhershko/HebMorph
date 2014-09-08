@@ -24,6 +24,7 @@ import com.code972.hebmorph.hspell.LingInfo;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 
 public class Tokenizer {
 
@@ -100,7 +101,7 @@ public class Tokenizer {
         this.suffixForExactMatch = suffixForExactMatch;
     }
 
-    private final DictRadix<Integer> hebrewPrefixes;
+    private final HashMap<String, Integer> hebrewPrefixes;
     private final DictRadix<Byte> specialCases;
     private static final Byte dummyData = (byte) 0;
     public void addSpecialCase(final String token) {
@@ -117,13 +118,12 @@ public class Tokenizer {
         specialCases.clear();
     }
 
-    public static boolean isLegalPrefix(final char[] prefix, int length, final DictRadix<Integer> prefixesTree) {
-        try {
-            prefixesTree.lookup(prefix, 0, length, false);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+    public static boolean isLegalPrefix(final String prefix, final HashMap<String, Integer> prefixesTree) {
+        return prefixesTree.containsKey(prefix);
+    }
+
+    public static boolean isLegalPrefix(final char[] prefix, int length, final HashMap<String, Integer> prefixesTree) {
+        return prefixesTree.containsKey(new String(prefix, 0, length));
     }
 
     private static final int IO_BUFFER_SIZE = 4096;

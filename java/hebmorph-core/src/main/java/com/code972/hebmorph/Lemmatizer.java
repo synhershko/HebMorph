@@ -23,30 +23,26 @@ import com.code972.hebmorph.datastructures.RealSortedList;
 import com.code972.hebmorph.datastructures.RealSortedList.SortOrder;
 import com.code972.hebmorph.hspell.LingInfo;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Lemmatizer
 {
 	private final DictRadix<MorphData> m_dict;
-	private final DictRadix<Integer> m_prefixes;
+	private final HashMap<String, Integer> m_prefixes;
     private DictRadix<MorphData> customWords;
 
 	public Lemmatizer(final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
         this(dict, LingInfo.buildPrefixTree(allowHeHasheela));
 	}
 
-    public Lemmatizer(final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes) {
+    public Lemmatizer(final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) {
         this.m_dict = dict;
         this.m_prefixes = prefixes;
     }
 
 	public boolean isLegalPrefix(final String str) {
-        try {
-            m_prefixes.lookup(str);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return m_prefixes.containsKey(str);
 	}
 
 	// See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule
@@ -126,11 +122,8 @@ public class Lemmatizer
                     if (word.length() - prefLen < 2)
                         break;
 
-                    try {
-                        prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-                    } catch (IllegalArgumentException e) {
+                    if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen))) == null)
                         break;
-                    }
 
                     try {
                         md = customWords.lookup(word.substring(prefLen));
@@ -176,11 +169,8 @@ public class Lemmatizer
 			if (word.length() - prefLen < 2)
 				break;
 
-            try {
-			    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-            } catch (IllegalArgumentException e) {
+            if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen)))== null)
                 break;
-            }
 
             try {
                 md = m_dict.lookup(word.substring(prefLen));
@@ -229,11 +219,8 @@ public class Lemmatizer
 			if (word.length() - prefLen < 2)
 				break;
 
-            try {
-			    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-            } catch (IllegalArgumentException e) {
+            if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen))) == null)
                 break;
-            }
 
 			tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
 			if (tolerated != null)
@@ -268,11 +255,8 @@ public class Lemmatizer
             if (word.length() - prefLen < 2)
                 break;
 
-            try {
-                prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-            } catch (IllegalArgumentException e) {
+            if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen))) == null)
                 break;
-            }
 
             try {
                 md = customWords.lookup(word.substring(prefLen));
@@ -306,11 +290,8 @@ public class Lemmatizer
             if (word.length() - prefLen < 2)
                 break;
 
-            try {
-                prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-            } catch (IllegalArgumentException e) {
+            if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen))) == null)
                 break;
-            }
 
             try {
                 md = m_dict.lookup(word.substring(prefLen));
@@ -346,11 +327,8 @@ public class Lemmatizer
                 if (word.length() - prefLen < 2)
                     break;
 
-                try {
-                    prefixMask = m_prefixes.lookup(word.substring(0, ++prefLen));
-                } catch (IllegalArgumentException e) {
+                if ((prefixMask = m_prefixes.get(word.substring(0, ++prefLen))) == null)
                     break;
-                }
 
                 tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
                 if (tolerated != null)
