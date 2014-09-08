@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,11 +41,11 @@ import static org.junit.Assert.fail;
 public class RealDataTest extends TestBase {
     public static class TestSimpleHebrewAnalyzer extends Analyzer {
         private final DictRadix<MorphData> dictRadix;
-        private final DictRadix<Integer> prefixes;
+        private final HashMap<String, Integer> prefixes;
         private final DictRadix<Byte> specialTokenizationCases;
         private final CharArraySet commonWords;
 
-        public TestSimpleHebrewAnalyzer(final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes,
+        public TestSimpleHebrewAnalyzer(final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes,
                                         final DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords) throws IOException {
             this.dictRadix = dictRadix;
             this.prefixes = prefixes;

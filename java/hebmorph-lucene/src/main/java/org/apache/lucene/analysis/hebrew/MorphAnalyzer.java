@@ -34,6 +34,7 @@ import org.apache.lucene.util.Version;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 
 public class MorphAnalyzer extends Analyzer {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
@@ -49,7 +50,7 @@ public class MorphAnalyzer extends Analyzer {
     private static final String DEFAULT_HSPELL_ENV_VARIABLE = "HSPELL_DATA_FILES_PATH";
     protected final Version matchVersion;
     private final DictRadix<MorphData> dictRadix;
-    private final DictRadix<Integer> prefixes;
+    private final HashMap<String, Integer> prefixes;
     private DictRadix<Byte> specialTokenizationCases;
     private Character suffixForExactMatch;
 
@@ -58,7 +59,7 @@ public class MorphAnalyzer extends Analyzer {
         this(matchVersion, dict, LingInfo.buildPrefixTree(false), commonWords, specialTokenizationCases);
     }
 
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Integer> prefixes) throws IOException {
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) throws IOException {
         this(matchVersion, dict, prefixes, null, null);
     }
 
@@ -98,7 +99,8 @@ public class MorphAnalyzer extends Analyzer {
         this(version, loadFromPath(hspellPath), commonWords);
     }
 
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes, final CharArraySet commonWords, final DictRadix<Byte> specialTokenizationCases) throws IOException {
+    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes,
+                         final CharArraySet commonWords, final DictRadix<Byte> specialTokenizationCases) throws IOException {
         this.matchVersion = matchVersion;
         this.dictRadix = dictRadix;
         this.prefixes = prefixes;

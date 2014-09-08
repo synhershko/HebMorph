@@ -26,6 +26,7 @@ import org.apache.lucene.analysis.tokenattributes.*;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 
 
 /**
@@ -36,10 +37,10 @@ public final class HebrewTokenizer extends Tokenizer
 {
 
 	private final com.code972.hebmorph.Tokenizer hebMorphTokenizer;
-	private final DictRadix<Integer> prefixesTree;
+	private final HashMap<String, Integer> prefixesTree;
 
 	private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);;
+	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
 //	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
 	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
@@ -52,7 +53,7 @@ public final class HebrewTokenizer extends Tokenizer
         this(_input, LingInfo.buildPrefixTree(false), specialCases);
     }
 
-	public HebrewTokenizer(final Reader _input, final DictRadix<Integer> _prefixesTree, final DictRadix<Byte> specialCases) {
+	public HebrewTokenizer(final Reader _input, final HashMap<String, Integer> _prefixesTree, final DictRadix<Byte> specialCases) {
         super(_input);
 		hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(input, specialCases);
 		prefixesTree = _prefixesTree;
@@ -184,12 +185,7 @@ public final class HebrewTokenizer extends Tokenizer
 
 	public boolean isLegalPrefix(final String str)
 	{
-        try {
-            prefixesTree.lookup(str);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return prefixesTree.containsKey(str);
 	}
 
 	// See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule

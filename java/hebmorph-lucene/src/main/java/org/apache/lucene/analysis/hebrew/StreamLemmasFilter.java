@@ -29,10 +29,7 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StreamLemmasFilter extends Tokenizer
 {
@@ -54,19 +51,20 @@ public class StreamLemmasFilter extends Tokenizer
     private final Set<String> previousLemmas = new HashSet<String>();
     private boolean keepOriginalWord;
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes) {
+    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes) {
 		this(input, dictRadix, prefixes, null, null, null);
 	}
 
-	public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes, final LemmaFilterBase lemmaFilter) {
+	public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes, final LemmaFilterBase lemmaFilter) {
         this(input, dictRadix, prefixes, null, null, lemmaFilter);
     }
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final DictRadix<Integer> prefixes, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
         this(input, dictRadix, prefixes, null, commonWords, lemmaFilter);
     }
 
-    public StreamLemmasFilter(Reader _input, DictRadix<MorphData> dictRadix, DictRadix<Integer> prefixes, DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
+    public StreamLemmasFilter(Reader _input, DictRadix<MorphData> dictRadix, HashMap<String, Integer> prefixes,
+                              DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
         super(_input);
         _streamLemmatizer = new StreamLemmatizer(input, dictRadix, prefixes, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
