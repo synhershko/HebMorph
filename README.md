@@ -65,7 +65,7 @@ For the analyzer support, get hebmorph-lucene:
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
-            <version>1.3.4</version>
+            <version>1.5.0</version>
             <scope>compile</scope>
         </dependency>
 ```
@@ -76,7 +76,7 @@ Direct reference to hebmorph-core is only needed if you need to use internal Heb
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-core</artifactId>
-            <version>1.3</version>
+            <version>1.5.0</version>
             <scope>compile</scope>
         </dependency>
 ```
