@@ -41,7 +41,7 @@
   <groupId>com.code972.hebmorph</groupId>
   <artifactId>hebmorph-core</artifactId>
   <packaging>jar</packaging>
-  <version>1.5.0-SNAPSHOT</version>
+  <version>1.5.0</version>
   <name>hebmorph-core</name>
   <description>Tools for tokenization and lemmatization of Hebrew texts. Part of the HebMorph project, for making Hebrew properly searchable</description>
   <url>http://code972.com/</url>
