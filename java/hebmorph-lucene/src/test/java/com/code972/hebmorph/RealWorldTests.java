@@ -24,8 +24,7 @@ public class RealWorldTests extends TestBase {
 
     @Test
     public void test() throws IOException {
-//        File files = new File("./../../test-files");
-        File files = new File("./test-files");
+        File files = new File("./../../test-files");
         for(File filename : files.listFiles()) {
             testImpl(filename.getPath());
         }
