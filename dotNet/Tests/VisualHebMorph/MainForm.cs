@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 using HebMorph;
 using HebMorph.DataStructures;
+using HebMorph.HSpell;
 
 namespace VisualHebMorph
 {
@@ -107,17 +108,14 @@ namespace VisualHebMorph
         {
             if (m_lemmatizer == null || !m_lemmatizer.IsInitialized || !(m_lemmatizer is StreamLemmatizer))
             {
-                m_lemmatizer = new HebMorph.StreamLemmatizer(new System.IO.StringReader(txbCheck.Text));
-
                 string hspellPath = SelectHSpellFolderPath();
                 if (hspellPath == null)
                     return;
 
-                m_lemmatizer.InitFromHSpellFolder(hspellPath, true, false);
-            } else
-            {
-                (m_lemmatizer as StreamLemmatizer).SetStream(new System.IO.StringReader(txbCheck.Text));
+                var radix = Loader.LoadDictionaryFromHSpellFolder(hspellPath, true);
+                m_lemmatizer = new HebMorph.StreamLemmatizer(radix, false);                
             }
+            (m_lemmatizer as StreamLemmatizer).SetStream(new System.IO.StringReader(txbCheck.Text));            
 
             string word = string.Empty;
             List<Token> tokens = new List<Token>();
