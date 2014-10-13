@@ -6,7 +6,6 @@ import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 

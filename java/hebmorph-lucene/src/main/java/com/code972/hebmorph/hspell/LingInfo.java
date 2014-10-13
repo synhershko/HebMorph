@@ -18,7 +18,6 @@
  **************************************************************************/
 package com.code972.hebmorph.hspell;
 
-import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants.DMask;
 import com.code972.hebmorph.hspell.Constants.PrefixType;
 

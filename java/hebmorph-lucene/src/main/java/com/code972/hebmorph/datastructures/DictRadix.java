@@ -553,15 +553,15 @@ public class DictRadix<T> implements Iterable<T>
     }
 
 
-	public class RadixEnumerator implements  java.util.Iterator<T>
+	public class RadixEnumerator implements  Iterator<T>
 	{
 		private DictRadix<T> radix;
-		private java.util.LinkedList<DictRadix<T>.DictNode> nodesPath;
+		private java.util.LinkedList<DictNode> nodesPath;
 
 		public RadixEnumerator(DictRadix<T> r)
 		{
 			this.radix = r;
-			nodesPath = new java.util.LinkedList<DictRadix<T>.DictNode>();
+			nodesPath = new java.util.LinkedList<DictNode>();
 			nodesPath.addLast(radix.m_root);
 		}
 
@@ -593,7 +593,7 @@ public class DictRadix<T> implements Iterable<T>
 
 			while (nodesPath.size() > 0)
 			{
-				DictRadix<T>.DictNode n = nodesPath.getLast();
+				DictNode n = nodesPath.getLast();
 				if (goUp || (n.getChildren() == null) || (n.getChildren().length == 0))
 				{
 					nodesPath.removeLast();
