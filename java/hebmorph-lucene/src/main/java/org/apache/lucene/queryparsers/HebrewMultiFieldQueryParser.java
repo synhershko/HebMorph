@@ -1,6 +1,5 @@
 package org.apache.lucene.queryparsers;
 
-import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -9,6 +8,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
+
+import java.util.Map;
 
 /* 
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -26,15 +27,12 @@ import org.apache.lucene.util.Version;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser
-{
-    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer)
-    {
+public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser {
+    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer) {
         super(matchVersion, fields, analyzer);
     }
 
-    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer, Map<String, Float> boosts)
-    {
+    HebrewMultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer, Map<String, Float> boosts) {
         super(matchVersion, fields, analyzer, boosts);
     }
 
@@ -80,17 +78,14 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser
     /// <summary>             if the length of the fields array differs from the length of
     /// the flags array
     /// </summary>
-    public static Query parse(Version matchVersion, String query, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException
-    {
+    public static Query parse(Version matchVersion, String query, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException {
         if (fields.length > flags.length)
             throw new IllegalArgumentException("fields.length != flags.length");
         BooleanQuery bQuery = new BooleanQuery();
-        for (int i = 0; i < fields.length; i++)
-        {
+        for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(matchVersion, fields[i], analyzer);
             Query q = qp.parse(query);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery)q).getClauses().length > 0))
-            {
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
                 bQuery.add(q, flags[i]);
             }
         }
@@ -124,17 +119,14 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser
     /// <summary>             if the length of the queries array differs from the length of
     /// the fields array
     /// </summary>
-    public static Query parse(Version matchVersion, String[] queries, String[] fields, Analyzer analyzer) throws ParseException
-    {
+    public static Query parse(Version matchVersion, String[] queries, String[] fields, Analyzer analyzer) throws ParseException {
         if (queries.length != fields.length)
             throw new IllegalArgumentException("queries.length != fields.length");
         BooleanQuery bQuery = new BooleanQuery();
-        for (int i = 0; i < fields.length; i++)
-        {
+        for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(matchVersion, fields[i], analyzer);
             Query q = qp.parse(queries[i]);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery)q).getClauses().length > 0))
-            {
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
                 bQuery.add(q, BooleanClause.Occur.SHOULD);
             }
         }
@@ -183,17 +175,14 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser
     /// <throws>  IllegalArgumentException </throws>
     /// <summary>             if the length of the queries, fields, and flags array differ
     /// </summary>
-    public static Query parse(Version matchVersion, String[] queries, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException
-    {
+    public static Query parse(Version matchVersion, String[] queries, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException {
         if (!(queries.length == fields.length && queries.length == flags.length))
             throw new IllegalArgumentException("queries, fields, and flags array have have different length");
         BooleanQuery bQuery = new BooleanQuery();
-        for (int i = 0; i < fields.length; i++)
-        {
+        for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(matchVersion, fields[i], analyzer);
             Query q = qp.parse(queries[i]);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery)q).getClauses().length > 0))
-            {
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
                 bQuery.add(q, flags[i]);
             }
         }

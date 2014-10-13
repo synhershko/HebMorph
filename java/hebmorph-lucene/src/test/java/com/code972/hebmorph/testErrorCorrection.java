@@ -13,7 +13,7 @@ public class testErrorCorrection extends TestBase {
     private final Lemmatizer _lemmatizer;
 
     public testErrorCorrection() throws IOException {
-        _lemmatizer = new Lemmatizer(getDictionary(), false);
+        _lemmatizer = new Lemmatizer(getDictionary(false));
     }
 
     @Test

@@ -20,41 +20,34 @@ package com.code972.hebmorph;
 
 import java.util.Arrays;
 
-public class MorphData
-{
-	private Integer[] descFlags;
-	private String[] lemmas;
-	private short prefixes;
+public class MorphData {
+    private Integer[] descFlags;
+    private String[] lemmas;
+    private short prefixes;
 
-	public void setLemmas(String[] lemmas)
-	{
-		this.lemmas = lemmas;
-	}
+    public void setLemmas(String[] lemmas) {
+        this.lemmas = lemmas;
+    }
 
-	public String[] getLemmas()
-	{
-		return lemmas;
-	}
+    public String[] getLemmas() {
+        return lemmas;
+    }
 
-	public void setPrefixes(short prefixes)
-	{
-		this.prefixes = prefixes;
-	}
+    public void setPrefixes(short prefixes) {
+        this.prefixes = prefixes;
+    }
 
-	public int getPrefixes()
-	{
-		return prefixes;
-	}
+    public int getPrefixes() {
+        return prefixes;
+    }
 
-	public void setDescFlags(Integer[] descFlags)
-	{
-		this.descFlags = descFlags;
-	}
+    public void setDescFlags(Integer[] descFlags) {
+        this.descFlags = descFlags;
+    }
 
-	public Integer[] getDescFlags()
-	{
-		return descFlags;
-	}
+    public Integer[] getDescFlags() {
+        return descFlags;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -83,6 +76,6 @@ public class MorphData
 
     @Override
     public String toString() {
-        return "{ prefix="+prefixes+" lemmas="+Arrays.asList(lemmas)+"}";
+        return "{ prefix=" + prefixes + " lemmas=" + Arrays.asList(lemmas) + "}";
     }
 }

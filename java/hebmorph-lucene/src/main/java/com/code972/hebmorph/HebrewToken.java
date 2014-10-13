@@ -18,22 +18,16 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
-import com.code972.hebmorph.hspell.LingInfo;
-
-public class HebrewToken extends Token implements Comparable<Token>
-{
+public class HebrewToken extends Token implements Comparable<Token> {
     private static final long serialVersionUID = -5809495040446607703L;
 
-    public HebrewToken(String _word, byte  _prefixLength, Integer _mask, String _lemma, float _score) {
+    public HebrewToken(String _word, byte _prefixLength, Integer _mask, String _lemma, float _score) {
         super(_word);
         prefixLength = _prefixLength;
         setMask(_mask);
-        if (_lemma == null)
-        {
+        if (_lemma == null) {
             lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
-        }
-        else
-        {
+        } else {
             lemma = _lemma;
         }
         setScore(_score);
@@ -97,46 +91,39 @@ public class HebrewToken extends Token implements Comparable<Token>
     }
 
     @Override
-    public String toString()
-    {
-        return String.format("%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
+    public String toString() {
+//        return String.format("%s (%s)", lemma, LingInfo.DMask2EnglishString(getMask()));
+        return String.format("%s", lemma);
     }
 
-    public final int compareTo(Token token)
-    {
-        HebrewToken other = (HebrewToken)((token instanceof HebrewToken) ? token : null);
+    public final int compareTo(Token token) {
+        HebrewToken other = (HebrewToken) ((token instanceof HebrewToken) ? token : null);
         if (other == null) return -1;
 
-        return ((Float)getScore()).compareTo(other.getScore());
+        return ((Float) getScore()).compareTo(other.getScore());
     }
 
-    public void setScore(float score)
-    {
+    public void setScore(float score) {
         this.score = score;
     }
 
-    public float getScore()
-    {
+    public float getScore() {
         return score;
     }
 
-    public void setMask(Integer mask)
-    {
+    public void setMask(Integer mask) {
         this.mask = mask;
     }
 
-    public Integer getMask()
-    {
+    public Integer getMask() {
         return mask;
     }
 
-    public byte getPrefixLength()
-    {
+    public byte getPrefixLength() {
         return prefixLength;
     }
 
-    public String getLemma()
-    {
+    public String getLemma() {
         return lemma;
     }
 }

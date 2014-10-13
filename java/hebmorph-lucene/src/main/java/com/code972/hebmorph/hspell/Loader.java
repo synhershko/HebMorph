@@ -47,9 +47,8 @@ public final class Loader {
     }
 
     /**
-     *
      * @param classloader
-     * @param hspellFolder      resources folder in which the hspell data is in; must end with /
+     * @param hspellFolder  resources folder in which the hspell data is in; must end with /
      * @param loadMorphData
      * @throws java.io.IOException
      */
@@ -79,18 +78,17 @@ public final class Loader {
                 dmasks.add(line);
             }
             reader.close();
-
             lookupLen = getWordCountInHSpellFolder(sizesFile);
             fdesc = new GZIPInputStream(descFile);
             fstem = new GZIPInputStream(stemsFile);
         }
     }
 
-	public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
+    public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
 
-		if (loadMorphData) {
+        if (loadMorphData) {
             // Load the count of morphological data slots required
-			final String lookup[] = new String[lookupLen + 1];
+            final String lookup[] = new String[lookupLen + 1];
 
             try {
                 final char[] sbuf = new char[Constants.MaxWordLength];
@@ -112,7 +110,10 @@ public final class Loader {
                     sbuf[slen++] = ISO8859_To_Unicode(c);
                 }
             } finally {
-                if (fdict != null) try { fdict.close(); } catch (IOException ignored) {}
+                if (fdict != null) try {
+                    fdict.close();
+                } catch (IOException ignored) {
+                }
             }
 
             final DictRadix<MorphData> ret = new DictRadix<MorphData>();
@@ -138,15 +139,24 @@ public final class Loader {
                     ret.addNode(lookup[i], data);
                 }
             } finally {
-                if (fprefixes != null) try { fprefixes.close(); } catch (IOException ignored) {}
-                if (fdesc != null) try { fdesc.close(); } catch (IOException ignored) {}
-                if (fstem != null) try { fstem.close(); } catch (IOException ignored) {}
+                if (fprefixes != null) try {
+                    fprefixes.close();
+                } catch (IOException ignored) {
+                }
+                if (fdesc != null) try {
+                    fdesc.close();
+                } catch (IOException ignored) {
+                }
+                if (fstem != null) try {
+                    fstem.close();
+                } catch (IOException ignored) {
+                }
             }
 
-			return ret;
+            return ret;
 
-		} else { // Use optimized version for loading HSpell's dictionary files
-			DictRadix<MorphData> ret = new DictRadix<MorphData>();
+        } else { // Use optimized version for loading HSpell's dictionary files
+            DictRadix<MorphData> ret = new DictRadix<MorphData>();
 
             try {
                 final char[] sbuf = new char[Constants.MaxWordLength];
@@ -175,13 +185,19 @@ public final class Loader {
                 }
 
             } finally {
-                if (fprefixes != null) try { fprefixes.close(); } catch (IOException ignored) {}
-                if (fdict != null) try { fdict.close(); } catch (IOException ignored) {}
+                if (fprefixes != null) try {
+                    fprefixes.close();
+                } catch (IOException ignored) {
+                }
+                if (fdict != null) try {
+                    fdict.close();
+                } catch (IOException ignored) {
+                }
             }
 
-			return ret;
-		}
-	}
+            return ret;
+        }
+    }
 
     public static int getWordCountInHSpellFolder(File path) throws IOException {
         return getWordCountInHSpellFolder(new FileInputStream(new File(path, Constants.sizesFile)));
@@ -203,11 +219,11 @@ public final class Loader {
     private final int[] buf = new int[5];
 
     private final ArrayList<Integer> wordMasks = new ArrayList<Integer>();
+
     final Integer[] readDescFile(InputStream fdesc) throws IOException {
         while ((buf[bufPos] = fdesc.read()) > -1) {
             // Break on EOL or EOF
-            if ((buf[bufPos] == '\n') || (buf[bufPos] == 0))
-            {
+            if ((buf[bufPos] == '\n') || (buf[bufPos] == 0)) {
                 bufPos = 0;
                 Integer[] ret = wordMasks.toArray(new Integer[wordMasks.size()]);
                 wordMasks.clear();
@@ -226,6 +242,7 @@ public final class Loader {
 
     // Note: What HSpell call "stems", which we define as lemmas
     private final ArrayList<Integer> wordStems = new ArrayList<Integer>();
+
     final List<Integer> readStemFile(InputStream fstem) throws IOException {
         wordStems.clear();
         while ((buf[bufPos] = fstem.read()) > -1) {
@@ -245,31 +262,30 @@ public final class Loader {
         return null;
     }
 
-	// Mapping is based on
-	// http://www.unicode.org/Public/MAPPINGS/ISO8859/8859-8.TXT
-	// 0xDF, 0xFD, 0xFE aren't converted
-	private static char ISO8859_To_Unicode(int c) {
-		if ((c >= 0xE0) && (c <= 0xFA))
-		{
-			return (char)(c + 0x4F0);
-		}
-		else if (c <= 0xBE)
-		{
-			return (char)c;
-		}
-		return ' ';
-	}
+    // Mapping is based on
+    // http://www.unicode.org/Public/MAPPINGS/ISO8859/8859-8.TXT
+    // 0xDF, 0xFD, 0xFE aren't converted
+    private static char ISO8859_To_Unicode(int c) {
+        if ((c >= 0xE0) && (c <= 0xFA)) {
+            return (char) (c + 0x4F0);
+        } else if (c <= 0xBE) {
+            return (char) c;
+        }
+        return ' ';
+    }
 
     private final static Integer[] descFlags_noun;
     private final static Integer[] descFlags_person_name;
     private final static Integer[] descFlags_place_name;
     private final static Integer[] descFlags_empty;
+
     static {
-        descFlags_noun = new Integer[] { 69 };
-        descFlags_person_name = new Integer[] { 262145 };
-        descFlags_place_name = new Integer[] { 262153 };
-        descFlags_empty = new Integer[] { 0 };
+        descFlags_noun = new Integer[]{69};
+        descFlags_person_name = new Integer[]{262145};
+        descFlags_place_name = new Integer[]{262153};
+        descFlags_empty = new Integer[]{0};
     }
+
     public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
         if (customWordsStream == null)
             return null;

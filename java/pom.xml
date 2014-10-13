@@ -10,7 +10,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hebmorph-core</module>
     <module>hebmorph-lucene</module>
   </modules>
 </project>
