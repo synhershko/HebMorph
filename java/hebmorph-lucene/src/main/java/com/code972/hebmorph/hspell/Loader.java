@@ -22,10 +22,7 @@ import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -54,7 +51,7 @@ public final class Loader {
      * @param classloader
      * @param hspellFolder      resources folder in which the hspell data is in; must end with /
      * @param loadMorphData
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public Loader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
         this(classloader.getResourceAsStream(hspellFolder + Constants.sizesFile), classloader.getResourceAsStream(hspellFolder + Constants.dmaskFile),
@@ -88,7 +85,7 @@ public final class Loader {
             fstem = new GZIPInputStream(stemsFile);
         }
     }
-	
+
 	public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
 
 		if (loadMorphData) {
@@ -205,7 +202,7 @@ public final class Loader {
     private int bufPos = 0;
     private final int[] buf = new int[5];
 
-    private final java.util.ArrayList<Integer> wordMasks = new java.util.ArrayList<Integer>();
+    private final ArrayList<Integer> wordMasks = new ArrayList<Integer>();
     final Integer[] readDescFile(InputStream fdesc) throws IOException {
         while ((buf[bufPos] = fdesc.read()) > -1) {
             // Break on EOL or EOF
@@ -228,7 +225,7 @@ public final class Loader {
     }
 
     // Note: What HSpell call "stems", which we define as lemmas
-    private final java.util.ArrayList<Integer> wordStems = new java.util.ArrayList<Integer>();
+    private final ArrayList<Integer> wordStems = new ArrayList<Integer>();
     final List<Integer> readStemFile(InputStream fstem) throws IOException {
         wordStems.clear();
         while ((buf[bufPos] = fstem.read()) > -1) {

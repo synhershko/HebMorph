@@ -21,6 +21,7 @@ package com.code972.hebmorph.lemmafilters;
 import com.code972.hebmorph.HebrewToken;
 import com.code972.hebmorph.Token;
 import com.code972.hebmorph.hspell.Constants.DMask;
+
 import java.util.List;
 
 

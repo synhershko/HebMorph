@@ -45,7 +45,7 @@ public final class LookupTolerators
 
 	*/
 
-	public static final ToleranceFunction[] TolerateEmKryiaAll = { new LookupTolerators.TolerateEmKryiaYud(), new LookupTolerators.TolerateEmKryiaVav(), new LookupTolerators.TolerateNonDoubledConsonantVav() };
+	public static final ToleranceFunction[] TolerateEmKryiaAll = { new TolerateEmKryiaYud(), new TolerateEmKryiaVav(), new TolerateNonDoubledConsonantVav() };
 
 	public interface ToleranceFunction
 	{

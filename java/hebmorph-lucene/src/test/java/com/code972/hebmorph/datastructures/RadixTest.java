@@ -117,7 +117,7 @@ public class RadixTest extends TestBase {
         // and that the nodes are alphabetically sorted
         int enCount = 0;
         String nodeText = "";
-        DictRadix<T>.RadixEnumerator en = (RadixEnumerator)d.iterator();
+        RadixEnumerator en = (RadixEnumerator)d.iterator();
         while(en.hasNext())
         {
             en.next();
