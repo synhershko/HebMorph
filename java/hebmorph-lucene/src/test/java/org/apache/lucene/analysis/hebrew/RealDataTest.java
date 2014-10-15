@@ -2,6 +2,7 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.ConstantsHandler;
 import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
@@ -69,7 +70,7 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
+        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), ConstantsHandler.readPrefixesFromFile(false), null, null);
         System.out.print("Dictionary initialized;");
 
         final HashSet<String> results = performSearch(a);
@@ -86,7 +87,7 @@ public class RealDataTest extends TestBase {
     @Test
     public void testMultiThreaded() throws IOException {
         //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LingInfo.buildPrefixTree(false));
+        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), ConstantsHandler.readPrefixesFromFile(false));
         System.out.println("Dictionary initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);

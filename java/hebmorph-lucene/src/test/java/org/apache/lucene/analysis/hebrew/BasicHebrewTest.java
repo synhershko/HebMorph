@@ -18,6 +18,7 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
+import com.code972.hebmorph.hspell.ConstantsHandler;
 import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
@@ -65,7 +66,7 @@ public class BasicHebrewTest extends TestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LingInfo.buildPrefixTree(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), ConstantsHandler.readPrefixesFromFile(false));
 	}
 
 	@After
@@ -153,7 +154,7 @@ public class BasicHebrewTest extends TestBase {
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), LingInfo.buildPrefixTree(false), null, new BasicLemmaFilter());
+                src = new StreamLemmasFilter(reader, getDictionary(), ConstantsHandler.readPrefixesFromFile(false), null, new BasicLemmaFilter());
                 src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {

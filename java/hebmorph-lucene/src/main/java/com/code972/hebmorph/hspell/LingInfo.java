@@ -25,29 +25,6 @@ import java.util.HashMap;
 
 public class LingInfo
 {
-	public static HashMap<String, Integer> buildPrefixTree(boolean allowHeHasheela)
-	{
-		String[] prefixes;
-		int[] masks;
-		if (allowHeHasheela)
-		{
-			prefixes = Constants.prefixes_H;
-			masks = Constants.masks_H;
-		}
-		else
-		{
-			prefixes = Constants.prefixes_noH;
-			masks = Constants.masks_noH;
-		}
-
-        HashMap<String, Integer> ret = new HashMap<>();
-		for (int i = 0; prefixes[i] != null; i++)
-		{
-			ret.put(prefixes[i], masks[i]);
-		}
-
-		return ret;
-	}
 
 	// find the prefixes required by a word according to its details
 	public static Integer DMask2ps(Integer dmask)

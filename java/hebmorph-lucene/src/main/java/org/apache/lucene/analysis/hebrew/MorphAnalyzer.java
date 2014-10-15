@@ -20,6 +20,7 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.ConstantsHandler;
 import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
@@ -56,7 +57,7 @@ public class MorphAnalyzer extends Analyzer {
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Byte> specialTokenizationCases,
                          final CharArraySet commonWords) throws IOException {
-        this(matchVersion, dict, LingInfo.buildPrefixTree(false), commonWords, specialTokenizationCases);
+        this(matchVersion, dict, ConstantsHandler.readPrefixesFromFile(false), commonWords, specialTokenizationCases);
     }
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) throws IOException {
@@ -64,7 +65,7 @@ public class MorphAnalyzer extends Analyzer {
     }
 
     public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
-        this(matchVersion, dict, LingInfo.buildPrefixTree(false), commonWords, null);
+        this(matchVersion, dict, ConstantsHandler.readPrefixesFromFile(false), commonWords, null);
     }
 
     /**
