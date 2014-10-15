@@ -69,12 +69,18 @@ public class LoadUtil {
     //
     //##########################
     //used for making the files
+
+
+
+
+
+
     public static boolean writePrefixesToFile(HashMap<String, Integer> prefixTree, String fileName){
         try{
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName));
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             for (Map.Entry<String,Integer> pair:prefixTree.entrySet()){
-                writer.write(pair.getKey() + DELIMETER + pair.getValue() + "\n");
+                bufferedWriter.write(pair.getKey() + DELIMETER + pair.getValue() + "\n");
             }
             writer.close();
         }catch(IOException e){

@@ -79,7 +79,6 @@ public final class Loader {
                 dmasks.add(line);
             }
             reader.close();
-
             lookupLen = getWordCountInHSpellFolder(sizesFile);
             fdesc = new GZIPInputStream(descFile);
             fstem = new GZIPInputStream(stemsFile);
