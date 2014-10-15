@@ -1,8 +1,5 @@
 package com.code972.hebmorph.hspell;
 
-import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.datastructures.DictRadix;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +7,14 @@ import java.util.Map;
 /**
  * Created by egozy on 10/13/14.
  */
-public class ConstantsHandler {
+public class LoadUtil {
     private final static String DELIMETER = "#",
             PREFIX_H="PREFIX_H.txt",
             PREFIX_NOH="PREFIX_NOH.txt";
 
     public static String getHspellPath() throws IOException {
         String hspellPath = null;
-            ClassLoader classLoader = ConstantsHandler.class.getClassLoader();
+            ClassLoader classLoader = LoadUtil.class.getClassLoader();
             File folder = new File(classLoader.getResource("").getPath());
             while (true) {
                 File tmp = new File(folder, "hspell-data-files");
@@ -67,10 +64,10 @@ public class ConstantsHandler {
         return map;
     }
 
-
-
-
-
+    //
+    //
+    //
+    //##########################
     //used for making the files
     public static boolean writePrefixesToFile(HashMap<String, Integer> prefixTree, String fileName){
         try{
