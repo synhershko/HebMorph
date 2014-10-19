@@ -5,11 +5,8 @@ import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by egozy on 10/13/14.
@@ -18,8 +15,8 @@ public class FileUtils {
     public final static String DELIMETER = "#",
             PREFIX_H="prefix_h.gz",
             PREFIX_NOH="prefix_noH.gz",
-            DICT_FILE="dict_file.gz";
-    public static final Charset ENCODING = Charset.forName("UTF-8");
+            DICT_FILE="dict.gz";
+    public static final Charset ENCODING_USED = Charset.forName("UTF-8");
 
     public static String getHspellPath() throws IOException {
         String hspellPath = null;
@@ -53,7 +50,7 @@ public class FileUtils {
             }else{
                 reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + PREFIX_NOH));
             }
-            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null){
                 String[] split = str.split(DELIMETER);
@@ -78,7 +75,7 @@ public class FileUtils {
         BufferedReader bufferedReader = null;
         try {
             reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + DICT_FILE));
-            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null) {
                 String[] split = str.split(DELIMETER); // 0=value,1=prefix,2=lemmas,3=descFlags
@@ -89,7 +86,7 @@ public class FileUtils {
                 MorphData md = new MorphData();
                 md.setPrefixes(Short.parseShort(split[1]));
                 String[] lemmas = split[2].split(",");
-                for (int i=0;i<lemmas.length;i++){
+                for (int i=0;i<lemmas.length;i++){ //null and "null" are read the same
                     if (lemmas[i].equals("null")){
                         lemmas[i] = null;
                     }
