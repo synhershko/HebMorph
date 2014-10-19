@@ -1,7 +1,7 @@
 
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.LoadUtil;
+import com.code972.hebmorph.hspell.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -38,7 +38,7 @@ public class TermPositionVectorTest extends TestBase {
 	@Before
 	public void setUp() throws Exception {
 		fieldType = initFieldType();
-		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LoadUtil.readPrefixesFromFile(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.readPrefixesFromFile(false));
 	}
 
 	@After

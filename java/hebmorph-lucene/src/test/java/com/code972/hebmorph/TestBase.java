@@ -1,8 +1,7 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.LoadUtil;
-import com.code972.hebmorph.hspell.Loader;
+import com.code972.hebmorph.hspell.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,10 +15,10 @@ public abstract class TestBase {
 
     protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
         if (dict == null) {
-//            String hspellPath = LoadUtil.getHspellPath();
+//            String hspellPath = FileUtils.getHspellPath();
 //            Loader loader = new Loader(new File(hspellPath), true);
 //            dict = loader.loadDictionaryFromHSpellData();
-            dict = LoadUtil.loadDicFromGzip();
+            dict = FileUtils.loadDicFromGzip();
         }
         return dict; 
     }

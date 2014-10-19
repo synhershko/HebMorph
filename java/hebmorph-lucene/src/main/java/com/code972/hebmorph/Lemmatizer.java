@@ -21,7 +21,7 @@ package com.code972.hebmorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.datastructures.RealSortedList;
 import com.code972.hebmorph.datastructures.RealSortedList.SortOrder;
-import com.code972.hebmorph.hspell.LoadUtil;
+import com.code972.hebmorph.hspell.FileUtils;
 import com.code972.hebmorph.hspell.LingInfo;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class Lemmatizer
     private DictRadix<MorphData> customWords;
 
 	public Lemmatizer(final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
-        this(dict, LoadUtil.readPrefixesFromFile(allowHeHasheela));
+        this(dict, FileUtils.readPrefixesFromFile(allowHeHasheela));
 	}
 
     public Lemmatizer(final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) {

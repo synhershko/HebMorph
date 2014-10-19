@@ -1,7 +1,7 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import com.code972.hebmorph.hspell.LoadUtil;
+import com.code972.hebmorph.hspell.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -17,7 +17,7 @@ public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCas
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             Tokenizer src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), LoadUtil.readPrefixesFromFile(false));
+                src = new StreamLemmasFilter(reader, getDictionary(), FileUtils.readPrefixesFromFile(false));
             } catch (IOException e) {
                 e.printStackTrace();
             }
