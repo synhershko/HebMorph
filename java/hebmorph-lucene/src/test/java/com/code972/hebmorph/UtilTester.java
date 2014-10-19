@@ -11,6 +11,7 @@ import com.code972.hebmorph.hspell.Loader;
 import org.junit.Test;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,17 +20,35 @@ import java.util.zip.GZIPOutputStream;
 
 public class UtilTester {
 
-    private final String FILE_NAME = "PREFIX_NOH.txt";
-
+    @Test
+    public void compareLoaderWithLoad() throws IOException {
+        long startTime,endTime;
+        startTime = System.nanoTime();
+        Loader loader = new Loader(new File(LoadUtil.getHspellPath()), true);
+        DictRadix<MorphData> dictLoader = loader.loadDictionaryFromHSpellData();
+        endTime = System.nanoTime();
+        double duration1 = (double)(endTime - startTime) / (1000000000);
+        startTime = System.nanoTime();
+        DictRadix<MorphData> dictLoad = LoadUtil.loadDicFromGzip();
+        endTime = System.nanoTime();
+        double duration2 = (double)(endTime - startTime) / (1000000000);
+        System.out.println("old: " + duration1 + " seconds ---> new: " + duration2 + " seconds");
+        DictRadix.RadixEnumerator en1 = (DictRadix.RadixEnumerator)dictLoader.iterator();
+        DictRadix.RadixEnumerator en2 = (DictRadix.RadixEnumerator)dictLoad.iterator();
+        while(en1.hasNext() && en2.hasNext()){
+            assert(en1.getCurrentKey().equals(en2.getCurrentKey()));
+            assert(en1.next().equals(en2.next()));
+        }
+    }
 //    @Test
     public void testBasicWriting() throws IOException {
         HashMap<String,Integer> map = LoadUtil.readPrefixesFromFile(false);
-        LoadUtil.writePrefixesToFile(map, LoadUtil.getHspellPath() + FILE_NAME);
+        LoadUtil.writePrefixesToFile(map, LoadUtil.getHspellPath() + "PREFIX_NOH.txt");
     }
 
 //    @Test
     public void testBasicReading() throws IOException {
-        HashMap<String,Integer> map = LoadUtil.readPrefixesFromFile(LoadUtil.getHspellPath() + FILE_NAME);
+        HashMap<String,Integer> map = LoadUtil.readPrefixesFromFile(LoadUtil.getHspellPath() + "PREFIX_NOH.txt");
         System.out.println(map.toString());
     }
 
@@ -39,54 +58,13 @@ public class UtilTester {
         System.out.println(map);
     }
 
-    private int BUFFER_SIZE = 8192;
-    @Test
-    public void readFromGzipDic() throws IOException {
-        DictRadix<MorphData> dict = new DictRadix<>();
-        GZIPInputStream reader = null;
-        BufferedReader bufferedReader = null;
-        try {
-            reader = new GZIPInputStream(new FileInputStream(LoadUtil.getHspellPath() + "DICT_FILE.gz"));
-            bufferedReader = new BufferedReader(new InputStreamReader(reader,"UTF-8"));
-            String str;
-            while ((str = bufferedReader.readLine()) != null) {
-                String[] split = str.split("#"); // 0=value,1=prefix,2=lemmas,3=descFlags
-                if (split.length != 4) {
-                    System.out.println("ERROR");
-                    //TODO: error
-                }
-                MorphData md = new MorphData();
-                md.setPrefixes(Short.parseShort(split[1]));
-                md.setLemmas(split[2].split(","));
-                String[] descStrings = split[3].split(",");
-                Integer[] descInts = new Integer[descStrings.length];
-                for (int i = 0; i < descStrings.length; i++) {
-                    descInts[i] = Integer.parseInt(descStrings[i]);
-                }
-                md.setDescFlags(descInts);
-                dict.addNode(split[0], md);
-            }
-        }catch (IOException e){
-            System.out.println("ERROR");
-            //TODO error
-        }
-        finally{
-            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}
-            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
-
-        }
-        System.out.println(dict.getCount());
-    }
-
-
     InputStream fdict;
     InputStream fprefixes;
     int lookupLen;
     InputStream fdesc;
     InputStream fstem;
     List<String> dmasks;
-
-        @Test
+//    @Test
     public void playWithLoader() throws IOException {
             // Load the count of morphological data slots required
         fdict = new GZIPInputStream(new FileInputStream(LoadUtil.getHspellPath() + Constants.dictionaryFile));
@@ -131,12 +109,14 @@ public class UtilTester {
             } finally {
                 if (fdict != null) try { fdict.close(); } catch (IOException ignored) {}
             }
-
+            GZIPOutputStream writer = null;
+//            FileOutputStream writer = null;
+            BufferedWriter bufferedWriter = null;
             final DictRadix<MorphData> ret = new DictRadix<MorphData>();
             try {
-//                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(LoadUtil.getHspellPath() + "DICT_FILE.txt"));
-                GZIPOutputStream writer = new GZIPOutputStream(new FileOutputStream(LoadUtil.getHspellPath() + "DICT_FILE.gz"));
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, "UTF-8"));
+//                writer = (new FileOutputStream(LoadUtil.getHspellPath() + "DICT_FILE.txt"));
+                writer = new GZIPOutputStream(new FileOutputStream(LoadUtil.getHspellPath() + "DICT_FILE.gz"));
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, Charset.forName("UTF-8")));
                 for (int i = 0; lookup[i] != null; i++) {
 //                    System.out.println(i);
                     MorphData data = new MorphData();
@@ -159,22 +139,25 @@ public class UtilTester {
                     String writtenString = new String();
                     writtenString+= (lookup[i] + "#" + data.getPrefixes() + "#");
                     for (String str:data.getLemmas()){
-                        writtenString+=(str + ",");
+                        writtenString += (str + ",");
                     }
 
                     writtenString+=("#");
                     for (int d:data.getDescFlags()){
-                        writtenString+=(i + ",");
+                        writtenString+=(d + ",");
                     }
                     writtenString+="\n";
 //                    System.out.println(writtenString);
                     bufferedWriter.write(writtenString);
                 }
+
             } finally {
                 if (fprefixes != null) try { fprefixes.close(); } catch (IOException ignored) {}
                 if (fdesc != null) try { fdesc.close(); } catch (IOException ignored) {}
                 if (fstem != null) try { fstem.close(); } catch (IOException ignored) {}
                 if (fstem != null) try { fstem.close(); } catch (IOException ignored) {}
+                if (bufferedWriter != null) try { bufferedWriter.close(); } catch (IOException ignored) {}
+                if (writer != null) try { writer.close(); } catch (IOException ignored) {}
             }
         System.out.println(ret.getCount());
     }

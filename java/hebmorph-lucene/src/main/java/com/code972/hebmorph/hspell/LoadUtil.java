@@ -1,8 +1,14 @@
 package com.code972.hebmorph.hspell;
 
+import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictRadix;
+
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by egozy on 10/13/14.
@@ -10,7 +16,8 @@ import java.util.Map;
 public class LoadUtil {
     private final static String DELIMETER = "#",
             PREFIX_H="PREFIX_H.txt",
-            PREFIX_NOH="PREFIX_NOH.txt";
+            PREFIX_NOH="PREFIX_NOH.txt",
+            DICT_FILE="DICT_FILE.gz";
 
     public static String getHspellPath() throws IOException {
         String hspellPath = null;
@@ -64,17 +71,63 @@ public class LoadUtil {
         return map;
     }
 
+
+    public static DictRadix<MorphData> loadDicFromGzip() throws IOException {
+        DictRadix<MorphData> dict = new DictRadix<>();
+        GZIPInputStream reader = null;
+        BufferedReader bufferedReader = null;
+        int j=0;
+        try {
+            reader = new GZIPInputStream(new FileInputStream(LoadUtil.getHspellPath() + DICT_FILE));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, Charset.forName("UTF-8")));
+            String str;
+            while ((str = bufferedReader.readLine()) != null) {
+                j++;
+                String[] split = str.split(DELIMETER); // 0=value,1=prefix,2=lemmas,3=descFlags
+                if (split.length != 4) {
+                    System.out.println("ERROR");
+                    //TODO: error
+                }
+                MorphData md = new MorphData();
+                md.setPrefixes(Short.parseShort(split[1]));
+                String[] lemmas = split[2].split(",");
+                for (int i=0;i<lemmas.length;i++){
+                    if (lemmas[i].equals("null")){
+                        lemmas[i] = null;
+                    }
+                }
+                md.setLemmas(lemmas);
+                String[] descStrings = split[3].split(",");
+                Integer[] descInts = new Integer[descStrings.length];
+                for (int i = 0; i < descStrings.length; i++) {
+                    descInts[i] = Integer.parseInt(descStrings[i]);
+                }
+                Arrays.toString(descInts);
+                md.setDescFlags(descInts);
+                dict.addNode(split[0], md);
+            }
+        }catch (IOException e){
+            System.out.println("ERROR : " + e);
+            //TODO error
+        }
+        finally{
+            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}
+            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
+        }
+        return dict;
+    }
+
+
+
+
+
+
+
     //
     //
     //
     //##########################
     //used for making the files
-
-
-
-
-
-
     public static boolean writePrefixesToFile(HashMap<String, Integer> prefixTree, String fileName){
         try{
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName));

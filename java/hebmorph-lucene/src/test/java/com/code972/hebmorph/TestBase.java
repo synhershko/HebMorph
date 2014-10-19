@@ -16,9 +16,10 @@ public abstract class TestBase {
 
     protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
         if (dict == null) {
-            String hspellPath = LoadUtil.getHspellPath();
-            Loader loader = new Loader(new File(hspellPath), true);
-            dict = loader.loadDictionaryFromHSpellData();
+//            String hspellPath = LoadUtil.getHspellPath();
+//            Loader loader = new Loader(new File(hspellPath), true);
+//            dict = loader.loadDictionaryFromHSpellData();
+            dict = LoadUtil.loadDicFromGzip();
         }
         return dict; 
     }
