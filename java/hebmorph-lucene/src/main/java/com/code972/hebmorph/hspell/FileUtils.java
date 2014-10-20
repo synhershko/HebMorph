@@ -1,6 +1,7 @@
 package com.code972.hebmorph.hspell;
 
 import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
@@ -14,19 +15,6 @@ import java.util.zip.GZIPOutputStream;
  * Created by egozy on 10/13/14.
  */
 public class FileUtils {
-
-    private static HashMap<String,Integer> prefixes = null;
-    private static boolean prefixesWithH = false;
-    public static HashMap<String,Integer> getPrefixes(){
-        return prefixes;
-    }
-    public static HashMap<String,Integer> getPrefixes(boolean allowHeHasheela){
-        if (prefixes == null || allowHeHasheela!=prefixesWithH){
-            prefixes = readPrefixesFromFile(allowHeHasheela);
-            prefixesWithH = allowHeHasheela;
-        }
-        return prefixes;
-    }
 
     public final static String DELIMETER = "#",
             PREFIX_H="prefix_h.gz",
@@ -59,8 +47,8 @@ public class FileUtils {
         return hspellPath;
     }
 
-    //used when loading using the Loader and thus prefixes aren't loadede automatically
-    private static HashMap<String,Integer> readPrefixesFromFile(boolean allowHeHasheela) {
+    //used when loading using the Loader and thus prefixes aren't loaded automatically
+    public static HashMap<String,Integer> readPrefixesFromFile(boolean allowHeHasheela) {
         HashMap<String,Integer> map = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
@@ -90,7 +78,7 @@ public class FileUtils {
     }
 
     //saves a complete dictionary and the corresponding prefixes to fileName.
-    public static void saveDicAndPrefixesToGzip(DictRadix<MorphData> dict, HashMap<String,Integer> prefixes, String fileName) throws IOException {
+    public static void saveDicAndPrefixesToGzip(DictHebMorph dict, String fileName) throws IOException {
         GZIPOutputStream writer = null;
         BufferedWriter bufferedWriter = null;
         try{
@@ -98,12 +86,12 @@ public class FileUtils {
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, ENCODING_USED));
             //write the prefixes
             bufferedWriter.write(PREFIXES_INDICATOR + "\n");
-            for (Map.Entry<String,Integer> pair:prefixes.entrySet()){
+            for (Map.Entry<String,Integer> pair:dict.getPref().entrySet()){
                 bufferedWriter.write(pair.getKey() + FileUtils.DELIMETER + pair.getValue() + "\n");
             }
             //write the dictionary
             bufferedWriter.write(DICTIONARY_INDICATOR + "\n");
-            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator)dict.iterator();
+            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator)dict.getRadix().iterator();
             while (en.hasNext()){
                 String mdName = en.getCurrentKey();
                 MorphData md = (MorphData) en.next();
@@ -125,15 +113,10 @@ public class FileUtils {
         }
     }
 
-    //load dict_h, can be changed later on if necessary.
-    public static DictRadix<MorphData> loadDicFromGzip() throws IOException{
-        return loadDicAndPrefixesFromGzip(getHspellPath() + DICT_H);
-    }
-
     //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
-    public static DictRadix<MorphData> loadDicAndPrefixesFromGzip(String fileName) throws IOException{
+    public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException{
         DictRadix<MorphData> dict = new DictRadix<>();
-        prefixes = new HashMap<>();
+        HashMap<String, Integer> prefixes = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
         try {
@@ -182,6 +165,7 @@ public class FileUtils {
             if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}
             if (reader != null) try { reader.close(); } catch (IOException ignored) {}
         }
-        return dict;
+        DictHebMorph ret = new DictHebMorph(dict,prefixes);
+        return ret;
     }
 }

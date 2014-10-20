@@ -19,8 +19,8 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.FileUtils;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
@@ -34,7 +34,6 @@ import org.apache.lucene.util.Version;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 
 public class MorphAnalyzer extends Analyzer {
 	/** An unmodifiable set containing some common Hebrew words that are usually not
@@ -49,68 +48,25 @@ public class MorphAnalyzer extends Analyzer {
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
     private static final String DEFAULT_HSPELL_ENV_VARIABLE = "HSPELL_DATA_FILES_PATH";
     protected final Version matchVersion;
-    private final DictRadix<MorphData> dictRadix;
-    private final HashMap<String, Integer> prefixes;
     private DictRadix<Byte> specialTokenizationCases;
+    private final DictHebMorph dict;
     private Character suffixForExactMatch;
 
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final DictRadix<Byte> specialTokenizationCases,
-                         final CharArraySet commonWords) throws IOException {
-        this(matchVersion, dict, FileUtils.getPrefixes(false), commonWords, specialTokenizationCases);
+    public MorphAnalyzer(final Version matchVersion, final DictHebMorph dict) throws IOException {
+        this(matchVersion, dict, null, null);
     }
 
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) throws IOException {
-        this(matchVersion, dict, prefixes, null, null);
-    }
-
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dict, final CharArraySet commonWords) throws IOException {
-        this(matchVersion, dict, FileUtils.getPrefixes(false), commonWords, null);
-    }
-
-    /**
-     * Initializes using data files at the default location on the classpath.
-     */
-    public MorphAnalyzer(final Version version) throws IOException {
-        this(version, loadFromClasspath(DEFAULT_HSPELL_DATA_CLASSPATH), null, null);
-    }
-
-    /**
-     * Initializes using data files at the specified location on the classpath.
-     */
-    public MorphAnalyzer(final Version version, final String hspellClasspath) throws IOException {
-        this(version, hspellClasspath, null);
-    }
-
-    public MorphAnalyzer(final Version version, final String hspellClasspath, final CharArraySet commonWords) throws IOException {
-        this(version, loadFromClasspath(hspellClasspath), commonWords);
-    }
-
-    /**
-     * Initializes using data files at the specified location (hspellPath must be a directory).
-     */
-    public MorphAnalyzer(final Version version, final File hspellPath) throws IOException {
-        this(version, hspellPath, null);
-    }
-
-    /**
-     * Initializes using data files at the specified location (hspellPath must be a directory).
-     */
-    public MorphAnalyzer(final Version version, final File hspellPath, final CharArraySet commonWords) throws IOException {
-        this(version, loadFromPath(hspellPath), commonWords);
-    }
-
-    public MorphAnalyzer(final Version matchVersion, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes,
+    public MorphAnalyzer(final Version matchVersion, final DictHebMorph dict,
                          final CharArraySet commonWords, final DictRadix<Byte> specialTokenizationCases) throws IOException {
         this.matchVersion = matchVersion;
-        this.dictRadix = dictRadix;
-        this.prefixes = prefixes;
+        this.dict = dict;
         this.specialTokenizationCases = specialTokenizationCases;
         this.commonWords = commonWords;
     }
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixes, specialTokenizationCases, commonWords, lemmaFilter);
+        final StreamLemmasFilter src = new StreamLemmasFilter(reader, dict, specialTokenizationCases, commonWords, lemmaFilter);
         src.setKeepOriginalWord(keepOriginalWord);
         src.setSuffixForExactMatch(suffixForExactMatch);
         TokenStream tok = new SuffixKeywordFilter(src, '$');

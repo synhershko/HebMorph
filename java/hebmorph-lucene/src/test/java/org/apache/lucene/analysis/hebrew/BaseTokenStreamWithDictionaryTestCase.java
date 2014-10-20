@@ -1,6 +1,7 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.FileUtils;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -13,12 +14,17 @@ import java.io.IOException;
  * Created by synhershko on 21/06/14.
  */
 public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStreamTestCase {
-    private static DictRadix<MorphData> dict;
+    private static DictHebMorph dict;
 
-    protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
+    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         String hspellPath = null;
         if (dict == null) {
-            dict = FileUtils.loadDicFromGzip();
+            if (allowHeHasheela) {
+                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_H);
+            }
+            else {
+                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_NOH);
+            }
         }
         return dict;
     }

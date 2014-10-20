@@ -31,6 +31,23 @@ public class RadixTest extends TestBase {
         doDoubleAddTest(d, new RandomGenerator());
     }
 
+    @Test
+    public void basicTestEquals(){
+        DictRadix<Integer> d1 = new DictRadix<Integer>();
+        DictRadix<Integer> d2 = new DictRadix<Integer>();
+        assert(d1.equals(d2));
+        d1.addNode("a",1);
+        assert(!d1.equals(d2));
+        d2.addNode("a",1);
+        assert(d1.equals(d2));
+        d1.addNode("b",2);
+        assert(!d1.equals(d2));
+        d2.addNode("b",2);
+        assert(d1.equals(d2));
+        d2.addNode("c",3);
+        assert(!d1.equals(d2));
+    }
+
     <T>void doDoubleAddTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
         d.clear();
 

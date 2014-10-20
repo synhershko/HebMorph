@@ -1,5 +1,6 @@
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.FileUtils;
 
@@ -11,14 +12,19 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 
 public abstract class TestBase {
-    private static DictRadix<MorphData> dict;
+    private static DictHebMorph dict;
 
-    protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
+    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
 //            String hspellPath = FileUtils.getHspellPath();
 //            Loader loader = new Loader(new File(hspellPath), true);
 //            dict = loader.loadDictionaryFromHSpellData();
-            dict = FileUtils.loadDicFromGzip();
+            if (allowHeHasheela){
+                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_H);
+            }
+            else{
+                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_NOH);
+            }
         }
         return dict; 
     }

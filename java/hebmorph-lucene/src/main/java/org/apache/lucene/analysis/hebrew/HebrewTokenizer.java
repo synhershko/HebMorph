@@ -46,11 +46,11 @@ public final class HebrewTokenizer extends Tokenizer
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
 	public HebrewTokenizer(final Reader _input) {
-		this(_input, FileUtils.getPrefixes(false), null);
+		this(_input, FileUtils.readPrefixesFromFile(false), null);
 	}
 
     public HebrewTokenizer(final Reader _input, final DictRadix<Byte> specialCases) {
-        this(_input, FileUtils.getPrefixes(false), specialCases);
+        this(_input, FileUtils.readPrefixesFromFile(false), specialCases);
     }
 
 	public HebrewTokenizer(final Reader _input, final HashMap<String, Integer> _prefixesTree, final DictRadix<Byte> specialCases) {

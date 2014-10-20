@@ -19,6 +19,7 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.*;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Tokenizer;
@@ -51,22 +52,22 @@ public class StreamLemmasFilter extends Tokenizer
     private final Set<String> previousLemmas = new HashSet<String>();
     private boolean keepOriginalWord;
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes) {
-		this(input, dictRadix, prefixes, null, null, null);
+    public StreamLemmasFilter(final Reader input, final DictHebMorph dict) {
+		this(input, dict, null, null, null);
 	}
 
-	public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes, final LemmaFilterBase lemmaFilter) {
-        this(input, dictRadix, prefixes, null, null, lemmaFilter);
+	public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final LemmaFilterBase lemmaFilter) {
+        this(input, dict, null, null, lemmaFilter);
     }
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
-        this(input, dictRadix, prefixes, null, commonWords, lemmaFilter);
+    public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+        this(input, dict, null, commonWords, lemmaFilter);
     }
 
-    public StreamLemmasFilter(Reader _input, DictRadix<MorphData> dictRadix, HashMap<String, Integer> prefixes,
+    public StreamLemmasFilter(Reader _input, DictHebMorph dict,
                               DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
         super(_input);
-        _streamLemmatizer = new StreamLemmatizer(input, dictRadix, prefixes, specialTokenizationCases);
+        _streamLemmatizer = new StreamLemmatizer(input, dict, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
         charUtils = CharacterUtils.getInstance(Version.LUCENE_46);

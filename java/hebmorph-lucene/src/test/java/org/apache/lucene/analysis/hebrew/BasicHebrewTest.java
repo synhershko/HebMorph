@@ -65,7 +65,7 @@ public class BasicHebrewTest extends TestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.getPrefixes(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(false));
 	}
 
 	@After
@@ -153,7 +153,7 @@ public class BasicHebrewTest extends TestBase {
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), FileUtils.getPrefixes(false), null, new BasicLemmaFilter());
+                src = new StreamLemmasFilter(reader, getDictionary(false), null, new BasicLemmaFilter());
                 src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {

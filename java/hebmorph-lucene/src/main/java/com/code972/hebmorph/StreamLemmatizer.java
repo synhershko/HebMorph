@@ -18,6 +18,7 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants.DMask;
 
@@ -30,19 +31,13 @@ import java.util.List;
 public class StreamLemmatizer extends Lemmatizer {
 	private final Tokenizer _tokenizer;
 
-    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
-        this(input, dict, allowHeHasheela, null);
+    public StreamLemmatizer(final Reader input, final DictHebMorph dict) {
+        this(input, dict, null);
     }
 
-	public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final boolean allowHeHasheela,
+    public StreamLemmatizer(final Reader input, final DictHebMorph dict,
                             final DictRadix<Byte> specialTokenizationCases) {
-		super(dict, allowHeHasheela);
-		_tokenizer = new Tokenizer(input, specialTokenizationCases);
-	}
-
-    public StreamLemmatizer(final Reader input, final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes,
-                            final DictRadix<Byte> specialTokenizationCases) {
-        super(dict, prefixes);
+        super(dict);
         _tokenizer = new Tokenizer(input, specialTokenizationCases);
     }
 

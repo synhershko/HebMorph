@@ -21,8 +21,6 @@ package com.code972.hebmorph.hspell;
 import com.code972.hebmorph.hspell.Constants.DMask;
 import com.code972.hebmorph.hspell.Constants.PrefixType;
 
-import java.util.HashMap;
-
 public class LingInfo {
 
     // find the prefixes required by a word according to its details
