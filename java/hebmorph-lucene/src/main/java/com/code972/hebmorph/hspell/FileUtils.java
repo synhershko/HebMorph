@@ -6,16 +6,35 @@ import com.code972.hebmorph.datastructures.DictRadix;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by egozy on 10/13/14.
  */
 public class FileUtils {
+
+    private static HashMap<String,Integer> prefixes = null;
+    private static boolean prefixesWithH = false;
+    public static HashMap<String,Integer> getPrefixes(){
+        return prefixes;
+    }
+    public static HashMap<String,Integer> getPrefixes(boolean allowHeHasheela){
+        if (prefixes == null || allowHeHasheela!=prefixesWithH){
+            prefixes = readPrefixesFromFile(allowHeHasheela);
+            prefixesWithH = allowHeHasheela;
+        }
+        return prefixes;
+    }
+
     public final static String DELIMETER = "#",
             PREFIX_H="prefix_h.gz",
             PREFIX_NOH="prefix_noH.gz",
-            DICT_FILE="dict.gz";
+            DICT_H="dict_h.gz",
+            DICT_NOH="dict_noH.gz",
+            PREFIXES_INDICATOR = "#PREFIXES",
+            DICTIONARY_INDICATOR = "#DICTIONARY";
     public static final Charset ENCODING_USED = Charset.forName("UTF-8");
 
     public static String getHspellPath() throws IOException {
@@ -40,7 +59,8 @@ public class FileUtils {
         return hspellPath;
     }
 
-    public static HashMap<String,Integer> readPrefixesFromFile(boolean allowHeHasheela) {
+    //used when loading using the Loader and thus prefixes aren't loadede automatically
+    private static HashMap<String,Integer> readPrefixesFromFile(boolean allowHeHasheela) {
         HashMap<String,Integer> map = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
@@ -69,14 +89,71 @@ public class FileUtils {
         return map;
     }
 
-    public static DictRadix<MorphData> loadDicFromGzip() throws IOException {
+    //saves a complete dictionary and the corresponding prefixes to fileName.
+    public static void saveDicAndPrefixesToGzip(DictRadix<MorphData> dict, HashMap<String,Integer> prefixes, String fileName) throws IOException {
+        GZIPOutputStream writer = null;
+        BufferedWriter bufferedWriter = null;
+        try{
+            writer = new GZIPOutputStream(new FileOutputStream(fileName));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, ENCODING_USED));
+            //write the prefixes
+            bufferedWriter.write(PREFIXES_INDICATOR + "\n");
+            for (Map.Entry<String,Integer> pair:prefixes.entrySet()){
+                bufferedWriter.write(pair.getKey() + FileUtils.DELIMETER + pair.getValue() + "\n");
+            }
+            //write the dictionary
+            bufferedWriter.write(DICTIONARY_INDICATOR + "\n");
+            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator)dict.iterator();
+            while (en.hasNext()){
+                String mdName = en.getCurrentKey();
+                MorphData md = (MorphData) en.next();
+                String writtenString = new String();
+                writtenString+= (mdName + "#" + md.getPrefixes() + "#");
+                for (String str:md.getLemmas()){
+                    writtenString += (str + ",");
+                }
+                writtenString+=("#");
+                for (int d:md.getDescFlags()){
+                    writtenString+=(d + ",");
+                }
+                writtenString+="\n";
+                bufferedWriter.write(writtenString);
+            }
+        }finally{
+            if (bufferedWriter != null) try { bufferedWriter.close(); } catch (IOException ignored) {}
+            if (writer != null) try { writer.close(); } catch (IOException ignored) {}
+        }
+    }
+
+    //load dict_h, can be changed later on if necessary.
+    public static DictRadix<MorphData> loadDicFromGzip() throws IOException{
+        return loadDicAndPrefixesFromGzip(getHspellPath() + DICT_H);
+    }
+
+    //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
+    public static DictRadix<MorphData> loadDicAndPrefixesFromGzip(String fileName) throws IOException{
         DictRadix<MorphData> dict = new DictRadix<>();
+        prefixes = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
         try {
-            reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + DICT_FILE));
+            reader = new GZIPInputStream(new FileInputStream(fileName));
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
+            if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)){
+                //TODO:ERROR
+            }
+            while (!(str = bufferedReader.readLine()).equals(DICTIONARY_INDICATOR)){
+                String[] split = str.split(DELIMETER);
+                if (split.length!=2){
+                    //TODO: Error
+                }else{
+                    prefixes.put(split[0],Integer.parseInt(split[1]));
+                }
+            }
+            if (!str.equals(DICTIONARY_INDICATOR)){
+                //TODO:ERROR
+            }
             while ((str = bufferedReader.readLine()) != null) {
                 String[] split = str.split(DELIMETER); // 0=value,1=prefix,2=lemmas,3=descFlags
                 if (split.length != 4) {
@@ -100,9 +177,6 @@ public class FileUtils {
                 md.setDescFlags(descInts);
                 dict.addNode(split[0], md);
             }
-        }catch (IOException e){
-            System.out.println("ERROR : " + e);
-            //TODO error
         }
         finally{
             if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}

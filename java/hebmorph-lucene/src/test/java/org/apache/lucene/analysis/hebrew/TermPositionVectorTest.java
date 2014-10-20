@@ -38,7 +38,7 @@ public class TermPositionVectorTest extends TestBase {
 	@Before
 	public void setUp() throws Exception {
 		fieldType = initFieldType();
-		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.readPrefixesFromFile(false));
+		analyzer = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.getPrefixes(false));
 	}
 
 	@After
