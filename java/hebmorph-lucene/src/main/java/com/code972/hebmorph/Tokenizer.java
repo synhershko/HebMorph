@@ -141,7 +141,7 @@ public class Tokenizer {
     public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
         this.input = input;
         this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>(false);
-        hebrewPrefixes = FileUtils.readPrefixesFromFile(false);
+        hebrewPrefixes = FileUtils.getPrefixes(false);
     }
 
     final static int TOKENIZATION_EXCEPTION_MAX_LENGTH = 25;

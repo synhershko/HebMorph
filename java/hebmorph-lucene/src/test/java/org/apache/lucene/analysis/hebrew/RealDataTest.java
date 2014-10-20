@@ -69,7 +69,7 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), FileUtils.readPrefixesFromFile(false), null, null);
+        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), FileUtils.getPrefixes(false), null, null);
         System.out.print("Dictionary initialized;");
 
         final HashSet<String> results = performSearch(a);
@@ -86,7 +86,7 @@ public class RealDataTest extends TestBase {
     @Test
     public void testMultiThreaded() throws IOException {
         //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.readPrefixesFromFile(false));
+        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), FileUtils.getPrefixes(false));
         System.out.println("Dictionary initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);

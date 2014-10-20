@@ -34,7 +34,7 @@ public class Lemmatizer
     private DictRadix<MorphData> customWords;
 
 	public Lemmatizer(final DictRadix<MorphData> dict, final boolean allowHeHasheela) {
-        this(dict, FileUtils.readPrefixesFromFile(allowHeHasheela));
+        this(dict, FileUtils.getPrefixes(allowHeHasheela));
 	}
 
     public Lemmatizer(final DictRadix<MorphData> dict, final HashMap<String, Integer> prefixes) {
