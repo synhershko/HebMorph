@@ -1,8 +1,7 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.FileUtils;
+import com.code972.hebmorph.hspell.HebLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,13 +15,10 @@ public abstract class TestBase {
 
     protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
-//            String hspellPath = FileUtils.getHspellPath();
-//            Loader loader = new Loader(new File(hspellPath), true);
-//            dict = loader.loadDictionaryFromHSpellData();
             if (allowHeHasheela) {
-                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_H);
+                dict = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_H);
             } else {
-                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_NOH);
+                dict = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_NOH);
             }
         }
         return dict;

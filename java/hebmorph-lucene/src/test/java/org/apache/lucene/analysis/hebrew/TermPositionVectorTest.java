@@ -1,7 +1,6 @@
 
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;

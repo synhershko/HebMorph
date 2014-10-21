@@ -17,7 +17,7 @@ public class DictHebMorph {
         this.dict = dict;
     }
 
-    //getters.
+//    getters.
     public DictRadix<MorphData> getRadix() {
         return dict;
     }
@@ -39,7 +39,7 @@ public class DictHebMorph {
             return false;
         if (getClass() != other.getClass())
             return false;
-        DictHebMorph dict = (DictHebMorph) other;
-        return (this.getRadix().equals(((DictHebMorph) other).getRadix()) && this.getPref().equals(((DictHebMorph) other).getPref()));
+        DictHebMorph otherDict = (DictHebMorph) other;
+        return (this.dict.equals(otherDict.dict) && this.pref.equals(otherDict.pref));
     }
 }

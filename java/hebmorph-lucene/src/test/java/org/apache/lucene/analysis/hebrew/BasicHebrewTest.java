@@ -18,7 +18,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.FileUtils;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SuffixKeywordFilter;

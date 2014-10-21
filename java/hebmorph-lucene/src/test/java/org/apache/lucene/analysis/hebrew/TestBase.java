@@ -1,10 +1,7 @@
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.FileUtils;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import com.code972.hebmorph.hspell.HebLoader;
 import org.junit.AfterClass;
 
 import java.io.File;
@@ -19,10 +16,10 @@ public abstract class TestBase {
         String hspellPath = null;
         if (dict == null) {
             if (allowHeHasheela) {
-                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_H);
+                dict = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_H);
             }
                 else {
-                dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_NOH);
+                dict = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_NOH);
             }
         }
         return dict;

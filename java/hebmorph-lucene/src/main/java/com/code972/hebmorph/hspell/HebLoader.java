@@ -14,7 +14,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Created by egozy on 10/13/14.
  */
-public class FileUtils {
+public class HebLoader {
 
     public final static String DELIMETER = "#",
             PREFIX_H = "prefix_h.gz",
@@ -27,7 +27,7 @@ public class FileUtils {
 
     public static String getHspellPath() throws IOException {
         String hspellPath = null;
-        ClassLoader classLoader = FileUtils.class.getClassLoader();
+        ClassLoader classLoader = HebLoader.class.getClassLoader();
         File folder = new File(classLoader.getResource("").getPath());
         while (true) {
             File tmp = new File(folder, "hspell-data-files");
@@ -54,22 +54,23 @@ public class FileUtils {
         BufferedReader bufferedReader = null;
         try {
             if (allowHeHasheela) {
-                reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + PREFIX_H));
+                reader = new GZIPInputStream(new FileInputStream(HebLoader.getHspellPath() + PREFIX_H));
             } else {
-                reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + PREFIX_NOH));
+                reader = new GZIPInputStream(new FileInputStream(HebLoader.getHspellPath() + PREFIX_NOH));
             }
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null) {
                 String[] split = str.split(DELIMETER);
                 if (split.length != 2) {
-                    //TODO: Error
+                    throw new IOException("Wrong format detected\n");
                 } else {
                     map.put(split[0], Integer.parseInt(split[1]));
                 }
             }
         } catch (IOException e) {
-            System.out.println("ERROR: " + e);
+            System.out.println("ERROR: " + e.toString() + e.getStackTrace());
+            return null;
         } finally {
             if (bufferedReader != null) try {
                 bufferedReader.close();
@@ -93,7 +94,7 @@ public class FileUtils {
             //write the prefixes
             bufferedWriter.write(PREFIXES_INDICATOR + "\n");
             for (Map.Entry<String, Integer> pair : dict.getPref().entrySet()) {
-                bufferedWriter.write(pair.getKey() + FileUtils.DELIMETER + pair.getValue() + "\n");
+                bufferedWriter.write(pair.getKey() + HebLoader.DELIMETER + pair.getValue() + "\n");
             }
             //write the dictionary
             bufferedWriter.write(DICTIONARY_INDICATOR + "\n");
@@ -136,24 +137,23 @@ public class FileUtils {
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)) {
-                //TODO:ERROR
+                throw new IOException("Wrong format detected");
             }
             while (!(str = bufferedReader.readLine()).equals(DICTIONARY_INDICATOR)) {
                 String[] split = str.split(DELIMETER);
                 if (split.length != 2) {
-                    //TODO: Error
+                    throw new IOException("Wrong format detected");
                 } else {
                     prefixes.put(split[0], Integer.parseInt(split[1]));
                 }
             }
             if (!str.equals(DICTIONARY_INDICATOR)) {
-                //TODO:ERROR
+                throw new IOException("Wrong format detected");
             }
             while ((str = bufferedReader.readLine()) != null) {
                 String[] split = str.split(DELIMETER); // 0=value,1=prefix,2=lemmas,3=descFlags
                 if (split.length != 4) {
-                    System.out.println("ERROR");
-                    //TODO: error
+                    throw new IOException("Wrong format detected");
                 }
                 MorphData md = new MorphData();
                 md.setPrefixes(Short.parseShort(split[1]));
