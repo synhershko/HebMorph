@@ -1,15 +1,15 @@
 package org.apache.lucene.analysis;
 
-import java.io.IOException;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
-public class SuffixKeywordFilter  extends TokenFilter {
+import java.io.IOException;
+
+public class SuffixKeywordFilter extends TokenFilter {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
-//    private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
+    //    private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     private final Character suffix;
