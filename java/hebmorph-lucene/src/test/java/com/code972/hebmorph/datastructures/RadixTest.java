@@ -10,21 +10,21 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 public class RadixTest extends TestBase {
-	@Test
+    @Test
     public void DoesAddNodesCorrectlyWithReferenceTypes() {
         DictRadix<UuidObject> d = new DictRadix<UuidObject>();
         doAddNodesTest(d, new GuidGenerator());
         doDoubleAddTest(d, new GuidGenerator());
     }
 
-	@Test
+    @Test
     public void doesAddNodesCorrectlyWithNullableTypes() {
         DictRadix<Integer> d = new DictRadix<Integer>();
         doAddNodesTest(d, new RandomGenerator());
         doDoubleAddTest(d, new RandomGenerator());
     }
 
-	@Test
+    @Test
     public void doesAddNodesCorrectlyWithNativeTypes() {
         DictRadix<Integer> d = new DictRadix<Integer>();
         doAddNodesTest(d, new RandomGenerator());
@@ -32,23 +32,23 @@ public class RadixTest extends TestBase {
     }
 
     @Test
-    public void basicTestEquals(){
+    public void basicTestEquals() {
         DictRadix<Integer> d1 = new DictRadix<Integer>();
         DictRadix<Integer> d2 = new DictRadix<Integer>();
-        assert(d1.equals(d2));
-        d1.addNode("a",1);
-        assert(!d1.equals(d2));
-        d2.addNode("a",1);
-        assert(d1.equals(d2));
-        d1.addNode("b",2);
-        assert(!d1.equals(d2));
-        d2.addNode("b",2);
-        assert(d1.equals(d2));
-        d2.addNode("c",3);
-        assert(!d1.equals(d2));
+        assert (d1.equals(d2));
+        d1.addNode("a", 1);
+        assert (!d1.equals(d2));
+        d2.addNode("a", 1);
+        assert (d1.equals(d2));
+        d1.addNode("b", 2);
+        assert (!d1.equals(d2));
+        d2.addNode("b", 2);
+        assert (d1.equals(d2));
+        d2.addNode("c", 3);
+        assert (!d1.equals(d2));
     }
 
-    <T>void doDoubleAddTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
+    <T> void doDoubleAddTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
         d.clear();
 
         try {
@@ -69,7 +69,7 @@ public class RadixTest extends TestBase {
         assertNull(d.lookup("a", true));
     }
 
-    <T>void doAddNodesTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
+    <T> void doAddNodesTest(DictRadix<T> d, DataGeneratorFunc<T> dataGenerator) {
         d.clear();
 
         IntBox counter = new IntBox(0);
@@ -134,9 +134,8 @@ public class RadixTest extends TestBase {
         // and that the nodes are alphabetically sorted
         int enCount = 0;
         String nodeText = "";
-        RadixEnumerator en = (RadixEnumerator)d.iterator();
-        while(en.hasNext())
-        {
+        RadixEnumerator en = (RadixEnumerator) d.iterator();
+        while (en.hasNext()) {
             en.next();
             assertTrue(cSharpStringCompare(nodeText, en.getCurrentKey()) < 0);
             nodeText = en.getCurrentKey();
@@ -164,7 +163,7 @@ public class RadixTest extends TestBase {
 
 
     static private int cSharpStringCompare(String s1, String s2) {
-        if(s1 == null)
+        if (s1 == null)
             return s2 == null ? 0 : -1;
         return s2 == null ? 1 : s1.compareTo(s2);
     }
@@ -172,7 +171,7 @@ public class RadixTest extends TestBase {
 
     private Random rnd = new Random();
 
-//    delegate object DataGeneratorFunc();
+    //    delegate object DataGeneratorFunc();
     static private interface DataGeneratorFunc<T> {
         public T generate();
     }
@@ -192,40 +191,39 @@ public class RadixTest extends TestBase {
 
 
     static private class IntBox {
-        IntBox(int val) { this.val = val; }
+        IntBox(int val) {
+            this.val = val;
+        }
+
         int val;
     }
 
 
-    class UuidObject
-    {
+    class UuidObject {
         public UUID _guid;
-        public UuidObject()
-        {
+
+        public UuidObject() {
             _guid = UUID.randomUUID();
         }
 
         @Override
-        public boolean equals(Object obj)
-        {
+        public boolean equals(Object obj) {
             if (!(obj instanceof UuidObject))
                 return false;
 
-            UuidObject o = (UuidObject)obj;
+            UuidObject o = (UuidObject) obj;
 
             return this._guid.equals(o._guid);
 
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return _guid.hashCode();
         }
     }
 
-    <T>void addAndIncrement(DictRadix<T> d, String key, T obj, IntBox counter)
-    {
+    <T> void addAndIncrement(DictRadix<T> d, String key, T obj, IntBox counter) {
         // Only increment counter if the key doesn't already
         boolean hasKey = true;
 

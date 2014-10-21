@@ -30,33 +30,35 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class StreamLemmasFilter extends Tokenizer
-{
-	private final StreamLemmatizer _streamLemmatizer;
+public class StreamLemmasFilter extends Tokenizer {
+    private final StreamLemmatizer _streamLemmatizer;
     private final CharArraySet commonWords;
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-	private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-	private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+    private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
+    private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
+    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     private final CharacterUtils charUtils;
 
-	private final LemmaFilterBase lemmaFilter;
-	private final List<Token> stack = new ArrayList<Token>();
-	private final List<Token> filterCache = new ArrayList<Token>();
-	private int index = 0;
+    private final LemmaFilterBase lemmaFilter;
+    private final List<Token> stack = new ArrayList<Token>();
+    private final List<Token> filterCache = new ArrayList<Token>();
+    private int index = 0;
     private final Set<String> previousLemmas = new HashSet<String>();
     private boolean keepOriginalWord;
 
     public StreamLemmasFilter(final Reader input, final DictHebMorph dict) {
-		this(input, dict, null, null, null);
-	}
+        this(input, dict, null, null, null);
+    }
 
-	public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final LemmaFilterBase lemmaFilter) {
+    public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final LemmaFilterBase lemmaFilter) {
         this(input, dict, null, null, lemmaFilter);
     }
 
@@ -73,7 +75,7 @@ public class StreamLemmasFilter extends Tokenizer
         charUtils = CharacterUtils.getInstance(Version.LUCENE_46);
     }
 
-    public void setSuffixForExactMatch(Character c){
+    public void setSuffixForExactMatch(Character c) {
         _streamLemmatizer.setSuffixForExactMatch(c);
     }
 
@@ -85,13 +87,13 @@ public class StreamLemmasFilter extends Tokenizer
 
     private int currentStartOffset, currentEndOffset;
 
-	@Override
-	public final boolean incrementToken() throws IOException {
+    @Override
+    public final boolean incrementToken() throws IOException {
         clearAttributes();
 
-		// Index all unique lemmas at the same position
+        // Index all unique lemmas at the same position
         while (index < stack.size()) {
-            final HebrewToken res = (HebrewToken)((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
+            final HebrewToken res = (HebrewToken) ((stack.get(index) instanceof HebrewToken) ? stack.get(index) : null);
             index++;
 
             if ((res == null) || !previousLemmas.add(res.getLemma())) // Skip multiple lemmas (we will merge morph properties later)
@@ -107,20 +109,20 @@ public class StreamLemmasFilter extends Tokenizer
 
         // Reset state
         index = 0;
-		stack.clear();
+        stack.clear();
         previousLemmas.clear();
 
-		// Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
-		// an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
-		final int tokenType = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack);
+        // Lemmatize next word in stream. The HebMorph lemmatizer will always return a token, unless
+        // an unrecognized Hebrew word is hit, then an empty tokens array will be returned.
+        final int tokenType = _streamLemmatizer.getLemmatizeNextToken(tempRefObject, stack);
         if (tokenType == 0) { // EOS
-			return false;
+            return false;
         }
 
-		// Store the location of the word in the original stream
+        // Store the location of the word in the original stream
         currentStartOffset = correctOffset(_streamLemmatizer.getStartOffset());
         currentEndOffset = correctOffset(_streamLemmatizer.getEndOffset());
-		offsetAtt.setOffset(currentStartOffset, currentEndOffset);
+        offsetAtt.setOffset(currentStartOffset, currentEndOffset);
 
         final String word = tempRefObject.ref;
         if (commonWords.contains(word)) { // common words should be treated later using dedicated filters
@@ -137,7 +139,7 @@ public class StreamLemmasFilter extends Tokenizer
 
             keywordAtt.setKeyword(true);
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) == 0) {
-                stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
+                stack.add(new HebrewToken(word, (byte) 0, 0, word, 1.0f));
             }
 
             return true;
@@ -169,14 +171,14 @@ public class StreamLemmasFilter extends Tokenizer
         typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
         // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
 
-		// Do some filtering if requested...
-		if (lemmaFilter != null && lemmaFilter.filterCollection(word, stack, filterCache) != null) {
-			stack.clear();
-			stack.addAll(filterCache);
-		}
+        // Do some filtering if requested...
+        if (lemmaFilter != null && lemmaFilter.filterCollection(word, stack, filterCache) != null) {
+            stack.clear();
+            stack.addAll(filterCache);
+        }
 
-		// OOV case - store the word as-is, and also output a suffixed version of it
-		if (stack.isEmpty()) {
+        // OOV case - store the word as-is, and also output a suffixed version of it
+        if (stack.isEmpty()) {
             termAtt.copyBuffer(word.toCharArray(), 0, word.length());
 
             if (keepOriginalWord) {
@@ -194,10 +196,10 @@ public class StreamLemmasFilter extends Tokenizer
             }
 
             if (keepOriginalWord)
-                stack.add(new HebrewToken(word, (byte)0, 0, word, 1.0f));
+                stack.add(new HebrewToken(word, (byte) 0, 0, word, 1.0f));
 
-			return true;
-		}
+            return true;
+        }
 
         // Mark and store the original term to increase precision, while all lemmas
         // will be popped out of the stack and get stored at the next call to IncrementToken.
@@ -208,7 +210,7 @@ public class StreamLemmasFilter extends Tokenizer
         }
 
         // If !keepOriginalWord
-        final HebrewToken hebToken = (HebrewToken)stack.get(0);
+        final HebrewToken hebToken = (HebrewToken) stack.get(0);
         if (stack.size() == 1) { // only one lemma was found
             stack.clear();
         } else { // // more than one lemma exist.
@@ -217,8 +219,8 @@ public class StreamLemmasFilter extends Tokenizer
         }
         createHebrewToken(hebToken);
 
-		return true;
-	}
+        return true;
+    }
 
     private void applyLowercaseFilter() {
         charUtils.toLowerCase(termAtt.buffer(), 0, termAtt.length());
@@ -226,8 +228,8 @@ public class StreamLemmasFilter extends Tokenizer
 
     protected void createHebrewToken(HebrewToken hebToken) {
         String tokenVal = hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma();
-		termAtt.copyBuffer(tokenVal.toCharArray(), 0, tokenVal.length());
-	}
+        termAtt.copyBuffer(tokenVal.toCharArray(), 0, tokenVal.length());
+    }
 
     @Override
     public final void end() throws IOException {
@@ -249,15 +251,15 @@ public class StreamLemmasFilter extends Tokenizer
     }
 
     @Override
-	public void reset() throws IOException {
+    public void reset() throws IOException {
         super.reset();
-		stack.clear();
+        stack.clear();
         filterCache.clear();
         previousLemmas.clear();
-		index = 0;
+        index = 0;
         currentStartOffset = currentEndOffset = 0;
-		_streamLemmatizer.reset(input);
-	}
+        _streamLemmatizer.reset(input);
+    }
 
     public void setKeepOriginalWord(boolean keepOriginalWord) {
         this.keepOriginalWord = keepOriginalWord;

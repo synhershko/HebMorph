@@ -29,32 +29,32 @@ import java.util.HashMap;
 public class Tokenizer {
 
     public static class TokenType {
-		public static int Hebrew = 1;
-		public static int NonHebrew = 2;
-		public static int Numeric = 4;
+        public static int Hebrew = 1;
+        public static int NonHebrew = 2;
+        public static int Numeric = 4;
         public static int Mixed = 8;
-		public static int Construct = 16;
-		public static int Acronym = 32;
+        public static int Construct = 16;
+        public static int Acronym = 32;
         public static int Exact = 64;
         public static int Custom = 128;
-	}
+    }
 
-	public static final char[] Geresh = { '\'', '\u05F3', '\u2018', '\u2019', '\u201B', '\uFF07' };
-	public static final char[] Gershayim = { '\"', '\u05F4', '\u201C', '\u201D', '\u201F', '\u275E', '\uFF02' };
-    public static final char[] Makaf = { '-', '\u2012', '\u2013', '\u2014', '\u2015', '\u05BE' };
-	public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
-	public static final char[] LettersAcceptingGeresh = { 'ז', 'ג', 'ץ', 'צ', 'ח' };
+    public static final char[] Geresh = {'\'', '\u05F3', '\u2018', '\u2019', '\u201B', '\uFF07'};
+    public static final char[] Gershayim = {'\"', '\u05F4', '\u201C', '\u201D', '\u201F', '\u275E', '\uFF02'};
+    public static final char[] Makaf = {'-', '\u2012', '\u2013', '\u2014', '\u2015', '\u05BE'};
+    public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
+    public static final char[] LettersAcceptingGeresh = {'ז', 'ג', 'ץ', 'צ', 'ח'};
 
-	public static boolean isOfChars(char c, char[] options) {
-		for (char o : options) {
-			if (c == o) return true;
-		}
-		return false;
-	}
+    public static boolean isOfChars(char c, char[] options) {
+        for (char o : options) {
+            if (c == o) return true;
+        }
+        return false;
+    }
 
-    public static char[] concatenateCharArrays(char[] ... arrays) {
+    public static char[] concatenateCharArrays(char[]... arrays) {
         int count = 0;
-        for(char[] a : arrays) {
+        for (char[] a : arrays) {
             count += a.length;
         }
 
@@ -68,35 +68,40 @@ public class Tokenizer {
         return ret;
     }
 
-	public static boolean isHebrewLetter(char c)
-	{
-		return ((c >= 1488) && (c <= 1514));
-	}
+    public static boolean isHebrewLetter(char c) {
+        return ((c >= 1488) && (c <= 1514));
+    }
+
     public static boolean isFinalHebrewLetter(char c) {
         return (c == 1507 || c == 1498 || c == 1501 || c == 1509 || c == 1503);
     }
-	public static boolean isNiqqudChar(char c) {
-		return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BB' || c == '\u05BC');
-	}
 
-	private Reader input;
-	private int dataLen = 0, inputOffset = 0;
+    public static boolean isNiqqudChar(char c) {
+        return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BB' || c == '\u05BC');
+    }
+
+    private Reader input;
+    private int dataLen = 0, inputOffset = 0;
 
     /// Both are necessary since the tokenizer does some normalization when necessary, and therefore
     /// it isn't always possible to get correct end-offset by looking at the length of the returned token
     /// string
     private int tokenOffset = 0, tokenLengthInSource = 0;
-	public final int getOffset() {
-		return tokenOffset;
-	}
+
+    public final int getOffset() {
+        return tokenOffset;
+    }
+
     public int getLengthInSource() {
         return tokenLengthInSource;
     }
 
     private Character suffixForExactMatch = null;
+
     public Character getSuffixForExactMatch() {
         return suffixForExactMatch;
     }
+
     public void setSuffixForExactMatch(final Character suffixForExactMatch) {
         this.suffixForExactMatch = suffixForExactMatch;
     }
@@ -104,6 +109,7 @@ public class Tokenizer {
     private final HashMap<String, Integer> hebrewPrefixes;
     private final DictRadix<Byte> specialCases;
     private static final Byte dummyData = (byte) 0;
+
     public void addSpecialCase(final String token) {
         if (token.length() > TOKENIZATION_EXCEPTION_MAX_LENGTH)
             throw new IllegalArgumentException("Special tokenization rule must be at most "
@@ -114,6 +120,7 @@ public class Tokenizer {
 
         specialCases.addNode(token, dummyData);
     }
+
     public void clearSpecialCases() {
         specialCases.clear();
     }
@@ -127,16 +134,16 @@ public class Tokenizer {
     }
 
     private static final int IO_BUFFER_SIZE = 4096;
-	private char[] ioBuffer = new char[IO_BUFFER_SIZE];
-	private int ioBufferIndex = 0;
+    private char[] ioBuffer = new char[IO_BUFFER_SIZE];
+    private int ioBufferIndex = 0;
 
-	private final char[] wordBuffer = new char[Constants.MaxWordLength];
+    private final char[] wordBuffer = new char[Constants.MaxWordLength];
     private byte currentTokenLength = 0;
     private int tokenType = 0;
 
     public Tokenizer(final Reader input) {
-		this(input, null);
-	}
+        this(input, null);
+    }
 
     public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
         this.input = input;
@@ -146,18 +153,19 @@ public class Tokenizer {
 
     final static int TOKENIZATION_EXCEPTION_MAX_LENGTH = 25;
     private char[] tokenizationExceptionBuffer = new char[TOKENIZATION_EXCEPTION_MAX_LENGTH];
+
     private boolean isRecognizedException(char[] prefix, byte length, char c) {
         if (length >= TOKENIZATION_EXCEPTION_MAX_LENGTH)
             return false; // custom tokenization exceptions are limited in length
 
         System.arraycopy(prefix, 0, tokenizationExceptionBuffer, 0, length);
         tokenizationExceptionBuffer[length] = c;
-        return isRecognizedException(tokenizationExceptionBuffer, length + 1, (byte)(length + 1));
+        return isRecognizedException(tokenizationExceptionBuffer, length + 1, (byte) (length + 1));
     }
 
     private boolean isRecognizedException(char c) {
         tokenizationExceptionBuffer[0] = c;
-        return isRecognizedException(tokenizationExceptionBuffer, 1, (byte)(1));
+        return isRecognizedException(tokenizationExceptionBuffer, 1, (byte) (1));
     }
 
     private boolean isRecognizedException(char[] token, int tokenLen, byte length) {
@@ -182,37 +190,37 @@ public class Tokenizer {
         }
     }
 
-	// Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
-	// This is a job for a normalizer, anyway
-	public int nextToken(final Reference<String> tokenString) throws IOException {
+    // Niqqud is not being removed by design, to allow for a future analyzer extension to take advantage of it
+    // This is a job for a normalizer, anyway
+    public int nextToken(final Reference<String> tokenString) throws IOException {
         currentTokenLength = 0;
         tokenOffset = 0; // invalidate
-		tokenType = 0;
+        tokenType = 0;
         boolean avoidTryingCustom = false;
-		while (true) {
-			if (ioBufferIndex >= dataLen) {
-				inputOffset += dataLen;
-				dataLen = input.read(ioBuffer, 0, ioBuffer.length);
-				if (dataLen <= 0) {
-					dataLen = 0; // so next offset += dataLen won't decrement offset
+        while (true) {
+            if (ioBufferIndex >= dataLen) {
+                inputOffset += dataLen;
+                dataLen = input.read(ioBuffer, 0, ioBuffer.length);
+                if (dataLen <= 0) {
+                    dataLen = 0; // so next offset += dataLen won't decrement offset
                     if ((tokenType & TokenType.Custom) > 0 && currentTokenLength > 0
                             && !isRecognizedException(wordBuffer, wordBuffer.length, currentTokenLength, true)) {
 
                         abortCustomToken();
                     }
                     if (currentTokenLength == 0) {
-						tokenString.ref = "";
+                        tokenString.ref = "";
                         tokenLengthInSource = 0;
                         tokenOffset = inputOffset;
-						return 0;
-					}
+                        return 0;
+                    }
                     break; // return what we have collected so far as a token
-				}
-				ioBufferIndex = 0;
-			}
+                }
+                ioBufferIndex = 0;
+            }
 
-			char c = ioBuffer[ioBufferIndex++];
-			boolean appendCurrentChar = false;
+            char c = ioBuffer[ioBufferIndex++];
+            boolean appendCurrentChar = false;
 
             if (currentTokenLength == 0) { // first char, figure out what it is
                 if (isHebrewLetter(c)) {
@@ -234,7 +242,7 @@ public class Tokenizer {
             } else { // we should consume every letter or digit, and tokenize on everything else
                 if (!avoidTryingCustom && (tokenType & TokenType.Custom) > 0 && !Character.isSpaceChar(c)) {
                     wordBuffer[currentTokenLength] = c;
-                    if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte)(currentTokenLength + 1))) {
+                    if (!isRecognizedException(wordBuffer, wordBuffer.length, (byte) (currentTokenLength + 1))) {
                         // Tokenize on non-alphanumeric
                         if (!Character.isLetterOrDigit(c))
                             break;
@@ -297,7 +305,7 @@ public class Tokenizer {
                 }
             }
 
-			if (appendCurrentChar) {
+            if (appendCurrentChar) {
                 // Consume normally
                 if (currentTokenLength == 0) { // mark the start of a new token
                     tokenOffset = inputOffset + ioBufferIndex - 1;
@@ -308,8 +316,7 @@ public class Tokenizer {
 
                 // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
                 if (isOfChars(c, Geresh)) {
-                    if (wordBuffer[currentTokenLength - 1] == c)
-                    {
+                    if (wordBuffer[currentTokenLength - 1] == c) {
                         wordBuffer[currentTokenLength - 1] = '"';
                         tokenType |= TokenType.Acronym;
                     }
@@ -332,24 +339,24 @@ public class Tokenizer {
             tokenLengthInSource = Math.max(inputOffset + ioBufferIndex - 1 - tokenOffset, 0);
         }
 
-		if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim)) {
-			wordBuffer[--currentTokenLength] = '\0';
+        if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim)) {
+            wordBuffer[--currentTokenLength] = '\0';
             tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
-		}
-		// Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
-		if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'') {
-			// All letters which this Geresh may mean something for
-			if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh)) {
-				wordBuffer[--currentTokenLength] = '\0';
+        }
+        // Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
+        if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'') {
+            // All letters which this Geresh may mean something for
+            if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh)) {
+                wordBuffer[--currentTokenLength] = '\0';
                 tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
-			}
-			// TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
-			// TODO: Handle ה (Hashem)
-		}
+            }
+            // TODO: Support marking abbrevations (פרופ') and Hebrew's th (ת')
+            // TODO: Handle ה (Hashem)
+        }
 
-		tokenString.ref = new String(wordBuffer, 0, currentTokenLength);
-		return tokenType;
-	}
+        tokenString.ref = new String(wordBuffer, 0, currentTokenLength);
+        return tokenType;
+    }
 
     private void abortCustomToken() {
         int start = 0, pos = 0;
@@ -394,13 +401,13 @@ public class Tokenizer {
     }
 
     public final void reset(final Reader _input) {
-		input = _input;
-		inputOffset = 0;
-		dataLen = 0;
-		ioBufferIndex = 0;
+        input = _input;
+        inputOffset = 0;
+        dataLen = 0;
+        ioBufferIndex = 0;
         tokenOffset = 0;
         tokenLengthInSource = 0;
         currentTokenLength = 0;
         tokenType = 0;
-	}
+    }
 }

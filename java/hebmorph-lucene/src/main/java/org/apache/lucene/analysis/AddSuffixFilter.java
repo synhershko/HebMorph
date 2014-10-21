@@ -26,31 +26,29 @@ import java.io.IOException;
 import java.util.Map;
 
 
-
-public final class AddSuffixFilter extends TokenFilter
-{
+public final class AddSuffixFilter extends TokenFilter {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
 
-	private final Map<String, char[]> suffixByTokenType;
+    private final Map<String, char[]> suffixByTokenType;
     private final boolean keepOrigin;
 
     public AddSuffixFilter(final TokenStream input, final Map<String, char[]> _suffixByTokenType) {
         this(input, _suffixByTokenType, false);
     }
 
-	public AddSuffixFilter(final TokenStream input, final Map<String, char[]> _suffixByTokenType, boolean keepOrigin) {
-		super(input);
-		suffixByTokenType = _suffixByTokenType;
+    public AddSuffixFilter(final TokenStream input, final Map<String, char[]> _suffixByTokenType, boolean keepOrigin) {
+        super(input);
+        suffixByTokenType = _suffixByTokenType;
         this.keepOrigin = keepOrigin;
-	}
+    }
 
     private char[] tokenBuffer = new char[Byte.MAX_VALUE];
     private int tokenLen = 0;
 
-	@Override
-	public final boolean incrementToken() throws IOException {
+    @Override
+    public final boolean incrementToken() throws IOException {
         if (tokenLen > 0) {
             termAtt.copyBuffer(tokenBuffer, 0, tokenLen);
             tokenLen = 0;
@@ -58,27 +56,27 @@ public final class AddSuffixFilter extends TokenFilter
             return true;
         }
 
-		if (!input.incrementToken()) { // reached EOS -- return null
-			return false;
-		}
+        if (!input.incrementToken()) { // reached EOS -- return null
+            return false;
+        }
 
-		if (suffixByTokenType == null) { // this practically means the filter is disabled
-			return true;
-		}
+        if (suffixByTokenType == null) { // this practically means the filter is disabled
+            return true;
+        }
 
-		final char[] suffix;
-		if (!((suffix = suffixByTokenType.get(typeAtt.type())) != null)) {
-			return true;
-		}
+        final char[] suffix;
+        if (!((suffix = suffixByTokenType.get(typeAtt.type())) != null)) {
+            return true;
+        }
 
-		char[] buffer = termAtt.buffer();
-		final int length = termAtt.length();
-		if (buffer.length <= length) {
-			buffer = termAtt.resizeBuffer(length + suffix.length);
-		}
+        char[] buffer = termAtt.buffer();
+        final int length = termAtt.length();
+        if (buffer.length <= length) {
+            buffer = termAtt.resizeBuffer(length + suffix.length);
+        }
 
-		System.arraycopy(suffix, 0, buffer, length, suffix.length);
-		termAtt.setLength(length + suffix.length);
+        System.arraycopy(suffix, 0, buffer, length, suffix.length);
+        termAtt.setLength(length + suffix.length);
 
         if (keepOrigin) {
             if (tokenBuffer == null || tokenBuffer.length < length)
@@ -88,6 +86,6 @@ public final class AddSuffixFilter extends TokenFilter
             tokenLen = length;
         }
 
-		return true;
-	}
+        return true;
+    }
 }

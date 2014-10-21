@@ -19,14 +19,13 @@ public abstract class TestBase {
 //            String hspellPath = FileUtils.getHspellPath();
 //            Loader loader = new Loader(new File(hspellPath), true);
 //            dict = loader.loadDictionaryFromHSpellData();
-            if (allowHeHasheela){
+            if (allowHeHasheela) {
                 dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_H);
-            }
-            else{
+            } else {
                 dict = FileUtils.loadDicAndPrefixesFromGzip(FileUtils.getHspellPath() + FileUtils.DICT_NOH);
             }
         }
-        return dict; 
+        return dict;
     }
 
     protected static String readFileToString(String path) throws IOException {
@@ -36,8 +35,7 @@ public abstract class TestBase {
             MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             /* Instead of using default, pass in a decoder. */
             return Charset.defaultCharset().decode(bb).toString();
-        }
-        finally {
+        } finally {
             stream.close();
         }
     }

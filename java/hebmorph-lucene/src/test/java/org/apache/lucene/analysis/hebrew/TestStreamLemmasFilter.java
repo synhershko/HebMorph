@@ -17,7 +17,7 @@ public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCas
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             Tokenizer src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), FileUtils.getPrefixes(false));
+                src = new StreamLemmasFilter(reader, getDictionary(true));
             } catch (IOException e) {
                 e.printStackTrace();
             }

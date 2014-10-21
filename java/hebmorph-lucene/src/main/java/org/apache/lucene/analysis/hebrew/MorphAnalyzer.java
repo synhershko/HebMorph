@@ -36,14 +36,15 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class MorphAnalyzer extends Analyzer {
-	/** An unmodifiable set containing some common Hebrew words that are usually not
-	 useful for searching.
-	*/
+    /**
+     * An unmodifiable set containing some common Hebrew words that are usually not
+     * useful for searching.
+     */
     private final CharArraySet commonWords;
 
-	private boolean keepOriginalWord = false;
+    private boolean keepOriginalWord = false;
 
-	private LemmaFilterBase lemmaFilter;
+    private LemmaFilterBase lemmaFilter;
 
     private static final String DEFAULT_HSPELL_DATA_CLASSPATH = "hspell-data-files";
     private static final String DEFAULT_HSPELL_ENV_VARIABLE = "HSPELL_DATA_FILES_PATH";
@@ -83,19 +84,19 @@ public class MorphAnalyzer extends Analyzer {
     }
 
     /**
-     A filter object to provide flexibility on deciding which lemmas are valid as index terms
-     and which are not.
+     * A filter object to provide flexibility on deciding which lemmas are valid as index terms
+     * and which are not.
      */
     public void setLemmaFilter(LemmaFilterBase lemmaFilter) {
         this.lemmaFilter = lemmaFilter;
     }
 
     /**
-     Set to true to mark tokens with a $ prefix also when there is only one lemma returned
-     from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
-     namespace) to perform searches on the same field used for the Morph analyzer. When used this
-     way, make sure to turn this on only while indexing, so searches don't get slower.
-     Default is false to save some index space.
+     * Set to true to mark tokens with a $ prefix also when there is only one lemma returned
+     * from the lemmatizer. This is mainly here to allow the Hebrew-aware SimpleAnalyzer (in this
+     * namespace) to perform searches on the same field used for the Morph analyzer. When used this
+     * way, make sure to turn this on only while indexing, so searches don't get slower.
+     * Default is false to save some index space.
      */
     public void setKeepOriginalWord(boolean keepOriginalWord) {
         this.keepOriginalWord = keepOriginalWord;
@@ -119,12 +120,12 @@ public class MorphAnalyzer extends Analyzer {
             Loader loader = new Loader(Thread.currentThread().getContextClassLoader(), pathInClasspath, true);
             return loader.loadDictionaryFromHSpellData();
         } catch (IOException ex) {
-       		try {
-       			// Try to use environment variable if failed with classpath
-				return loadFromEnvVariable();
-			} catch (IOException e) {
-				throw new IllegalStateException("Failed to read data", ex);
-			}
+            try {
+                // Try to use environment variable if failed with classpath
+                return loadFromEnvVariable();
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read data", ex);
+            }
         }
     }
 
@@ -136,14 +137,14 @@ public class MorphAnalyzer extends Analyzer {
             throw new IllegalStateException("Failed to read data", ex);
         }
     }
-    
+
     static private DictRadix<MorphData> loadFromEnvVariable() throws IOException {
-       	String hspellPath = System.getenv(DEFAULT_HSPELL_ENV_VARIABLE);
-       	if (hspellPath == null) {
-       		throw new IllegalStateException("Failed to load hspell dictionary files. They should be configured " +
-       				"in classpath or by " + DEFAULT_HSPELL_ENV_VARIABLE + " environment variable");
-       	}
-       	Loader loader = new Loader(new File(hspellPath), true);
+        String hspellPath = System.getenv(DEFAULT_HSPELL_ENV_VARIABLE);
+        if (hspellPath == null) {
+            throw new IllegalStateException("Failed to load hspell dictionary files. They should be configured " +
+                    "in classpath or by " + DEFAULT_HSPELL_ENV_VARIABLE + " environment variable");
+        }
+        Loader loader = new Loader(new File(hspellPath), true);
         return loader.loadDictionaryFromHSpellData();
     }
 }

@@ -17,10 +17,10 @@ import java.util.zip.GZIPOutputStream;
 public class FileUtils {
 
     public final static String DELIMETER = "#",
-            PREFIX_H="prefix_h.gz",
-            PREFIX_NOH="prefix_noH.gz",
-            DICT_H="dict_h.gz",
-            DICT_NOH="dict_noH.gz",
+            PREFIX_H = "prefix_h.gz",
+            PREFIX_NOH = "prefix_noH.gz",
+            DICT_H = "dict_h.gz",
+            DICT_NOH = "dict_noH.gz",
             PREFIXES_INDICATOR = "#PREFIXES",
             DICTIONARY_INDICATOR = "#DICTIONARY";
     public static final Charset ENCODING_USED = Charset.forName("UTF-8");
@@ -41,38 +41,44 @@ public class FileUtils {
         if (hspellPath == null) {
             throw new IllegalArgumentException("path to hspell data folder couldn't be found");
         }
-        if (!hspellPath.endsWith("/")){
-            hspellPath+= "/";
+        if (!hspellPath.endsWith("/")) {
+            hspellPath += "/";
         }
         return hspellPath;
     }
 
     //used when loading using the Loader and thus prefixes aren't loaded automatically
-    public static HashMap<String,Integer> readPrefixesFromFile(boolean allowHeHasheela) {
-        HashMap<String,Integer> map = new HashMap<>();
+    public static HashMap<String, Integer> readPrefixesFromFile(boolean allowHeHasheela) {
+        HashMap<String, Integer> map = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
-        try{
-            if (allowHeHasheela){
+        try {
+            if (allowHeHasheela) {
                 reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + PREFIX_H));
-            }else{
+            } else {
                 reader = new GZIPInputStream(new FileInputStream(FileUtils.getHspellPath() + PREFIX_NOH));
             }
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
-            while ((str = bufferedReader.readLine()) != null){
+            while ((str = bufferedReader.readLine()) != null) {
                 String[] split = str.split(DELIMETER);
-                if (split.length!=2){
+                if (split.length != 2) {
                     //TODO: Error
-                }else{
-                    map.put(split[0],Integer.parseInt(split[1]));
+                } else {
+                    map.put(split[0], Integer.parseInt(split[1]));
                 }
             }
         } catch (IOException e) {
             System.out.println("ERROR: " + e);
-        } finally{
-            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}
-            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
+        } finally {
+            if (bufferedReader != null) try {
+                bufferedReader.close();
+            } catch (IOException ignored) {
+            }
+            if (reader != null) try {
+                reader.close();
+            } catch (IOException ignored) {
+            }
         }
         return map;
     }
@@ -81,40 +87,46 @@ public class FileUtils {
     public static void saveDicAndPrefixesToGzip(DictHebMorph dict, String fileName) throws IOException {
         GZIPOutputStream writer = null;
         BufferedWriter bufferedWriter = null;
-        try{
+        try {
             writer = new GZIPOutputStream(new FileOutputStream(fileName));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, ENCODING_USED));
             //write the prefixes
             bufferedWriter.write(PREFIXES_INDICATOR + "\n");
-            for (Map.Entry<String,Integer> pair:dict.getPref().entrySet()){
+            for (Map.Entry<String, Integer> pair : dict.getPref().entrySet()) {
                 bufferedWriter.write(pair.getKey() + FileUtils.DELIMETER + pair.getValue() + "\n");
             }
             //write the dictionary
             bufferedWriter.write(DICTIONARY_INDICATOR + "\n");
-            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator)dict.getRadix().iterator();
-            while (en.hasNext()){
+            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator) dict.getRadix().iterator();
+            while (en.hasNext()) {
                 String mdName = en.getCurrentKey();
                 MorphData md = (MorphData) en.next();
                 String writtenString = new String();
-                writtenString+= (mdName + "#" + md.getPrefixes() + "#");
-                for (String str:md.getLemmas()){
+                writtenString += (mdName + "#" + md.getPrefixes() + "#");
+                for (String str : md.getLemmas()) {
                     writtenString += (str + ",");
                 }
-                writtenString+=("#");
-                for (int d:md.getDescFlags()){
-                    writtenString+=(d + ",");
+                writtenString += ("#");
+                for (int d : md.getDescFlags()) {
+                    writtenString += (d + ",");
                 }
-                writtenString+="\n";
+                writtenString += "\n";
                 bufferedWriter.write(writtenString);
             }
-        }finally{
-            if (bufferedWriter != null) try { bufferedWriter.close(); } catch (IOException ignored) {}
-            if (writer != null) try { writer.close(); } catch (IOException ignored) {}
+        } finally {
+            if (bufferedWriter != null) try {
+                bufferedWriter.close();
+            } catch (IOException ignored) {
+            }
+            if (writer != null) try {
+                writer.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 
     //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
-    public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException{
+    public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException {
         DictRadix<MorphData> dict = new DictRadix<>();
         HashMap<String, Integer> prefixes = new HashMap<>();
         GZIPInputStream reader = null;
@@ -123,18 +135,18 @@ public class FileUtils {
             reader = new GZIPInputStream(new FileInputStream(fileName));
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
-            if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)){
+            if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)) {
                 //TODO:ERROR
             }
-            while (!(str = bufferedReader.readLine()).equals(DICTIONARY_INDICATOR)){
+            while (!(str = bufferedReader.readLine()).equals(DICTIONARY_INDICATOR)) {
                 String[] split = str.split(DELIMETER);
-                if (split.length!=2){
+                if (split.length != 2) {
                     //TODO: Error
-                }else{
-                    prefixes.put(split[0],Integer.parseInt(split[1]));
+                } else {
+                    prefixes.put(split[0], Integer.parseInt(split[1]));
                 }
             }
-            if (!str.equals(DICTIONARY_INDICATOR)){
+            if (!str.equals(DICTIONARY_INDICATOR)) {
                 //TODO:ERROR
             }
             while ((str = bufferedReader.readLine()) != null) {
@@ -146,8 +158,8 @@ public class FileUtils {
                 MorphData md = new MorphData();
                 md.setPrefixes(Short.parseShort(split[1]));
                 String[] lemmas = split[2].split(",");
-                for (int i=0;i<lemmas.length;i++){ //null and "null" are read the same
-                    if (lemmas[i].equals("null")){
+                for (int i = 0; i < lemmas.length; i++) { //null and "null" are read the same
+                    if (lemmas[i].equals("null")) {
                         lemmas[i] = null;
                     }
                 }
@@ -160,12 +172,17 @@ public class FileUtils {
                 md.setDescFlags(descInts);
                 dict.addNode(split[0], md);
             }
+        } finally {
+            if (bufferedReader != null) try {
+                bufferedReader.close();
+            } catch (IOException ignored) {
+            }
+            if (reader != null) try {
+                reader.close();
+            } catch (IOException ignored) {
+            }
         }
-        finally{
-            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ignored) {}
-            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
-        }
-        DictHebMorph ret = new DictHebMorph(dict,prefixes);
+        DictHebMorph ret = new DictHebMorph(dict, prefixes);
         return ret;
     }
 }

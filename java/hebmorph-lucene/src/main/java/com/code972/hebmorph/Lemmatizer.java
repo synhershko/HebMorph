@@ -22,79 +22,69 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.datastructures.RealSortedList;
 import com.code972.hebmorph.datastructures.RealSortedList.SortOrder;
-import com.code972.hebmorph.hspell.FileUtils;
 import com.code972.hebmorph.hspell.LingInfo;
 
-import java.util.HashMap;
 import java.util.List;
 
-public class Lemmatizer
-{
-	private final DictHebMorph m_dict;
+public class Lemmatizer {
+    private final DictHebMorph m_dict;
     private DictRadix<MorphData> customWords;
 
     public Lemmatizer(final DictHebMorph dict) {
         this.m_dict = dict;
     }
 
-	public boolean isLegalPrefix(final String str) {
+    public boolean isLegalPrefix(final String str) {
         return m_dict.getPref().containsKey(str);
-	}
+    }
 
-	// See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule
-	public String tryStrippingPrefix(String word)
-	{
-		// TODO: Make sure we conform to the academy rules as closely as possible
+    // See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule
+    public String tryStrippingPrefix(String word) {
+        // TODO: Make sure we conform to the academy rules as closely as possible
 
-		int firstQuote = word.indexOf('"');
+        int firstQuote = word.indexOf('"');
 
-		if (firstQuote > -1 && firstQuote < word.length() - 2)
-		{
-			if (isLegalPrefix(word.substring(0, firstQuote)))
-			{
-				return word.substring(firstQuote + 1, firstQuote + 1 + word.length() - firstQuote - 1);
-			}
-		}
+        if (firstQuote > -1 && firstQuote < word.length() - 2) {
+            if (isLegalPrefix(word.substring(0, firstQuote))) {
+                return word.substring(firstQuote + 1, firstQuote + 1 + word.length() - firstQuote - 1);
+            }
+        }
 
-		int firstSingleQuote = word.indexOf('\'');
-		if (firstSingleQuote == -1)
-		{
-			return word;
-		}
+        int firstSingleQuote = word.indexOf('\'');
+        if (firstSingleQuote == -1) {
+            return word;
+        }
 
-		if ((firstQuote > -1) && (firstSingleQuote > firstQuote))
-		{
-			return word;
-		}
+        if ((firstQuote > -1) && (firstSingleQuote > firstQuote)) {
+            return word;
+        }
 
-		if (isLegalPrefix(word.substring(0, firstSingleQuote)))
-		{
-			return word.substring(firstSingleQuote + 1, firstSingleQuote + 1 + word.length() - firstSingleQuote - 1);
-		}
+        if (isLegalPrefix(word.substring(0, firstSingleQuote))) {
+            return word.substring(firstSingleQuote + 1, firstSingleQuote + 1 + word.length() - firstSingleQuote - 1);
+        }
 
-		return word;
-	}
+        return word;
+    }
 
-	/**
-	 Removes all Niqqud character from a word
+    /**
+     * Removes all Niqqud character from a word
+     *
+     * @param word A string to remove Niqqud from
+     * @return A new word "clean" of Niqqud chars
+     */
+    static public String removeNiqqud(final String word) {
+        final int length = word.length();
+        final StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            if ((word.charAt(i) < 1455) || (word.charAt(i) > 1476)) { // current position is not a Niqqud character
+                sb.append(word.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
 
-	 @param word A string to remove Niqqud from
-	 @return A new word "clean" of Niqqud chars
-	*/
-	static public String removeNiqqud(final String word)
-	{
-		final int length = word.length();
-		final StringBuilder sb = new StringBuilder(length);
-		for (int i = 0; i < length; i++) {
-			if ((word.charAt(i) < 1455) || (word.charAt(i) > 1476)) { // current position is not a Niqqud character
-				sb.append(word.charAt(i));
-			}
-		}
-		return sb.toString();
-	}
-
-	public List<HebrewToken> lemmatize(final String word) {
-		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+    public List<HebrewToken> lemmatize(final String word) {
+        final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
         byte prefLen = 0;
         Integer prefixMask;
@@ -103,14 +93,14 @@ public class Lemmatizer
         // Lookup the word in the custom words list. It is guaranteed to have only one lemma for a word,
         // so we can always access the first entry of a record - if we got any
         // If we find any results, we can immediately return
-        if (customWords != null){
+        if (customWords != null) {
             try {
                 md = customWords.lookup(word);
             } catch (IllegalArgumentException e) {
             }
 
             if (md != null) { // exact match was found in the custom words list
-                ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[0], md.getLemmas()[0], 1.0f));
+                ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[0], md.getLemmas()[0], 1.0f));
                 return ret;
             } else { // try stripping prefixes
                 while (true) {
@@ -132,7 +122,7 @@ public class Lemmatizer
                         }
                     }
                 }
-                if (ret.size() > 0) return  ret;
+                if (ret.size() > 0) return ret;
             }
         }
 
@@ -142,30 +132,30 @@ public class Lemmatizer
         } catch (IllegalArgumentException e) {
             md = null;
         }
-		if (md != null) {
-			for (int result = 0; result < md.getLemmas().length; result++) {
-				ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
-			}
-		} else if (word.endsWith("'")) { // Try ommitting closing Geresh
+        if (md != null) {
+            for (int result = 0; result < md.getLemmas().length; result++) {
+                ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+            }
+        } else if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
                 md = m_dict.getRadix().lookup(word.substring(0, word.length() - 1));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
-			if (md != null) {
-				for (int result = 0; result < md.getLemmas().length; result++) {
-					ret.addUnique(new HebrewToken(word, (byte)0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
-				}
-			}
-		}
+            if (md != null) {
+                for (int result = 0; result < md.getLemmas().length; result++) {
+                    ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+                }
+            }
+        }
 
         prefLen = 0;
-		while (true) {
-			// Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-			if (word.length() - prefLen < 2)
-				break;
+        while (true) {
+            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+            if (word.length() - prefLen < 2)
+                break;
 
-            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen)))== null)
+            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
                 break;
 
             try {
@@ -173,19 +163,19 @@ public class Lemmatizer
             } catch (IllegalArgumentException e) {
                 md = null;
             }
-			if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-				for (int result = 0; result < md.getLemmas().length; result++) {
-					if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
-						ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[result], md.getLemmas()[result], 0.9f));
-					}
-				}
-			}
-		}
-		return ret;
-	}
+            if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
+                for (int result = 0; result < md.getLemmas().length; result++) {
+                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                        ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[result], md.getLemmas()[result], 0.9f));
+                    }
+                }
+            }
+        }
+        return ret;
+    }
 
-	public List<HebrewToken> lemmatizeTolerant(final String word) {
-		final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+    public List<HebrewToken> lemmatizeTolerant(final String word) {
+        final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
         // Don't try tolerating long words. Longest Hebrew word is 19 chars long
         // http://en.wikipedia.org/wiki/Longest_words#Hebrew
@@ -193,48 +183,40 @@ public class Lemmatizer
             return ret;
         }
 
-		byte prefLen = 0;
-		Integer prefixMask;
+        byte prefLen = 0;
+        Integer prefixMask;
 
-		List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.getRadix().lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
-		if (tolerated != null)
-		{
-			for (DictRadix<MorphData>.LookupResult lr : tolerated)
-			{
-				for (int result = 0; result < lr.getData().getLemmas().length; result++)
-				{
-					ret.addUnique(new HebrewToken(lr.getWord(), (byte)0, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore()));
-				}
-			}
-		}
+        List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.getRadix().lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+        if (tolerated != null) {
+            for (DictRadix<MorphData>.LookupResult lr : tolerated) {
+                for (int result = 0; result < lr.getData().getLemmas().length; result++) {
+                    ret.addUnique(new HebrewToken(lr.getWord(), (byte) 0, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore()));
+                }
+            }
+        }
 
-		prefLen = 0;
-		while (true)
-		{
-			// Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-			if (word.length() - prefLen < 2)
-				break;
+        prefLen = 0;
+        while (true) {
+            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+            if (word.length() - prefLen < 2)
+                break;
 
             if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
                 break;
 
-			tolerated = m_dict.getRadix().lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
-			if (tolerated != null)
-			{
-				for (DictRadix<MorphData>.LookupResult lr : tolerated)
-				{
-					for (int result = 0; result < lr.getData().getLemmas().length; result++)
-					{
-						if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0)
-						{
-							ret.addUnique(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
-						}
-					}
-				}
-			}
-		}
+            tolerated = m_dict.getRadix().lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
+            if (tolerated != null) {
+                for (DictRadix<MorphData>.LookupResult lr : tolerated) {
+                    for (int result = 0; result < lr.getData().getLemmas().length; result++) {
+                        if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0) {
+                            ret.addUnique(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
+                        }
+                    }
+                }
+            }
+        }
         return ret;
-	}
+    }
 
     public final WordType isRecognizedWord(final String word, final boolean tolerate) {
         byte prefLen = 0;
@@ -311,14 +293,12 @@ public class Lemmatizer
             }
 
             List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.getRadix().lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
-            if (tolerated != null && tolerated.size() > 0)
-            {
+            if (tolerated != null && tolerated.size() > 0) {
                 return WordType.HEBREW_TOLERATED;
             }
 
             prefLen = 0;
-            while (true)
-            {
+            while (true) {
                 // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
                 if (word.length() - prefLen < 2)
                     break;
@@ -327,14 +307,10 @@ public class Lemmatizer
                     break;
 
                 tolerated = m_dict.getRadix().lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
-                if (tolerated != null)
-                {
-                    for (DictRadix<MorphData>.LookupResult lr : tolerated)
-                    {
-                        for (int result = 0; result < lr.getData().getLemmas().length; result++)
-                        {
-                            if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0)
-                            {
+                if (tolerated != null) {
+                    for (DictRadix<MorphData>.LookupResult lr : tolerated) {
+                        for (int result = 0; result < lr.getData().getLemmas().length; result++) {
+                            if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0) {
                                 return WordType.HEBREW_TOLERATED_WITH_PREFIX;
                             }
                         }

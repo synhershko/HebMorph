@@ -36,7 +36,7 @@ public class LingInfo {
             } else {
                 specifier = PrefixType.PS_ALL;
             }
-			/*TODO I feel that this may lead to a bug with ליפול and other infinitives that
+            /*TODO I feel that this may lead to a bug with ליפול and other infinitives that
              * did not loose their initial lamed.  I should correct this all the way from
              * woo.pl*/
             if ((dmask & DMask.D_TENSEMASK) == DMask.D_INFINITIVE) {

@@ -9,10 +9,10 @@ import java.util.HashMap;
  */
 public class DictHebMorph {
     //consider whether or not make it generic. for now, let's roll without
-    private HashMap<String,Integer> pref;
+    private HashMap<String, Integer> pref;
     private DictRadix<MorphData> dict;
 
-    public DictHebMorph(DictRadix<MorphData> dict, HashMap<String, Integer> pref){
+    public DictHebMorph(DictRadix<MorphData> dict, HashMap<String, Integer> pref) {
         this.pref = pref;
         this.dict = dict;
     }
@@ -21,24 +21,25 @@ public class DictHebMorph {
     public DictRadix<MorphData> getRadix() {
         return dict;
     }
-    public HashMap<String,Integer> getPref(){
+
+    public HashMap<String, Integer> getPref() {
         return pref;
     }
 
-    public void clear(){
+    public void clear() {
         dict.clear();
         pref.clear();
     }
 
     @Override
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
         if (this == other)
             return true;
         if (other == null)
             return false;
         if (getClass() != other.getClass())
             return false;
-        DictHebMorph dict = (DictHebMorph)other;
+        DictHebMorph dict = (DictHebMorph) other;
         return (this.getRadix().equals(((DictHebMorph) other).getRadix()) && this.getPref().equals(((DictHebMorph) other).getPref()));
     }
 }
