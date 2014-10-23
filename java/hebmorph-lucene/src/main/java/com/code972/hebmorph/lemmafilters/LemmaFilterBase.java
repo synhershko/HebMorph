@@ -24,17 +24,17 @@ import java.util.List;
 
 
 public abstract class LemmaFilterBase {
-	public List<Token> filterCollection(final String word, final List<Token> collection, final List<Token> preallocatedOut) {
+    public List<Token> filterCollection(final String word, final List<Token> collection, final List<Token> preallocatedOut) {
         preallocatedOut.clear();
 
-		for (final Token t : collection) {
-			if (isValidToken(t)) {
-				preallocatedOut.add(t);
-			}
-		}
+        for (final Token t : collection) {
+            if (isValidToken(t)) {
+                preallocatedOut.add(t);
+            }
+        }
 
-		return preallocatedOut;
-	}
+        return preallocatedOut;
+    }
 
-	public abstract boolean isValidToken(final Token t);
+    public abstract boolean isValidToken(final Token t);
 }

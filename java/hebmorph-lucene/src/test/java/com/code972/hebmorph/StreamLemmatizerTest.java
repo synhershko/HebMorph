@@ -13,35 +13,29 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class StreamLemmatizerTest extends TestBase
-{
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{
-	}
+public class StreamLemmatizerTest extends TestBase {
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
 
     @Before
-    public void SetUp()
-    {
+    public void SetUp() {
     }
 
     @Test
-    public void IncrementsOffsetCorrectly() throws IOException
-    {
+    public void IncrementsOffsetCorrectly() throws IOException {
         String input = "";
-        for (int repeat = 0; repeat < 4000; repeat++)
-        {
+        for (int repeat = 0; repeat < 4000; repeat++) {
             input += "test test test test ";
         }
         StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input),
-                                                   // dict is not used in this test
-                                                   null , true);
+                // dict is not used in this test
+                null);
 
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
         int previousOffest = -5;
-        while (sl.getLemmatizeNextToken(token, results) > 0)
-        {
+        while (sl.getLemmatizeNextToken(token, results) > 0) {
             assertEquals(previousOffest, sl.getStartOffset() - 5);
             assertEquals(4, sl.getEndOffset() - sl.getStartOffset());
             previousOffest = sl.getStartOffset();
@@ -49,10 +43,9 @@ public class StreamLemmatizerTest extends TestBase
     }
 
     @Test
-    public void testHebrewWords() throws IOException
-    {
+    public void testHebrewWords() throws IOException {
         final String input = "שלום";
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input), getDictionary(), false);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(input), getDictionary(false));
 
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
@@ -63,7 +56,7 @@ public class StreamLemmatizerTest extends TestBase
         assertEquals(4, sl.getEndOffset());
         results.clear();
 
-        sl = new StreamLemmatizer(new StringReader("בבבי"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("בבבי"), getDictionary(false));
         assertTrue(sl.getLemmatizeNextToken(token, results) > 0);
         assertEquals(0, sl.getStartOffset());
         assertEquals(4, sl.getEndOffset());
@@ -82,7 +75,7 @@ public class StreamLemmatizerTest extends TestBase
         testAutoStripMixedImpl("cellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
 
         DictRadix<Byte> specialTokenizationCases = new DictRadix<>(false);
-        specialTokenizationCases.addNode("C++", new Byte((byte)0));
+        specialTokenizationCases.addNode("C++", new Byte((byte) 0));
         testAutoStripMixedImpl("בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
         testAutoStripMixedImpl("בc++ ", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
         testAutoStripMixedImpl(" בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
@@ -96,17 +89,17 @@ public class StreamLemmatizerTest extends TestBase
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary() , false, specialTokenizationCases);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader(word), getDictionary(false), specialTokenizationCases);
         int tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(expected, token.ref);
         assertEquals(expectedType, tokenType);
 
-        sl = new StreamLemmatizer(new StringReader(word + " בדיקה"), getDictionary() , true, specialTokenizationCases);
+        sl = new StreamLemmatizer(new StringReader(word + " בדיקה"), getDictionary(true), specialTokenizationCases);
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(expected, token.ref);
         assertEquals(expectedType, tokenType);
 
-        sl = new StreamLemmatizer(new StringReader("בדיקה " + word), getDictionary() , true, specialTokenizationCases);
+        sl = new StreamLemmatizer(new StringReader("בדיקה " + word), getDictionary(true), specialTokenizationCases);
         sl.getLemmatizeNextToken(token, results);
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(expected, token.ref);
@@ -118,21 +111,21 @@ public class StreamLemmatizerTest extends TestBase
         Reference<String> token = new Reference<String>("");
         List<Token> results = new ArrayList<Token>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("בדיקה$"), getDictionary() , false);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("בדיקה$"), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         int tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
         assertEquals("בדיקה", token.ref);
         assertEquals(0, sl.getLemmatizeNextToken(token, results));
 
-        sl = new StreamLemmatizer(new StringReader("בדיקות$"), getDictionary() , false);
+        sl = new StreamLemmatizer(new StringReader("בדיקות$"), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
         assertEquals("בדיקות", token.ref);
         assertEquals(0, sl.getLemmatizeNextToken(token, results));
 
-        sl = new StreamLemmatizer(new StringReader("\"בין$ תחומי$\""), getDictionary() , false);
+        sl = new StreamLemmatizer(new StringReader("\"בין$ תחומי$\""), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
@@ -149,40 +142,39 @@ public class StreamLemmatizerTest extends TestBase
         Reference<String> token = new Reference<>("");
         List<Token> results = new ArrayList<>();
 
-        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(), false);
+        StreamLemmatizer sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(false));
         int tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("מב\"ל", token.ref);
 
-        sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("מב\"ל"), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("מב\"ל", token.ref);
 
-        sl = new StreamLemmatizer(new StringReader("ומש\"א"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("ומש\"א"), getDictionary(false));
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("ומש\"א", token.ref);
 
-        sl = new StreamLemmatizer(new StringReader("ומש\"א"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("ומש\"א"), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("ומש\"א", token.ref);
 
-        sl = new StreamLemmatizer(new StringReader("ומש\"א$"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("ומש\"א$"), getDictionary(false));
         sl.setSuffixForExactMatch('$');
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals("ומש\"א", token.ref);
         assertEquals(Tokenizer.TokenType.Acronym | Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact, tokenType);
 
-        sl = new StreamLemmatizer(new StringReader("ה\"מכונית"), getDictionary(), false);
+        sl = new StreamLemmatizer(new StringReader("ה\"מכונית"), getDictionary(false));
         tokenType = sl.getLemmatizeNextToken(token, results);
         assertEquals(Tokenizer.TokenType.Hebrew, tokenType);
         assertEquals("מכונית", token.ref);
     }
-
 
 
     // TODO: RemovesObviousStopWords: first collations, then based on morphological data hspell needs to

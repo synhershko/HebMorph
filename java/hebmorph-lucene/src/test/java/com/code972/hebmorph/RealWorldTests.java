@@ -16,16 +16,16 @@ public class RealWorldTests extends TestBase {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        specialTokenizationCases.addNode("H&M", new Byte((byte)0));
-        specialTokenizationCases.addNode("C++", new Byte((byte)0));
-        specialTokenizationCases.addNode("i-phone", new Byte((byte)0));
-        specialTokenizationCases.addNode("i-pad", new Byte((byte)0));
+        specialTokenizationCases.addNode("H&M", new Byte((byte) 0));
+        specialTokenizationCases.addNode("C++", new Byte((byte) 0));
+        specialTokenizationCases.addNode("i-phone", new Byte((byte) 0));
+        specialTokenizationCases.addNode("i-pad", new Byte((byte) 0));
     }
 
     @Test
     public void test() throws IOException {
         File files = new File("./../../test-files");
-        for(File filename : files.listFiles()) {
+        for (File filename : files.listFiles()) {
             testImpl(filename.getPath());
         }
     }
@@ -35,7 +35,7 @@ public class RealWorldTests extends TestBase {
         List<Token> results = new ArrayList<Token>();
 
         final String contents = readFileToString(filename);
-        final StreamLemmatizer sl = new StreamLemmatizer(new StringReader(contents), getDictionary() , false, specialTokenizationCases);
+        final StreamLemmatizer sl = new StreamLemmatizer(new StringReader(contents), getDictionary(false), specialTokenizationCases);
         while (sl.getLemmatizeNextToken(token, results) != 0) {
             System.out.println(token.ref);
         }

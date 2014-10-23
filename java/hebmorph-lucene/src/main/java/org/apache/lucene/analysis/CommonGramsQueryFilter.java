@@ -26,7 +26,7 @@ import static org.apache.lucene.analysis.CommonGramsFilter.GRAM_TYPE;
 /**
  * Wrap a CommonGramsFilter optimizing phrase queries by only returning single
  * words when they are not a member of a bigram.
- *
+ * <p/>
  * Example:
  * <ul>
  * <li>query input to CommonGramsFilter: "the rain in spain falls mainly"
