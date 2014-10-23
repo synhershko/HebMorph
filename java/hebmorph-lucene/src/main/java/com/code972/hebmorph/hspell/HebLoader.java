@@ -16,6 +16,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class HebLoader {
 
+    public static final int FILE_FORMAT_VERSION = 1;
+
     public final static String DELIMETER = "#",
             PREFIX_H = "prefix_h.gz",
             PREFIX_NOH = "prefix_noH.gz",

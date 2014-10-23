@@ -24,18 +24,19 @@ import com.code972.hebmorph.datastructures.RealSortedList;
 import com.code972.hebmorph.datastructures.RealSortedList.SortOrder;
 import com.code972.hebmorph.hspell.LingInfo;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Lemmatizer {
-    private final DictHebMorph m_dict;
+    private final DictHebMorph dictHeb;
     private DictRadix<MorphData> customWords;
 
     public Lemmatizer(final DictHebMorph dict) {
-        this.m_dict = dict;
+        this.dictHeb = dict;
     }
 
     public boolean isLegalPrefix(final String str) {
-        return m_dict.getPref().containsKey(str);
+        return dictHeb.getPref().containsKey(str);
     }
 
     // See the Academy's punctuation rules (see לשוננו לעם, טבת, תשס"ב) for an explanation of this rule
@@ -89,7 +90,8 @@ public class Lemmatizer {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md = null;
-
+        DictRadix<MorphData> m_dict = dictHeb.getRadix();
+        HashMap<String,Integer> m_pref = dictHeb.getPref();
         // Lookup the word in the custom words list. It is guaranteed to have only one lemma for a word,
         // so we can always access the first entry of a record - if we got any
         // If we find any results, we can immediately return
@@ -108,7 +110,7 @@ public class Lemmatizer {
                     if (word.length() - prefLen < 2)
                         break;
 
-                    if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+                    if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                         break;
 
                     try {
@@ -128,7 +130,7 @@ public class Lemmatizer {
 
         // Continue with looking up the word in the standard dictionary
         try {
-            md = m_dict.getRadix().lookup(word);
+            md = m_dict.lookup(word);
         } catch (IllegalArgumentException e) {
             md = null;
         }
@@ -138,7 +140,7 @@ public class Lemmatizer {
             }
         } else if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
-                md = m_dict.getRadix().lookup(word.substring(0, word.length() - 1));
+                md = m_dict.lookup(word.substring(0, word.length() - 1));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
@@ -155,11 +157,11 @@ public class Lemmatizer {
             if (word.length() - prefLen < 2)
                 break;
 
-            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+            if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                 break;
 
             try {
-                md = m_dict.getRadix().lookup(word.substring(prefLen));
+                md = m_dict.lookup(word.substring(prefLen));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
@@ -176,7 +178,8 @@ public class Lemmatizer {
 
     public List<HebrewToken> lemmatizeTolerant(final String word) {
         final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
-
+        DictRadix<MorphData> m_dict = dictHeb.getRadix();
+        HashMap<String,Integer> m_pref = dictHeb.getPref();
         // Don't try tolerating long words. Longest Hebrew word is 19 chars long
         // http://en.wikipedia.org/wiki/Longest_words#Hebrew
         if (word.length() > 20) {
@@ -186,7 +189,7 @@ public class Lemmatizer {
         byte prefLen = 0;
         Integer prefixMask;
 
-        List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.getRadix().lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+        List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
         if (tolerated != null) {
             for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                 for (int result = 0; result < lr.getData().getLemmas().length; result++) {
@@ -201,10 +204,10 @@ public class Lemmatizer {
             if (word.length() - prefLen < 2)
                 break;
 
-            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+            if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                 break;
 
-            tolerated = m_dict.getRadix().lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
+            tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
             if (tolerated != null) {
                 for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                     for (int result = 0; result < lr.getData().getLemmas().length; result++) {
@@ -222,7 +225,8 @@ public class Lemmatizer {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md;
-
+        DictRadix<MorphData> m_dict = dictHeb.getRadix();
+        HashMap<String,Integer> m_pref = dictHeb.getPref();
         try {
             if (customWords.lookup(word) != null) return WordType.CUSTOM;
         } catch (IllegalArgumentException e) {
@@ -233,7 +237,7 @@ public class Lemmatizer {
             if (word.length() - prefLen < 2)
                 break;
 
-            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+            if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                 break;
 
             try {
@@ -251,13 +255,13 @@ public class Lemmatizer {
         }
 
         try {
-            if (m_dict.getRadix().lookup(word) != null) return WordType.HEBREW;
+            if (m_dict.lookup(word) != null) return WordType.HEBREW;
         } catch (IllegalArgumentException e) {
         }
 
         if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
-                if (m_dict.getRadix().lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
+                if (m_dict.lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
             } catch (IllegalArgumentException e) {
             }
         }
@@ -268,11 +272,11 @@ public class Lemmatizer {
             if (word.length() - prefLen < 2)
                 break;
 
-            if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+            if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                 break;
 
             try {
-                md = m_dict.getRadix().lookup(word.substring(prefLen));
+                md = m_dict.lookup(word.substring(prefLen));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
@@ -292,7 +296,7 @@ public class Lemmatizer {
                 return WordType.UNRECOGNIZED;
             }
 
-            List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.getRadix().lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+            List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
             if (tolerated != null && tolerated.size() > 0) {
                 return WordType.HEBREW_TOLERATED;
             }
@@ -303,10 +307,10 @@ public class Lemmatizer {
                 if (word.length() - prefLen < 2)
                     break;
 
-                if ((prefixMask = m_dict.getPref().get(word.substring(0, ++prefLen))) == null)
+                if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                     break;
 
-                tolerated = m_dict.getRadix().lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
+                tolerated = m_dict.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
                 if (tolerated != null) {
                     for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                         for (int result = 0; result < lr.getData().getLemmas().length; result++) {

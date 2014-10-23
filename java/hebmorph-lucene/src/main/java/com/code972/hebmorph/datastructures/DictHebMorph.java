@@ -8,7 +8,6 @@ import java.util.HashMap;
  * Created by Egozy on 20/10/2014.
  */
 public class DictHebMorph {
-    //consider whether or not make it generic. for now, let's roll without
     private HashMap<String, Integer> pref;
     private DictRadix<MorphData> dict;
 
