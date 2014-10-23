@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 @TimeoutSuite(millis = 10000000)
 public class RandomizedTokenizerTests {
 
-    String[] customWords = new String[] { "C++", "C++X0", "i-phone", "i-pad", ".NET",
+    String[] customWords = new String[]{"C++", "C++X0", "i-phone", "i-pad", ".NET",
             "VB.NET", "F#", "C#", "נביעות+", "Google+"};
 
     @Test
@@ -79,11 +79,11 @@ public class RandomizedTokenizerTests {
      * scope (so no static initializers). The returned {@link java.util.Random} instance will be
      * <b>different</b> when this method is called inside a {@link org.junit.BeforeClass} hook (static
      * suite scope) and within {@link org.junit.Before}/ {@link org.junit.After} hooks or test methods.
-     *
+     * <p/>
      * <p>The returned instance must not be shared with other threads or cross a single scope's
      * boundary. For example, a {@link java.util.Random} acquired within a test method shouldn't be reused
      * for another test case.
-     *
+     * <p/>
      * <p>There is an overhead connected with getting the {@link java.util.Random} for a particular context
      * and thread. It is better to cache the {@link java.util.Random} locally if tight loops with multiple
      * invocations are present or create a derivative local {@link java.util.Random} for millions of calls
@@ -107,7 +107,7 @@ public class RandomizedTokenizerTests {
         }
 
         @Override
-        public boolean equals(Object obj){
+        public boolean equals(Object obj) {
             if (!(obj instanceof WordAndPosition))
                 return false;
 
@@ -116,7 +116,7 @@ public class RandomizedTokenizerTests {
         }
 
         @Override
-        public int hashCode(){
+        public int hashCode() {
             return 0;
         }
 

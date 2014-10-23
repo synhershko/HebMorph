@@ -18,43 +18,36 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
-public class Token
-{
+public class Token {
     private static final long serialVersionUID = 6619399351938583614L;
 
-	private String text;
-	private boolean isNumeric = false;
+    private String text;
+    private boolean isNumeric = false;
 
-	public Token(String tokenText)
-	{
-		text = tokenText;
-	}
+    public Token(String tokenText) {
+        text = tokenText;
+    }
 
-	public Token(String tokenText, boolean isNumeric)
-	{
-		this(tokenText);
-		this.isNumeric = isNumeric;
-	}
+    public Token(String tokenText, boolean isNumeric) {
+        this(tokenText);
+        this.isNumeric = isNumeric;
+    }
 
-	public String getText()
-	{
-		return text;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public void setText(String text)
-	{
-		this.text = text;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
 
-	public boolean isNumeric()
-	{
-		return isNumeric;
-	}
+    public boolean isNumeric() {
+        return isNumeric;
+    }
 
-	public void setNumeric(boolean isNumeric)
-	{
-		this.isNumeric = isNumeric;
-	}
+    public void setNumeric(boolean isNumeric) {
+        this.isNumeric = isNumeric;
+    }
 
     /* (non-Javadoc)
       * @see java.lang.Object#hashCode()
@@ -98,6 +91,6 @@ public class Token
 
     @Override
     public String toString() {
-        return String.format("%s isNumeric:(%b)", text , isNumeric);
+        return String.format("%s isNumeric:(%b)", text, isNumeric);
     }
 }

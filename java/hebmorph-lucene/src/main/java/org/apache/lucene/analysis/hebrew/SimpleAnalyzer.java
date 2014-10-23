@@ -18,7 +18,10 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.AddSuffixFilter;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CommonGramsFilter;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymMap;
@@ -30,12 +33,13 @@ import java.io.Reader;
 import java.util.Map;
 
 public final class SimpleAnalyzer extends Analyzer {
-	/** An unmodifiable set containing some common Hebrew words that are usually not
-	 useful for searching.
-	*/
+    /**
+     * An unmodifiable set containing some common Hebrew words that are usually not
+     * useful for searching.
+     */
     private final CharArraySet commonWords;
 
-	private Map<String, char[]> suffixByTokenType = null;
+    private Map<String, char[]> suffixByTokenType = null;
     private final Version matchVersion;
     private final SynonymMap acronymMergingMap;
 
@@ -68,10 +72,10 @@ public final class SimpleAnalyzer extends Analyzer {
     }
 
     public void registerSuffix(String tokenType, String suffix) {
-		if (suffixByTokenType == null)
-			suffixByTokenType = new java.util.HashMap<>();
+        if (suffixByTokenType == null)
+            suffixByTokenType = new java.util.HashMap<>();
 
-		if (!suffixByTokenType.containsKey(tokenType))
-			suffixByTokenType.put(tokenType, suffix.toCharArray());
-	}
+        if (!suffixByTokenType.containsKey(tokenType))
+            suffixByTokenType.put(tokenType, suffix.toCharArray());
+    }
 }

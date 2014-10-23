@@ -1,7 +1,6 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import com.code972.hebmorph.hspell.LingInfo;
 import org.apache.lucene.analysis.Analyzer;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class TestStreamLemmasFilterWithOrigin extends BaseTokenStreamWithDiction
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), LingInfo.buildPrefixTree(false));
+                src = new StreamLemmasFilter(reader, getDictionary(false));
                 src.setKeepOriginalWord(true);
             } catch (IOException e) {
                 e.printStackTrace();
