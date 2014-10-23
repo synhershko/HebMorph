@@ -30,10 +30,7 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StreamLemmasFilter extends Tokenizer {
     private final StreamLemmatizer _streamLemmatizer;
@@ -58,8 +55,9 @@ public class StreamLemmasFilter extends Tokenizer {
         this(input, dict, null, null, null);
     }
 
-    public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final LemmaFilterBase lemmaFilter) {
-        this(input, dict, null, null, lemmaFilter);
+
+    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dict, final HashMap<String,Integer> pref, DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+        this(input, new DictHebMorph(dict,pref), null, commonWords, lemmaFilter);
     }
 
     public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {

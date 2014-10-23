@@ -16,14 +16,14 @@ public class HebLoaderTester {
 
     @Test
     public void compareLoaderWithLoad() throws IOException {
-        String[] strings = {HebLoader.DICT_H, HebLoader.DICT_NOH};
-        boolean[] booleans = {true, false};
+        String[] dicts = {HebLoader.DICT_H, HebLoader.DICT_NOH};
+        String[] prefs = {HebLoader.PREFIX_H, HebLoader.PREFIX_NOH};
         for (int i = 0; i < 2; i++) {
             Loader loader = new Loader(new File(HebLoader.getHspellPath()), true);
             DictRadix<MorphData> rad1 = loader.loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefixes1 = HebLoader.readPrefixesFromFile(booleans[i]);
+            HashMap<String, Integer> prefixes1 = HebLoader.readPrefixesFromFile(prefs[i]);
             DictHebMorph dict1 = new DictHebMorph(rad1, prefixes1);
-            DictHebMorph dict2 = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + strings[i]);
+            DictHebMorph dict2 = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + dicts[i]);
             assert (dict1.equals(dict2));
         }
     }
@@ -45,7 +45,7 @@ public class HebLoaderTester {
         startTime = System.nanoTime();
         Loader loader = new Loader(new File(HebLoader.getHspellPath()), true);
         DictRadix<MorphData> dictLoader = loader.loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefixes = HebLoader.readPrefixesFromFile(true);
+        HashMap<String, Integer> prefixes = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_H);
         endTime = System.nanoTime();
         duration1 = (double) (endTime - startTime) / (1000000000);
         startTime = System.nanoTime();

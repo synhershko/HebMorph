@@ -27,7 +27,7 @@ public class HebLoader {
             DICTIONARY_INDICATOR = "#DICTIONARY";
     public static final Charset ENCODING_USED = Charset.forName("UTF-8");
 
-    public static String getHspellPath() throws IOException {
+    public static String getHspellPath() {
         String hspellPath = null;
         ClassLoader classLoader = HebLoader.class.getClassLoader();
         File folder = new File(classLoader.getResource("").getPath());
@@ -50,16 +50,12 @@ public class HebLoader {
     }
 
     //used when loading using the Loader and thus prefixes aren't loaded automatically
-    public static HashMap<String, Integer> readPrefixesFromFile(boolean allowHeHasheela) {
+    public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
         HashMap<String, Integer> map = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
         try {
-            if (allowHeHasheela) {
-                reader = new GZIPInputStream(new FileInputStream(HebLoader.getHspellPath() + PREFIX_H));
-            } else {
-                reader = new GZIPInputStream(new FileInputStream(HebLoader.getHspellPath() + PREFIX_NOH));
-            }
+            reader = new GZIPInputStream(new FileInputStream(prefixPath));
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null) {
