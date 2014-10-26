@@ -21,8 +21,6 @@ public class HebLoader {
     public final static String DELIMETER = "#",
             PREFIX_H = "prefix_h.gz",
             PREFIX_NOH = "prefix_noH.gz",
-            DICT_H = "dict_h.gz",
-            DICT_NOH = "dict_noH.gz",
             PREFIXES_INDICATOR = "#PREFIXES",
             DICTIONARY_INDICATOR = "#DICTIONARY";
     public static final Charset ENCODING_USED = Charset.forName("UTF-8");
@@ -89,6 +87,8 @@ public class HebLoader {
         try {
             writer = new GZIPOutputStream(new FileOutputStream(fileName));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, ENCODING_USED));
+            //write version number
+            bufferedWriter.write(FILE_FORMAT_VERSION + "\n");
             //write the prefixes
             bufferedWriter.write(PREFIXES_INDICATOR + "\n");
             for (Map.Entry<String, Integer> pair : dict.getPref().entrySet()) {
@@ -134,8 +134,11 @@ public class HebLoader {
             reader = new GZIPInputStream(new FileInputStream(fileName));
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
+            if (!(Integer.parseInt(bufferedReader.readLine()) == FILE_FORMAT_VERSION)) {
+                throw new IOException("Old or incorrect format detected");
+            }
             if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)) {
-                throw new IOException("Wrong format detected");
+                throw new IOException("Unknown format detected");
             }
             while (!(str = bufferedReader.readLine()).equals(DICTIONARY_INDICATOR)) {
                 String[] split = str.split(DELIMETER);

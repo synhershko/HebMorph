@@ -156,7 +156,6 @@ public class Lemmatizer {
             // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
             if (word.length() - prefLen < 2)
                 break;
-
             if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
                 break;
 

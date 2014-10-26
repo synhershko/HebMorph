@@ -15,22 +15,8 @@ import java.util.HashMap;
 public class HebLoaderTester {
 
     @Test
-    public void compareLoaderWithLoad() throws IOException {
-        String[] dicts = {HebLoader.DICT_H, HebLoader.DICT_NOH};
-        String[] prefs = {HebLoader.PREFIX_H, HebLoader.PREFIX_NOH};
-        for (int i = 0; i < 2; i++) {
-            Loader loader = new Loader(new File(HebLoader.getHspellPath()), true);
-            DictRadix<MorphData> rad1 = loader.loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefixes1 = HebLoader.readPrefixesFromFile(prefs[i]);
-            DictHebMorph dict1 = new DictHebMorph(rad1, prefixes1);
-            DictHebMorph dict2 = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + dicts[i]);
-            assert (dict1.equals(dict2));
-        }
-    }
-
-    @Test
     public void testWriteEqualsRead() throws IOException {
-        DictHebMorph dict1 = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_H);
+        DictHebMorph dict1 = basicDictionary();
         HebLoader.saveDicAndPrefixesToGzip(dict1, HebLoader.getHspellPath() + "temp_dict.gz");
         DictHebMorph dict2 = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + "temp_dict.gz");
         assert (dict1.equals(dict2));
@@ -38,20 +24,25 @@ public class HebLoaderTester {
         assert (file.delete());
     }
 
-    @Test
-    public void timeTest() throws IOException {
-        long startTime, endTime;
-        double duration1,duration2;
-        startTime = System.nanoTime();
-        Loader loader = new Loader(new File(HebLoader.getHspellPath()), true);
-        DictRadix<MorphData> dictLoader = loader.loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefixes = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_H);
-        endTime = System.nanoTime();
-        duration1 = (double) (endTime - startTime) / (1000000000);
-        startTime = System.nanoTime();
-        DictHebMorph dictLoad = HebLoader.loadDicAndPrefixesFromGzip(HebLoader.getHspellPath() + HebLoader.DICT_H);
-        endTime = System.nanoTime();
-        duration2 = (double) (endTime - startTime) / (1000000000);
-        System.out.println("old: " + duration1 + " seconds ---> new: " + duration2 + " seconds");
+    private DictHebMorph basicDictionary(){
+        DictHebMorph dict;
+        HashMap<String,Integer> prefs = new HashMap<>();
+        prefs.put("ב",43);
+        prefs.put("בכ",42);
+        prefs.put("ה",32);
+        prefs.put("ו",60);
+        DictRadix<MorphData> radix = new DictRadix<>();
+        MorphData md = new MorphData();
+        md.setLemmas(new String[]{"אנציקלופדיה"});
+        md.setPrefixes((short)63);
+        md.setDescFlags(new Integer[]{77});
+        radix.addNode("אנציקלופדיה",md);
+        md = new MorphData();
+        md.setLemmas(new String[]{"לימוד","לימוד"});
+        md.setPrefixes((short)63);
+        md.setDescFlags(new Integer[]{0,201});
+        radix.addNode("לימוד",md);
+        dict = new DictHebMorph(radix,prefs);
+        return dict;
     }
 }
