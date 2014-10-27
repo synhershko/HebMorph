@@ -1,8 +1,7 @@
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,22 +38,20 @@ import static org.junit.Assert.fail;
  */
 public class RealDataTest extends TestBase {
     public static class TestSimpleHebrewAnalyzer extends Analyzer {
-        private final DictRadix<MorphData> dictRadix;
-        private final HashMap<String, Integer> prefixes;
+        private final DictHebMorph dict;
         private final DictRadix<Byte> specialTokenizationCases;
         private final CharArraySet commonWords;
 
-        public TestSimpleHebrewAnalyzer(final DictRadix<MorphData> dictRadix, final HashMap<String, Integer> prefixes,
+        public TestSimpleHebrewAnalyzer(final DictHebMorph dict,
                                         final DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords) throws IOException {
-            this.dictRadix = dictRadix;
-            this.prefixes = prefixes;
+            this.dict = dict;
             this.specialTokenizationCases = specialTokenizationCases;
             this.commonWords = commonWords;
         }
 
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixes, specialTokenizationCases, commonWords, new BasicLemmaFilter());
+            final StreamLemmasFilter src = new StreamLemmasFilter(reader, dict, specialTokenizationCases, commonWords, new BasicLemmaFilter());
             src.setKeepOriginalWord(true);
 
             return new TokenStreamComponents(src) {
@@ -69,8 +65,8 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        System.out.print("Dictionary initialized;");
+        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(false), null, null);
+        System.out.print("DictHebMorph initialized;");
 
         final HashSet<String> results = performSearch(a);
         for (int i = 0; i < 10; i++) {
@@ -86,8 +82,8 @@ public class RealDataTest extends TestBase {
     @Test
     public void testMultiThreaded() throws IOException {
         //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(), LingInfo.buildPrefixTree(false));
-        System.out.println("Dictionary initialized");
+        final Analyzer a = new MorphAnalyzer(Version.LUCENE_46, getDictionary(false));
+        System.out.println("DictHebMorph initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);
         final HashSet<String> results = performSearch(a);

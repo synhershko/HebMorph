@@ -1,6 +1,8 @@
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HebLoader;
 import com.code972.hebmorph.hspell.Loader;
 
 import java.io.File;
@@ -9,33 +11,23 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 public abstract class TestBase {
-    private static DictRadix<MorphData> dict;
+    private static DictHebMorph dict;
 
-    protected synchronized DictRadix<MorphData> getDictionary() throws IOException {
-        String hspellPath = null;
+    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
-            ClassLoader classLoader = TestBase.class.getClassLoader();
-            File folder = new File(classLoader.getResource("").getPath());
-            while (true) {
-                File tmp = new File(folder, "hspell-data-files");
-                if (tmp.exists() && tmp.isDirectory()) {
-                    hspellPath = tmp.toString();
-                    break;
-                }
-
-                folder = folder.getParentFile();
-                if (folder == null) break;
+            DictRadix<MorphData> radix = new Loader(new File(HebLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+            HashMap<String, Integer> prefs = null;
+            if (allowHeHasheela) {
+                prefs = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_H);
+            } else {
+                prefs = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_NOH);
             }
-
-            if (hspellPath == null)
-                throw new IllegalArgumentException("path to hspell data folder couldn't be found");
-
-            Loader loader = new Loader(new File(hspellPath), true);
-            dict = loader.loadDictionaryFromHSpellData();
+            dict = new DictHebMorph(radix, prefs);
         }
-        return dict; 
+        return dict;
     }
 
     protected static String readFileToString(String path) throws IOException {
@@ -45,8 +37,7 @@ public abstract class TestBase {
             MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             /* Instead of using default, pass in a decoder. */
             return Charset.defaultCharset().decode(bb).toString();
-        }
-        finally {
+        } finally {
             stream.close();
         }
     }

@@ -18,15 +18,15 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
-public final class Reference<T>
-{
-	public T ref;
-	public Reference(T initialVal) {
-		ref = initialVal;
-	}
+public final class Reference<T> {
+    public T ref;
 
-	public static <T> Reference<T> reference(T initialVal) {
-	    return new Reference<T>(initialVal);
-	}
+    public Reference(T initialVal) {
+        ref = initialVal;
+    }
+
+    public static <T> Reference<T> reference(T initialVal) {
+        return new Reference<T>(initialVal);
+    }
 
 }

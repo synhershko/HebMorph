@@ -6,12 +6,12 @@ import org.junit.runners.Suite;
 
 /**
  * A test suites that includes all hebmorph tests
- * @author itaifrenkel
  *
+ * @author itaifrenkel
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	LemmatizerTest.class, RadixTest.class, TokenizerTest.class, StreamLemmatizerTest.class
+        LemmatizerTest.class, RadixTest.class, TokenizerTest.class, StreamLemmatizerTest.class
 })
 public class RegressionTestSuite {
 

@@ -29,7 +29,7 @@ import java.io.IOException;
  * <li>output:|"the","the-quick"|"brown"|"fox"|</li>
  * <li>"the-quick" has a position increment of 0 so it is in the same position
  * as "the" "the-quick" has a term.type() of "gram"</li>
- *
+ * <p/>
  * </ul>
  */
 
@@ -63,7 +63,7 @@ public final class CommonGramsFilter extends TokenFilter {
      * bigrams with position increment 0 type=gram where one or both of the words
      * in a potential bigram are in the set of common words .
      *
-     * @param input TokenStream input in filter chain
+     * @param input       TokenStream input in filter chain
      * @param commonWords The set of common words.
      * @deprecated use the one with keepOrigin
      */
@@ -78,9 +78,9 @@ public final class CommonGramsFilter extends TokenFilter {
      * bigrams with position increment 0 type=gram where one or both of the words
      * in a potential bigram are in the set of common words .
      *
-     * @param input TokenStream input in filter chain
+     * @param input       TokenStream input in filter chain
      * @param commonWords The set of common words.
-     * @param keepOrigin Whether to keep the original common word as a unigram or not.
+     * @param keepOrigin  Whether to keep the original common word as a unigram or not.
      */
     public CommonGramsFilter(Version matchVersion, TokenStream input, CharArraySet commonWords, boolean keepOrigin) {
         super(input);
@@ -98,11 +98,11 @@ public final class CommonGramsFilter extends TokenFilter {
      * output the token. If the token and/or the following token are in the list
      * of common words also output a bigram with position increment 0 and
      * type="gram"
-     *
+     * <p/>
      * TODO:Consider adding an option to not emit unigram stopwords
      * as in CDL XTF BigramStopFilter, CommonGramsQueryFilter would need to be
      * changed to work with this.
-     *
+     * <p/>
      * TODO: Consider optimizing for the case of three
      * commongrams i.e "man of the year" normally produces 3 bigrams: "man-of",
      * "of-the", "the-year" but with proper management of positions we could
@@ -116,8 +116,7 @@ public final class CommonGramsFilter extends TokenFilter {
             saveTermBuffer();
             if (!isCommon())
                 return true;
-        }
-        else if (savedState != null) { // only relevant if we are keeping originals
+        } else if (savedState != null) { // only relevant if we are keeping originals
             restoreState(savedState);
             savedState = null;
             saveTermBuffer();
