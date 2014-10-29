@@ -7,9 +7,7 @@ import com.code972.hebmorph.datastructures.DictRadix;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by egozy on 10/13/14.
@@ -65,7 +63,7 @@ public class HebLoader {
                 }
             }
         } catch (IOException e) {
-            System.out.println("ERROR: " + e.toString() + e.getStackTrace());
+            System.out.println("ERROR: " + e);
             return null;
         } finally {
             if (bufferedReader != null) try {
@@ -80,49 +78,6 @@ public class HebLoader {
         return map;
     }
 
-    //saves a complete dictionary and the corresponding prefixes to fileName.
-    public static void saveDicAndPrefixesToGzip(DictHebMorph dict, String fileName) throws IOException {
-        GZIPOutputStream writer = null;
-        BufferedWriter bufferedWriter = null;
-        try {
-            writer = new GZIPOutputStream(new FileOutputStream(fileName));
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(writer, ENCODING_USED));
-            //write version number
-            bufferedWriter.write(FILE_FORMAT_VERSION + "\n");
-            //write the prefixes
-            bufferedWriter.write(PREFIXES_INDICATOR + "\n");
-            for (Map.Entry<String, Integer> pair : dict.getPref().entrySet()) {
-                bufferedWriter.write(pair.getKey() + HebLoader.DELIMETER + pair.getValue() + "\n");
-            }
-            //write the dictionary
-            bufferedWriter.write(DICTIONARY_INDICATOR + "\n");
-            DictRadix.RadixEnumerator en = (DictRadix.RadixEnumerator) dict.getRadix().iterator();
-            while (en.hasNext()) {
-                String mdName = en.getCurrentKey();
-                MorphData md = (MorphData) en.next();
-                String writtenString = new String();
-                writtenString += (mdName + "#" + md.getPrefixes() + "#");
-                for (String str : md.getLemmas()) {
-                    writtenString += (str + ",");
-                }
-                writtenString += ("#");
-                for (int d : md.getDescFlags()) {
-                    writtenString += (d + ",");
-                }
-                writtenString += "\n";
-                bufferedWriter.write(writtenString);
-            }
-        } finally {
-            if (bufferedWriter != null) try {
-                bufferedWriter.close();
-            } catch (IOException ignored) {
-            }
-            if (writer != null) try {
-                writer.close();
-            } catch (IOException ignored) {
-            }
-        }
-    }
 
     //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
     public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException {
@@ -183,7 +138,6 @@ public class HebLoader {
             } catch (IOException ignored) {
             }
         }
-        DictHebMorph ret = new DictHebMorph(dict, prefixes);
-        return ret;
+        return new DictHebMorph(dict, prefixes);
     }
 }
