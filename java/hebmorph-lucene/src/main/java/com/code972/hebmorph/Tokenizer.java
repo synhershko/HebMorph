@@ -20,6 +20,7 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.Constants;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.HebLoader;
 
 import java.io.IOException;
@@ -148,7 +149,7 @@ public class Tokenizer {
     public Tokenizer(final Reader input, final DictRadix<Byte> specialCases) {
         this.input = input;
         this.specialCases = specialCases != null ? specialCases : new DictRadix<Byte>(false);
-        hebrewPrefixes = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_NOH);
+        hebrewPrefixes = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HebLoader.PREFIX_NOH);
     }
 
     final static int TOKENIZATION_EXCEPTION_MAX_LENGTH = 25;

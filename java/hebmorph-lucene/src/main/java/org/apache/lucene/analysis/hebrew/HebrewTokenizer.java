@@ -20,6 +20,7 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.Reference;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.HebLoader;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -48,11 +49,11 @@ public final class HebrewTokenizer extends Tokenizer {
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     public HebrewTokenizer(final Reader _input) {
-        this(_input, HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_NOH), null);
+        this(_input, HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HebLoader.PREFIX_NOH), null);
     }
 
     public HebrewTokenizer(final Reader _input, final DictRadix<Byte> specialCases) {
-        this(_input, HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_NOH), specialCases);
+        this(_input, HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HebLoader.PREFIX_NOH), specialCases);
     }
 
     public HebrewTokenizer(final Reader _input, final HashMap<String, Integer> _prefixesTree, final DictRadix<Byte> specialCases) {

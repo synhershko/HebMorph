@@ -4,7 +4,10 @@ import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
@@ -23,62 +26,6 @@ public class HebLoader {
             DICTIONARY_INDICATOR = "#DICTIONARY";
     public static final Charset ENCODING_USED = Charset.forName("UTF-8");
 
-    public static String getHspellPath() {
-        String hspellPath = null;
-        ClassLoader classLoader = HebLoader.class.getClassLoader();
-        File folder = new File(classLoader.getResource("").getPath());
-        while (true) {
-            File tmp = new File(folder, "hspell-data-files");
-            if (tmp.exists() && tmp.isDirectory()) {
-                hspellPath = tmp.toString();
-                break;
-            }
-            folder = folder.getParentFile();
-            if (folder == null) break;
-        }
-        if (hspellPath == null) {
-            throw new IllegalArgumentException("path to hspell data folder couldn't be found");
-        }
-        if (!hspellPath.endsWith("/")) {
-            hspellPath += "/";
-        }
-        return hspellPath;
-    }
-
-    //used when loading using the Loader and thus prefixes aren't loaded automatically
-    public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
-        HashMap<String, Integer> map = new HashMap<>();
-        GZIPInputStream reader = null;
-        BufferedReader bufferedReader = null;
-        try {
-            reader = new GZIPInputStream(new FileInputStream(prefixPath));
-            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
-            String str;
-            while ((str = bufferedReader.readLine()) != null) {
-                String[] split = str.split(DELIMETER);
-                if (split.length != 2) {
-                    throw new IOException("Wrong format detected\n");
-                } else {
-                    map.put(split[0], Integer.parseInt(split[1]));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("ERROR: " + e);
-            return null;
-        } finally {
-            if (bufferedReader != null) try {
-                bufferedReader.close();
-            } catch (IOException ignored) {
-            }
-            if (reader != null) try {
-                reader.close();
-            } catch (IOException ignored) {
-            }
-        }
-        return map;
-    }
-
-
     //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
     public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException {
         DictRadix<MorphData> dict = new DictRadix<>();
@@ -90,7 +37,7 @@ public class HebLoader {
             bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             if (!(Integer.parseInt(bufferedReader.readLine()) == FILE_FORMAT_VERSION)) {
-                throw new IOException("Old or incorrect format detected");
+                throw new IOException("Old format detected");
             }
             if (!bufferedReader.readLine().equals(PREFIXES_INDICATOR)) {
                 throw new IOException("Unknown format detected");

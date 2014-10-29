@@ -23,13 +23,10 @@ import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public final class Loader {
+public final class HSpellLoader {
     protected List<String> dmasks;
     protected final boolean loadMorphData;
     private int lookupLen;
@@ -37,7 +34,7 @@ public final class Loader {
     protected InputStream fdict, fprefixes;
     protected InputStream fdesc = null, fstem = null;
 
-    public Loader(File hspellFolder, boolean loadMorphData) throws IOException {
+    public HSpellLoader(File hspellFolder, boolean loadMorphData) throws IOException {
         this(new FileInputStream(new File(hspellFolder, Constants.sizesFile)), new FileInputStream(new File(hspellFolder, Constants.dmaskFile)),
                 new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)), new FileInputStream(new File(hspellFolder, Constants.prefixesFile)),
                 new FileInputStream(new File(hspellFolder, Constants.descFile)), new FileInputStream(new File(hspellFolder, Constants.stemsFile)), loadMorphData);
@@ -52,13 +49,13 @@ public final class Loader {
      * @param loadMorphData
      * @throws java.io.IOException
      */
-    public Loader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
+    public HSpellLoader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
         this(classloader.getResourceAsStream(hspellFolder + Constants.sizesFile), classloader.getResourceAsStream(hspellFolder + Constants.dmaskFile),
                 classloader.getResourceAsStream(hspellFolder + Constants.dictionaryFile), classloader.getResourceAsStream(hspellFolder + Constants.prefixesFile),
                 classloader.getResourceAsStream(hspellFolder + Constants.descFile), classloader.getResourceAsStream(hspellFolder + Constants.stemsFile), loadMorphData);
     }
 
-    public Loader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
+    public HSpellLoader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
         fdict = new GZIPInputStream(dictFile);
         fprefixes = new GZIPInputStream(prefixesFile);
         this.loadMorphData = loadMorphData;
@@ -82,6 +79,61 @@ public final class Loader {
             fdesc = new GZIPInputStream(descFile);
             fstem = new GZIPInputStream(stemsFile);
         }
+    }
+
+    public static String getHspellPath() {
+        String hspellPath = null;
+        ClassLoader classLoader = HebLoader.class.getClassLoader();
+        File folder = new File(classLoader.getResource("").getPath());
+        while (true) {
+            File tmp = new File(folder, "hspell-data-files");
+            if (tmp.exists() && tmp.isDirectory()) {
+                hspellPath = tmp.toString();
+                break;
+            }
+            folder = folder.getParentFile();
+            if (folder == null) break;
+        }
+        if (hspellPath == null) {
+            throw new IllegalArgumentException("path to hspell data folder couldn't be found");
+        }
+        if (!hspellPath.endsWith("/")) {
+            hspellPath += "/";
+        }
+        return hspellPath;
+    }
+
+    //used when loading using the Loader and thus prefixes aren't loaded automatically
+    public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
+        HashMap<String, Integer> map = new HashMap<>();
+        GZIPInputStream reader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            reader = new GZIPInputStream(new FileInputStream(prefixPath));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, HebLoader.ENCODING_USED));
+            String str;
+            while ((str = bufferedReader.readLine()) != null) {
+                String[] split = str.split(HebLoader.DELIMETER);
+                if (split.length != 2) {
+                    throw new IOException("Wrong format detected\n");
+                } else {
+                    map.put(split[0], Integer.parseInt(split[1]));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR: " + e);
+            return null;
+        } finally {
+            if (bufferedReader != null) try {
+                bufferedReader.close();
+            } catch (IOException ignored) {
+            }
+            if (reader != null) try {
+                reader.close();
+            } catch (IOException ignored) {
+            }
+        }
+        return map;
     }
 
     public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
