@@ -51,7 +51,7 @@ public class MorphData {
             if (getClass() != obj.getClass())
                 return false;
             Lemma other = (Lemma) obj;
-            if (this.descFlag != (other.descFlag) || !this.lemma.equals(other.descFlag)){
+            if (this.descFlag != (other.descFlag) || !this.lemma.equals(other.lemma)){
                 return false;
             }
             return true;
