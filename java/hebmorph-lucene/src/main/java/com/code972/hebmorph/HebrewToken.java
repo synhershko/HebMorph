@@ -21,6 +21,10 @@ package com.code972.hebmorph;
 public class HebrewToken extends Token implements Comparable<Token> {
     private static final long serialVersionUID = -5809495040446607703L;
 
+    public HebrewToken(String _word, byte _prefixLength, MorphData.Lemma lemma, float _score) {
+        this(_word, _prefixLength, lemma.getDescFlag(), lemma.getLemma(), _score);
+    }
+
     public HebrewToken(String _word, byte _prefixLength, Integer _mask, String _lemma, float _score) {
         super(_word);
         prefixLength = _prefixLength;

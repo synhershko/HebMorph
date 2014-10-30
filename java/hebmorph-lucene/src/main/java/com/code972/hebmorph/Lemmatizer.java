@@ -102,7 +102,7 @@ public class Lemmatizer {
             }
 
             if (md != null) { // exact match was found in the custom words list
-                ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[0], md.getLemmas()[0], 1.0f));
+                ret.addUnique(new HebrewToken(word, (byte) 0,md.getLemmas()[0], 1.0f));
                 return ret;
             } else { // try stripping prefixes
                 while (true) {
@@ -119,8 +119,8 @@ public class Lemmatizer {
                         md = null;
                     }
                     if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-                        if ((LingInfo.DMask2ps(md.getDescFlags()[0]) & prefixMask) > 0) {
-                            ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[0], md.getLemmas()[0], 0.9f));
+                        if ((LingInfo.DMask2ps(md.getLemmas()[0].getDescFlag()) & prefixMask) > 0) {
+                            ret.addUnique(new HebrewToken(word, prefLen, md.getLemmas()[0], 0.9f));
                         }
                     }
                 }
@@ -136,7 +136,7 @@ public class Lemmatizer {
         }
         if (md != null) {
             for (int result = 0; result < md.getLemmas().length; result++) {
-                ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+                ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
             }
         } else if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
@@ -146,7 +146,7 @@ public class Lemmatizer {
             }
             if (md != null) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    ret.addUnique(new HebrewToken(word, (byte) 0, md.getDescFlags()[result], md.getLemmas()[result], 1.0f));
+                    ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
                 }
             }
         }
@@ -166,8 +166,8 @@ public class Lemmatizer {
             }
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
-                        ret.addUnique(new HebrewToken(word, prefLen, md.getDescFlags()[result], md.getLemmas()[result], 0.9f));
+                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
+                        ret.addUnique(new HebrewToken(word, prefLen, md.getLemmas()[result], 0.9f));
                     }
                 }
             }
@@ -192,7 +192,7 @@ public class Lemmatizer {
         if (tolerated != null) {
             for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                 for (int result = 0; result < lr.getData().getLemmas().length; result++) {
-                    ret.addUnique(new HebrewToken(lr.getWord(), (byte) 0, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore()));
+                    ret.addUnique(new HebrewToken(lr.getWord(), (byte) 0, lr.getData().getLemmas()[result], lr.getScore()));
                 }
             }
         }
@@ -210,8 +210,8 @@ public class Lemmatizer {
             if (tolerated != null) {
                 for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                     for (int result = 0; result < lr.getData().getLemmas().length; result++) {
-                        if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0) {
-                            ret.addUnique(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getDescFlags()[result], lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
+                        if ((LingInfo.DMask2ps(lr.getData().getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
+                            ret.addUnique(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
                         }
                     }
                 }
@@ -246,7 +246,7 @@ public class Lemmatizer {
             }
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                         return WordType.CUSTOM_WITH_PREFIX;
                     }
                 }
@@ -281,7 +281,7 @@ public class Lemmatizer {
             }
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                         return WordType.HEBREW_WITH_PREFIX;
                     }
                 }
@@ -313,7 +313,7 @@ public class Lemmatizer {
                 if (tolerated != null) {
                     for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                         for (int result = 0; result < lr.getData().getLemmas().length; result++) {
-                            if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0) {
+                            if ((LingInfo.DMask2ps(lr.getData().getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                                 return WordType.HEBREW_TOLERATED_WITH_PREFIX;
                             }
                         }

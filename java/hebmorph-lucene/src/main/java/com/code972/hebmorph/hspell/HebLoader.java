@@ -60,19 +60,18 @@ public class HebLoader {
                 }
                 MorphData md = new MorphData();
                 md.setPrefixes(Short.parseShort(split[1]));
-                String[] lemmas = split[2].split(",");
+                String[] lemmaStrings = split[2].split(",");
+                String[] descStrings = split[3].split(",");
+                if (lemmaStrings.length != descStrings.length) {
+                    throw new IOException("Number of lemmas does not match number of descFlags");
+                }
+                MorphData.Lemma[] lemmas = new MorphData.Lemma[lemmaStrings.length];
+
                 for (int i = 0; i < lemmas.length; i++) { //null and "null" are read the same
-                    if (lemmas[i].equals("null")) {
-                        lemmas[i] = null;
-                    }
+                    String lem = lemmaStrings[i].equals("null")?null:lemmaStrings[i];
+                    lemmas[i] = new MorphData.Lemma(lem,Integer.parseInt(descStrings[i]));
                 }
                 md.setLemmas(lemmas);
-                String[] descStrings = split[3].split(",");
-                Integer[] descInts = new Integer[descStrings.length];
-                for (int i = 0; i < descStrings.length; i++) {
-                    descInts[i] = Integer.parseInt(descStrings[i]);
-                }
-                md.setDescFlags(descInts);
                 dict.addNode(split[0], md);
             }
         } finally {

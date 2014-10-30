@@ -173,19 +173,22 @@ public final class HSpellLoader {
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
-                    data.setDescFlags(readDescFile(fdesc));
+                    Integer[] descFlags = readDescFile(fdesc);
 
                     final List<Integer> stemReferences = readStemFile(fstem);
-                    final String[] lemmas = new String[stemReferences.size()];
+                    final MorphData.Lemma[] lemmas = new MorphData.Lemma[stemReferences.size()];
                     int stemPosition = 0;
                     for (int r : stemReferences) {
+                        String lemma;
                         // This is a bypass for the psuedo-stem "שונות", as defined by hspell
                         // TODO: Try looking into changing this in hspell itself
                         if (lookup[r].equals("שונות") && !lookup[r].equals(lookup[i])) {
-                            lemmas[stemPosition++] = null;
+                            lemma = null;
                         } else {
-                            lemmas[stemPosition++] = lookup[r];
+                            lemma = lookup[r];
                         }
+                        lemmas[stemPosition] = new MorphData.Lemma(lemma,descFlags[stemPosition]);
+                        stemPosition++;
                     }
                     data.setLemmas(lemmas);
                     ret.addNode(lookup[i], data);
@@ -326,16 +329,16 @@ public final class HSpellLoader {
         return ' ';
     }
 
-    private final static Integer[] descFlags_noun;
-    private final static Integer[] descFlags_person_name;
-    private final static Integer[] descFlags_place_name;
-    private final static Integer[] descFlags_empty;
+    private final static int descFlags_noun;
+    private final static int descFlags_person_name;
+    private final static int descFlags_place_name;
+    private final static int descFlags_empty;
 
     static {
-        descFlags_noun = new Integer[]{69};
-        descFlags_person_name = new Integer[]{262145};
-        descFlags_place_name = new Integer[]{262153};
-        descFlags_empty = new Integer[]{0};
+        descFlags_noun = 69;
+        descFlags_person_name = 262145;
+        descFlags_place_name = 262153;
+        descFlags_empty = 0;
     }
 
     public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
@@ -356,27 +359,23 @@ public final class HSpellLoader {
                 case "שםעצם":
                     md = new MorphData();
                     md.setPrefixes((short) 63);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_noun);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_noun)});
                     break;
                 case "שםחברה":
                 case "שםפרטי":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_person_name);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_person_name)});
                     break;
                 case "שםמקום":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_place_name);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_place_name)});
                     break;
                 case "שםמדויק":
                     md = new MorphData();
                     md.setPrefixes((short) 0);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_empty);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_empty)});
                     break;
             }
 
