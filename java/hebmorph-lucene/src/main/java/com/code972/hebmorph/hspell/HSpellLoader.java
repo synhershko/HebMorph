@@ -329,17 +329,10 @@ public final class HSpellLoader {
         return ' ';
     }
 
-    private final static int descFlags_noun;
-    private final static int descFlags_person_name;
-    private final static int descFlags_place_name;
-    private final static int descFlags_empty;
-
-    static {
-        descFlags_noun = 69;
-        descFlags_person_name = 262145;
-        descFlags_place_name = 262153;
-        descFlags_empty = 0;
-    }
+    private final static int descFlags_noun = 69;
+    private final static int descFlags_person_name = 262145;
+    private final static int descFlags_place_name = 262153;
+    private final static int descFlags_empty = 0;
 
     public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
         if (customWordsStream == null)
