@@ -21,9 +21,9 @@ public abstract class TestBase {
             DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
             HashMap<String, Integer> prefs = null;
             if (allowHeHasheela) {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HebLoader.PREFIX_H);
+                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
             } else {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HebLoader.PREFIX_NOH);
+                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
             }
             dict = new DictHebMorph(radix, prefs);
         }

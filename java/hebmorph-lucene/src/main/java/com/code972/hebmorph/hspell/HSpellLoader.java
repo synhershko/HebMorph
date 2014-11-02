@@ -27,6 +27,9 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 public final class HSpellLoader {
+
+    public final static String PREFIX_H = "prefix_h.gz", PREFIX_NOH = "prefix_noH.gz";
+
     protected List<String> dmasks;
     protected final boolean loadMorphData;
     private int lookupLen;
@@ -103,6 +106,9 @@ public final class HSpellLoader {
         return hspellPath;
     }
 
+    public static HashMap<String,Integer> readDefaultPrefixes(){
+        return readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+    }
     //used when loading using the Loader and thus prefixes aren't loaded automatically
     public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
         HashMap<String, Integer> map = new HashMap<>();
@@ -187,7 +193,7 @@ public final class HSpellLoader {
                         } else {
                             lemma = lookup[r];
                         }
-                        lemmas[stemPosition] = new MorphData.Lemma(lemma,descFlags[stemPosition]);
+                        lemmas[stemPosition] = new MorphData.Lemma(lemma, descFlags[stemPosition]);
                         stemPosition++;
                     }
                     data.setLemmas(lemmas);
@@ -352,23 +358,23 @@ public final class HSpellLoader {
                 case "שםעצם":
                     md = new MorphData();
                     md.setPrefixes((short) 63);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_noun)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_noun)});
                     break;
                 case "שםחברה":
                 case "שםפרטי":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_person_name)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_person_name)});
                     break;
                 case "שםמקום":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_place_name)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_place_name)});
                     break;
                 case "שםמדויק":
                     md = new MorphData();
                     md.setPrefixes((short) 0);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0],descFlags_empty)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_empty)});
                     break;
             }
 

@@ -37,7 +37,7 @@ public class StreamLemmatizer extends Lemmatizer {
     public StreamLemmatizer(final Reader input, final DictHebMorph dict,
                             final DictRadix<Byte> specialTokenizationCases) {
         super(dict);
-        _tokenizer = new Tokenizer(input, specialTokenizationCases);
+        _tokenizer = new Tokenizer(input, (dict==null?null:dict.getPref()),specialTokenizationCases);
     }
 
     public void reset(final Reader input) {
