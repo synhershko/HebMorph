@@ -3,8 +3,8 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.HebLoader;
-import com.code972.hebmorph.hspell.Loader;
 import org.junit.AfterClass;
 
 import java.io.File;
@@ -18,12 +18,12 @@ public abstract class TestBase {
 
     protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
-            DictRadix<MorphData> radix = new Loader(new File(HebLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+            DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
             HashMap<String, Integer> prefs = null;
             if (allowHeHasheela) {
-                prefs = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_H);
+                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
             } else {
-                prefs = HebLoader.readPrefixesFromFile(HebLoader.getHspellPath() + HebLoader.PREFIX_NOH);
+                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
             }
             dict = new DictHebMorph(radix, prefs);
         }

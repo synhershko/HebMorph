@@ -1,6 +1,7 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
@@ -17,7 +18,7 @@ public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final HebrewTokenizer src = new HebrewTokenizer(reader);
+            final HebrewTokenizer src = new HebrewTokenizer(reader, HSpellLoader.readDefaultPrefixes());
             return new Analyzer.TokenStreamComponents(src);
         }
     };

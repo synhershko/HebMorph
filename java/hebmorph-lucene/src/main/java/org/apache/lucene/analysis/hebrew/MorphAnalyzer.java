@@ -21,7 +21,7 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.Loader;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SuffixKeywordFilter;
@@ -117,7 +117,7 @@ public class MorphAnalyzer extends Analyzer {
 
     static private DictRadix<MorphData> loadFromClasspath(final String pathInClasspath) {
         try {
-            Loader loader = new Loader(Thread.currentThread().getContextClassLoader(), pathInClasspath, true);
+            HSpellLoader loader = new HSpellLoader(Thread.currentThread().getContextClassLoader(), pathInClasspath, true);
             return loader.loadDictionaryFromHSpellData();
         } catch (IOException ex) {
             try {
@@ -131,7 +131,7 @@ public class MorphAnalyzer extends Analyzer {
 
     static private DictRadix<MorphData> loadFromPath(final File path) {
         try {
-            Loader loader = new Loader(path, true);
+            HSpellLoader loader = new HSpellLoader(path, true);
             return loader.loadDictionaryFromHSpellData();
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to read data", ex);
@@ -144,7 +144,7 @@ public class MorphAnalyzer extends Analyzer {
             throw new IllegalStateException("Failed to load hspell dictionary files. They should be configured " +
                     "in classpath or by " + DEFAULT_HSPELL_ENV_VARIABLE + " environment variable");
         }
-        Loader loader = new Loader(new File(hspellPath), true);
+        HSpellLoader loader = new HSpellLoader(new File(hspellPath), true);
         return loader.loadDictionaryFromHSpellData();
     }
 }

@@ -21,15 +21,57 @@ package com.code972.hebmorph;
 import java.util.Arrays;
 
 public class MorphData {
-    private Integer[] descFlags;
-    private String[] lemmas;
+    private Lemma[] lemmas;
     private short prefixes;
 
-    public void setLemmas(String[] lemmas) {
+
+    public static class Lemma {
+        private final int descFlag;
+        private final String lemma;
+
+        public Lemma(String lemma, int descFlag){
+            this.lemma = lemma;
+            this.descFlag = descFlag;
+        }
+
+        public int getDescFlag() {
+            return descFlag;
+        }
+
+        public String getLemma() {
+            return lemma;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Lemma other = (Lemma) obj;
+            if (this.descFlag != (other.descFlag) || !this.lemma.equals(other.lemma)){
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 37;
+            int result = 1;
+            result = prime * result + descFlag;
+            result = prime * result + lemma.hashCode();
+            return result;
+        }
+    }
+
+    public void setLemmas(Lemma[] lemmas) {
         this.lemmas = lemmas;
     }
 
-    public String[] getLemmas() {
+    public Lemma[] getLemmas() {
         return lemmas;
     }
 
@@ -41,14 +83,6 @@ public class MorphData {
         return prefixes;
     }
 
-    public void setDescFlags(Integer[] descFlags) {
-        this.descFlags = descFlags;
-    }
-
-    public Integer[] getDescFlags() {
-        return descFlags;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -58,8 +92,6 @@ public class MorphData {
         if (getClass() != obj.getClass())
             return false;
         MorphData other = (MorphData) obj;
-        if (!Arrays.equals(descFlags, other.descFlags))
-            return false;
         if (!Arrays.equals(lemmas, other.lemmas))
             return false;
         return true;
@@ -69,7 +101,6 @@ public class MorphData {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(descFlags);
         result = prime * result + Arrays.hashCode(lemmas);
         return result;
     }

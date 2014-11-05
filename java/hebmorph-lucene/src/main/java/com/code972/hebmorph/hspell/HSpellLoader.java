@@ -23,13 +23,13 @@ import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public final class Loader {
+public final class HSpellLoader {
+
+    public final static String PREFIX_H = "prefix_h.gz", PREFIX_NOH = "prefix_noH.gz";
+
     protected List<String> dmasks;
     protected final boolean loadMorphData;
     private int lookupLen;
@@ -37,7 +37,7 @@ public final class Loader {
     protected InputStream fdict, fprefixes;
     protected InputStream fdesc = null, fstem = null;
 
-    public Loader(File hspellFolder, boolean loadMorphData) throws IOException {
+    public HSpellLoader(File hspellFolder, boolean loadMorphData) throws IOException {
         this(new FileInputStream(new File(hspellFolder, Constants.sizesFile)), new FileInputStream(new File(hspellFolder, Constants.dmaskFile)),
                 new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)), new FileInputStream(new File(hspellFolder, Constants.prefixesFile)),
                 new FileInputStream(new File(hspellFolder, Constants.descFile)), new FileInputStream(new File(hspellFolder, Constants.stemsFile)), loadMorphData);
@@ -52,13 +52,13 @@ public final class Loader {
      * @param loadMorphData
      * @throws java.io.IOException
      */
-    public Loader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
+    public HSpellLoader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
         this(classloader.getResourceAsStream(hspellFolder + Constants.sizesFile), classloader.getResourceAsStream(hspellFolder + Constants.dmaskFile),
                 classloader.getResourceAsStream(hspellFolder + Constants.dictionaryFile), classloader.getResourceAsStream(hspellFolder + Constants.prefixesFile),
                 classloader.getResourceAsStream(hspellFolder + Constants.descFile), classloader.getResourceAsStream(hspellFolder + Constants.stemsFile), loadMorphData);
     }
 
-    public Loader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
+    public HSpellLoader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
         fdict = new GZIPInputStream(dictFile);
         fprefixes = new GZIPInputStream(prefixesFile);
         this.loadMorphData = loadMorphData;
@@ -82,6 +82,64 @@ public final class Loader {
             fdesc = new GZIPInputStream(descFile);
             fstem = new GZIPInputStream(stemsFile);
         }
+    }
+
+    public static String getHspellPath() {
+        String hspellPath = null;
+        ClassLoader classLoader = HebLoader.class.getClassLoader();
+        File folder = new File(classLoader.getResource("").getPath());
+        while (true) {
+            File tmp = new File(folder, "hspell-data-files");
+            if (tmp.exists() && tmp.isDirectory()) {
+                hspellPath = tmp.toString();
+                break;
+            }
+            folder = folder.getParentFile();
+            if (folder == null) break;
+        }
+        if (hspellPath == null) {
+            throw new IllegalArgumentException("path to hspell data folder couldn't be found");
+        }
+        if (!hspellPath.endsWith("/")) {
+            hspellPath += "/";
+        }
+        return hspellPath;
+    }
+
+    public static HashMap<String,Integer> readDefaultPrefixes(){
+        return readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+    }
+    //used when loading using the Loader and thus prefixes aren't loaded automatically
+    public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
+        HashMap<String, Integer> map = new HashMap<>();
+        GZIPInputStream reader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            reader = new GZIPInputStream(new FileInputStream(prefixPath));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, HebLoader.ENCODING_USED));
+            String str;
+            while ((str = bufferedReader.readLine()) != null) {
+                String[] split = str.split(HebLoader.DELIMETER);
+                if (split.length != 2) {
+                    throw new IOException("Wrong format detected\n");
+                } else {
+                    map.put(split[0], Integer.parseInt(split[1]));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR: " + e);
+            return null;
+        } finally {
+            if (bufferedReader != null) try {
+                bufferedReader.close();
+            } catch (IOException ignored) {
+            }
+            if (reader != null) try {
+                reader.close();
+            } catch (IOException ignored) {
+            }
+        }
+        return map;
     }
 
     public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
@@ -121,19 +179,22 @@ public final class Loader {
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
-                    data.setDescFlags(readDescFile(fdesc));
+                    Integer[] descFlags = readDescFile(fdesc);
 
                     final List<Integer> stemReferences = readStemFile(fstem);
-                    final String[] lemmas = new String[stemReferences.size()];
+                    final MorphData.Lemma[] lemmas = new MorphData.Lemma[stemReferences.size()];
                     int stemPosition = 0;
                     for (int r : stemReferences) {
+                        String lemma;
                         // This is a bypass for the psuedo-stem "שונות", as defined by hspell
                         // TODO: Try looking into changing this in hspell itself
                         if (lookup[r].equals("שונות") && !lookup[r].equals(lookup[i])) {
-                            lemmas[stemPosition++] = null;
+                            lemma = null;
                         } else {
-                            lemmas[stemPosition++] = lookup[r];
+                            lemma = lookup[r];
                         }
+                        lemmas[stemPosition] = new MorphData.Lemma(lemma, descFlags[stemPosition]);
+                        stemPosition++;
                     }
                     data.setLemmas(lemmas);
                     ret.addNode(lookup[i], data);
@@ -274,17 +335,10 @@ public final class Loader {
         return ' ';
     }
 
-    private final static Integer[] descFlags_noun;
-    private final static Integer[] descFlags_person_name;
-    private final static Integer[] descFlags_place_name;
-    private final static Integer[] descFlags_empty;
-
-    static {
-        descFlags_noun = new Integer[]{69};
-        descFlags_person_name = new Integer[]{262145};
-        descFlags_place_name = new Integer[]{262153};
-        descFlags_empty = new Integer[]{0};
-    }
+    private final static int descFlags_noun = 69;
+    private final static int descFlags_person_name = 262145;
+    private final static int descFlags_place_name = 262153;
+    private final static int descFlags_empty = 0;
 
     public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
         if (customWordsStream == null)
@@ -304,27 +358,23 @@ public final class Loader {
                 case "שםעצם":
                     md = new MorphData();
                     md.setPrefixes((short) 63);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_noun);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_noun)});
                     break;
                 case "שםחברה":
                 case "שםפרטי":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_person_name);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_person_name)});
                     break;
                 case "שםמקום":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_place_name);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_place_name)});
                     break;
                 case "שםמדויק":
                     md = new MorphData();
                     md.setPrefixes((short) 0);
-                    md.setLemmas(new String[]{cells[0]});
-                    md.setDescFlags(descFlags_empty);
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_empty)});
                     break;
             }
 

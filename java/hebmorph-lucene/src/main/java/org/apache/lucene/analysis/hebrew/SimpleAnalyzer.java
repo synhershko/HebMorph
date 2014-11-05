@@ -30,6 +30,7 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class SimpleAnalyzer extends Analyzer {
@@ -40,22 +41,24 @@ public final class SimpleAnalyzer extends Analyzer {
     private final CharArraySet commonWords;
 
     private Map<String, char[]> suffixByTokenType = null;
+    private HashMap<String, Integer> prefixesTree;
     private final Version matchVersion;
     private final SynonymMap acronymMergingMap;
 
-    public SimpleAnalyzer(Version matchVersion) throws IOException {
-        this(matchVersion, null);
+    public SimpleAnalyzer(Version matchVersion, final HashMap<String, Integer> prefixes) throws IOException {
+        this(matchVersion, prefixes, null);
     }
 
-    public SimpleAnalyzer(final Version matchVersion, final CharArraySet commonWords) throws IOException {
+    public SimpleAnalyzer(final Version matchVersion, final HashMap<String, Integer> prefixes, final CharArraySet commonWords) throws IOException {
         this.commonWords = commonWords;
         this.matchVersion = matchVersion;
+        this.prefixesTree = prefixes;
         this.acronymMergingMap = MorphAnalyzer.buildAcronymsMergingMap();
     }
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final HebrewTokenizer src = new HebrewTokenizer(reader);
+        final HebrewTokenizer src = new HebrewTokenizer(reader,prefixesTree);
         TokenStream tok = new NiqqudFilter(src);
         tok = new LowerCaseFilter(matchVersion, tok);
         tok = new SynonymFilter(tok, acronymMergingMap, false);
