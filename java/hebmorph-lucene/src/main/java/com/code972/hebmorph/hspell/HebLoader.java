@@ -66,8 +66,8 @@ public class HebLoader {
                 MorphData.Lemma[] lemmas = new MorphData.Lemma[lemmaStrings.length];
 
                 for (int i = 0; i < lemmas.length; i++) { //null and "null" are read the same
-                    String lem = lemmaStrings[i].equals("null")?null:lemmaStrings[i];
-                    lemmas[i] = new MorphData.Lemma(lem,Integer.parseInt(descStrings[i]));
+                    String lem = lemmaStrings[i].equals("null") ? null : lemmaStrings[i];
+                    lemmas[i] = new MorphData.Lemma(lem, Integer.parseInt(descStrings[i]));
                 }
                 md.setLemmas(lemmas);
                 dict.addNode(split[0], md);
