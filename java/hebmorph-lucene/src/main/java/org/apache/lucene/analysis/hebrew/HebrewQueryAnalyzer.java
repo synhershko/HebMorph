@@ -3,15 +3,13 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
+import org.apache.lucene.analysis.AddSuffixCharFilter;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 
 /**
  * Created by synhershko on 12/25/13.
@@ -31,7 +29,7 @@ public class HebrewQueryAnalyzer extends HebrewAnalyzer {
         src.setKeepOriginalWord(true);
 
         TokenStream tok = new ASCIIFoldingFilter(src);
-        tok = new AddSuffixFilter(tok, '$') {
+        tok = new AddSuffixCharFilter(tok, '$') {
             @Override
             protected void handleCurrentToken() {
                 if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {

@@ -25,42 +25,13 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected static final Version matchVersion = Version.LUCENE_4_9;
     private static final Byte dummyData = (byte) 0;
 
-    //    protected final HashMap<String, Integer> prefixesTree = LingInfo.buildPrefixTree(false);
-//    protected final DictRadix<MorphData> dictRadix;
     protected DictHebMorph dict;
     protected DictRadix<MorphData> customWords;
     protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
     protected DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
 
-
     protected CharArraySet commonWords = null;
-
-/*    static {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try {
-            Loader loader = new Loader(classloader, "hspell-data-files/", true);
-            setDictRadix(loader.loadDictionaryFromHSpellData());
-        } catch (IOException e) {
-            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
-            logger.error("Unable to load the hspell dictionary files", e);
-        }
-
-        try {
-            setCustomTokenizationCases(classloader.getResourceAsStream("special-tokenization-cases.txt"));
-        } catch (IOException e) {
-            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
-            logger.debug("Unable to load special tokenization cases", e);
-        }
-
-        try {
-            setCustomWords(classloader.getResourceAsStream("custom-words.txt"));
-        } catch (IOException e) {
-            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
-            logger.debug("Unable to load custom dictionary", e);
-        }
-    }*/
-
     public DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
         if (input != null) {
             final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
@@ -74,10 +45,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
         }
         return SPECIAL_TOKENIZATION_CASES;
     }
-
-//    public void setDict(final DictHebMorph dict) {
-//        this.dict = dict;
-//    }
 
     public DictRadix<MorphData> setCustomWords(InputStream input) throws IOException {
         customWords = HSpellLoader.loadCustomWords(input, dict.getRadix());

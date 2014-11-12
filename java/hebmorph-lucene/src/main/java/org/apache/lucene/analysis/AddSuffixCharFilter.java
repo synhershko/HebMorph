@@ -1,4 +1,4 @@
-package org.apache.lucene.analysis.hebrew;
+package org.apache.lucene.analysis;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -6,7 +6,7 @@ import org.apache.lucene.analysis.tokenattributes.*;
 
 import java.io.IOException;
 
-public abstract class AddSuffixFilter extends TokenFilter {
+public abstract class AddSuffixCharFilter extends TokenFilter {
     protected final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     protected final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     protected final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
@@ -17,7 +17,7 @@ public abstract class AddSuffixFilter extends TokenFilter {
     private int latestStartOffset, latestEndOffset;
     private String latestType;
 
-    public AddSuffixFilter(final TokenStream input, final Character suffixToAdd) {
+    public AddSuffixCharFilter(final TokenStream input, final Character suffixToAdd) {
         super(input);
         this.suffix = suffixToAdd;
     }

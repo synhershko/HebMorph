@@ -1,9 +1,6 @@
 package org.apache.lucene.analysis.hebrew;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,7 +14,7 @@ public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
         protected TokenStreamComponents createComponents(String fieldName,
                                                          Reader reader) {
             Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
-            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
+            return new TokenStreamComponents(t, new AddSuffixCharFilter(t, '$') {
                 @Override
                 protected void handleCurrentToken() {
                     duplicateCurrentToken();
@@ -32,7 +29,7 @@ public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
         protected TokenStreamComponents createComponents(String fieldName,
                                                          Reader reader) {
             Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
-            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
+            return new TokenStreamComponents(t, new AddSuffixCharFilter(t, '$') {
                 @Override
                 protected void handleCurrentToken() {
                     suffixCurrent();
