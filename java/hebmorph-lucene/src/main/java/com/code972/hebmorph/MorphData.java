@@ -21,13 +21,13 @@ package com.code972.hebmorph;
 import java.util.Arrays;
 
 public class MorphData {
-    private Lemma[] lemmas;
+    private Lemma[] lemmas = null;
     private short prefixes;
 
 
     public static class Lemma {
-        private final int descFlag;
-        private final String lemma;
+        private int descFlag;
+        private String lemma;
 
         public Lemma(String lemma, int descFlag){
             this.lemma = lemma;
@@ -42,6 +42,14 @@ public class MorphData {
             return lemma;
         }
 
+        public void setDescFlag(int desc) {
+            descFlag=desc;
+        }
+
+        public void setLemma(String lemma) {
+            this.lemma = lemma;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj)
@@ -51,10 +59,13 @@ public class MorphData {
             if (getClass() != obj.getClass())
                 return false;
             Lemma other = (Lemma) obj;
-            if (this.descFlag != (other.descFlag) || !this.lemma.equals(other.lemma)){
+            if (this.descFlag!= other.descFlag){
                 return false;
             }
-            return true;
+            if (this.lemma==null){
+                return other.lemma==null;
+            }
+            return this.lemma.equals(other.lemma);
         }
 
         @Override
@@ -62,8 +73,13 @@ public class MorphData {
             final int prime = 37;
             int result = 1;
             result = prime * result + descFlag;
-            result = prime * result + lemma.hashCode();
+            result = prime * result + (lemma==null?0:lemma.hashCode());
             return result;
+        }
+
+        @Override
+        public String toString(){
+            return lemma + ":" + descFlag;
         }
     }
 
@@ -92,9 +108,10 @@ public class MorphData {
         if (getClass() != obj.getClass())
             return false;
         MorphData other = (MorphData) obj;
-        if (!Arrays.equals(lemmas, other.lemmas))
-            return false;
-        return true;
+        if (lemmas==null){
+            return other.lemmas == null;
+        }
+        return other.lemmas!=null && Arrays.equals(lemmas,other.lemmas);
     }
 
     @Override
