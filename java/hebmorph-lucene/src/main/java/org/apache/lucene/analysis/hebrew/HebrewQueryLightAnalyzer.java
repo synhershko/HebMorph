@@ -3,7 +3,7 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import org.apache.lucene.analysis.AddSuffixCharFilter;
+import org.apache.lucene.analysis.AddSuffixFilter;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
@@ -30,7 +30,7 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
 
         TokenStream tok = new ASCIIFoldingFilter(src);
         //tok = new SuffixKeywordFilter(tok, '$');
-        tok = new AddSuffixCharFilter(tok, '$') {
+        tok = new AddSuffixFilter(tok, '$') {
             @Override
             protected void handleCurrentToken() {
                 if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {

@@ -56,8 +56,8 @@ public class StreamLemmasFilter extends Tokenizer {
     }
 
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dict, final HashMap<String,Integer> pref, DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
-        this(input, new DictHebMorph(dict,pref), null, commonWords, lemmaFilter);
+    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dict, final HashMap<String, Integer> pref, DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+        this(input, new DictHebMorph(dict, pref), null, commonWords, lemmaFilter);
     }
 
     public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {

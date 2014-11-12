@@ -14,7 +14,7 @@ public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
         protected TokenStreamComponents createComponents(String fieldName,
                                                          Reader reader) {
             Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
-            return new TokenStreamComponents(t, new AddSuffixCharFilter(t, '$') {
+            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
                 @Override
                 protected void handleCurrentToken() {
                     duplicateCurrentToken();
@@ -29,7 +29,7 @@ public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
         protected TokenStreamComponents createComponents(String fieldName,
                                                          Reader reader) {
             Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
-            return new TokenStreamComponents(t, new AddSuffixCharFilter(t, '$') {
+            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
                 @Override
                 protected void handleCurrentToken() {
                     suffixCurrent();

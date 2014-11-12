@@ -32,6 +32,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
 
     protected CharArraySet commonWords = null;
+
     public DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
         if (input != null) {
             final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(

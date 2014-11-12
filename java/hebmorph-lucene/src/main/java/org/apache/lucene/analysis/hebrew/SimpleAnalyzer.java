@@ -18,7 +18,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import org.apache.lucene.analysis.AddSuffixFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -58,14 +57,13 @@ public final class SimpleAnalyzer extends Analyzer {
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final HebrewTokenizer src = new HebrewTokenizer(reader,prefixesTree);
+        final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree);
         TokenStream tok = new NiqqudFilter(src);
         tok = new LowerCaseFilter(matchVersion, tok);
         tok = new SynonymFilter(tok, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
-        if ((suffixByTokenType != null) && (suffixByTokenType.size() > 0))
-            tok = new AddSuffixFilter(tok, suffixByTokenType);
+        //consider adding a suffix filter?
         return new TokenStreamComponents(src, tok) {
             @Override
             protected void setReader(final Reader reader) throws IOException {
