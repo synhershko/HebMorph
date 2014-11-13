@@ -35,7 +35,7 @@ public final class HSpellLoader {
 
     public final static String PREFIX_H = "prefix_h.gz", PREFIX_NOH = "prefix_noH.gz";
 
-    protected List<String> dmasks;
+    protected List<Integer> dmasks;
     protected final boolean loadMorphData;
     private int lookupLen;
 
@@ -80,7 +80,10 @@ public final class HSpellLoader {
                     }
                     continue;
                 }
-                dmasks.add(line);
+                int i = isInt(line);
+                if (i>=0){
+                    dmasks.add(i);
+                }
             }
             reader.close();
             lookupLen = getWordCountInHSpellFolder(sizesFile);
@@ -186,7 +189,6 @@ public final class HSpellLoader {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
                     Integer[] descFlags = readDescFile(fdesc);
-
                     final List<Integer> stemReferences = readStemFile(fstem);
                     final MorphData.Lemma[] lemmas = new MorphData.Lemma[stemReferences.size()];
                     int stemPosition = 0;
@@ -299,7 +301,7 @@ public final class HSpellLoader {
             bufPos++;
             if (bufPos % 2 == 0) {
                 int i = buf[0] - 'A' + (buf[1] - 'A') * 26;
-                wordMasks.add(Integer.valueOf(dmasks.get(i).substring(0, dmasks.get(i).length() - 1)));
+                wordMasks.add(dmasks.get(i));
                 bufPos = 0;
                 continue;
             }
@@ -318,7 +320,6 @@ public final class HSpellLoader {
                 bufPos = 0;
                 return wordStems;
             }
-
             bufPos++;
             if (bufPos % 3 == 0) {
                 wordStems.add(buf[0] - 33 + (buf[1] - 33) * 94 + (buf[2] - 33) * 94 * 94);
@@ -420,6 +421,29 @@ public final class HSpellLoader {
         }
 
         return custom;
+    }
+
+    //Retrieves the integer value of string (which may end with ','). Returns -1 if cannot convert.
+    public static int isInt(String str) {
+        if (str == null) {
+            return -1;
+        }
+        int length = str.length();
+        length = str.endsWith(",")?length-1:length;
+        if (length == 0) {
+            return -1;
+        }
+        int num=0;
+        for (int i=0; i < length; i++) {
+            char c = str.charAt(i);
+            if (c <= '/' || c >= ':') {
+                return -1;
+            }
+            int digit = (int)c - (int)'0';
+            num*=10;
+            num+=digit;
+        }
+        return num;
     }
 
 
