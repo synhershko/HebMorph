@@ -15,42 +15,35 @@
  *   License along with this program; if not, see                          *
  *   <http://www.gnu.org/licenses/>.                                       *
  **************************************************************************/
-package org.apache.lucene.analysis.hebrew;
+package com.code972.hebmorph;
 
-import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.Constants;
 import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.HebLoader;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.junit.AfterClass;
+import com.code972.hebmorph.hspell.LingInfo;
+import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStreamTestCase {
-    private static DictHebMorph dict;
-
-    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
-        if (dict == null) {
-            DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefs = null;
-            if (allowHeHasheela) {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
-            } else {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-            }
-            dict = new DictHebMorph(radix, prefs);
-        }
-        return dict;
-    }
-
-    @AfterClass
-    public static void cleanup() {
-        if (dict != null) {
-            dict.clear();
-            dict = null;
-        }
+public class MorphDataTester {
+    @Test
+    public void lemmaTestEquals() {
+        MorphData.Lemma lemma1 = new MorphData.Lemma("asd", 15), lemma2 = new MorphData.Lemma("asd", 15);
+        assert (lemma1.equals(lemma2));
+        lemma1 = new MorphData.Lemma("asd",5);
+        assert (!lemma1.equals(lemma2));
+        lemma2 = new MorphData.Lemma("asd",5);
+        assert (lemma1.equals(lemma2));
+        lemma1 = new MorphData.Lemma("a",5);
+        assert (!lemma1.equals(lemma2));
+        lemma2 = new MorphData.Lemma("a",5);
+        assert (lemma1.equals(lemma2));
+        lemma1 = new MorphData.Lemma(null,5);
+        assert (!lemma1.equals(lemma2));
+        lemma2 = new MorphData.Lemma(null,5);
+        assert (lemma1.equals(lemma2));
     }
 }

@@ -1,7 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010-2013 by                                            *
+ *   Copyright (C) 2010-2015 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License           *
@@ -19,7 +18,12 @@
 package com.code972.hebmorph.hspell;
 
 import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import org.apache.lucene.analysis.hebrew.HebrewExactAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewIndexingAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewQueryAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -30,7 +34,7 @@ public final class HSpellLoader {
 
     public final static String PREFIX_H = "prefix_h.gz", PREFIX_NOH = "prefix_noH.gz";
 
-    protected List<String> dmasks;
+    protected List<Integer> dmasks;
     protected final boolean loadMorphData;
     private int lookupLen;
 
@@ -75,7 +79,10 @@ public final class HSpellLoader {
                     }
                     continue;
                 }
-                dmasks.add(line);
+                int i = tryParseInt(line);
+                if (i >= 0) {
+                    dmasks.add(i);
+                }
             }
             reader.close();
             lookupLen = getWordCountInHSpellFolder(sizesFile);
@@ -106,9 +113,10 @@ public final class HSpellLoader {
         return hspellPath;
     }
 
-    public static HashMap<String,Integer> readDefaultPrefixes(){
+    public static HashMap<String, Integer> readDefaultPrefixes() {
         return readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
     }
+
     //used when loading using the Loader and thus prefixes aren't loaded automatically
     public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
         HashMap<String, Integer> map = new HashMap<>();
@@ -180,7 +188,6 @@ public final class HSpellLoader {
                     MorphData data = new MorphData();
                     data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
                     Integer[] descFlags = readDescFile(fdesc);
-
                     final List<Integer> stemReferences = readStemFile(fstem);
                     final MorphData.Lemma[] lemmas = new MorphData.Lemma[stemReferences.size()];
                     int stemPosition = 0;
@@ -292,8 +299,9 @@ public final class HSpellLoader {
             }
             bufPos++;
             if (bufPos % 2 == 0) {
+
                 int i = buf[0] - 'A' + (buf[1] - 'A') * 26;
-                wordMasks.add(Integer.valueOf(dmasks.get(i).substring(0, dmasks.get(i).length() - 1)));
+                wordMasks.add(dmasks.get(i));
                 bufPos = 0;
                 continue;
             }
@@ -312,7 +320,6 @@ public final class HSpellLoader {
                 bufPos = 0;
                 return wordStems;
             }
-
             bufPos++;
             if (bufPos % 3 == 0) {
                 wordStems.add(buf[0] - 33 + (buf[1] - 33) * 94 + (buf[2] - 33) * 94 * 94);
@@ -414,5 +421,53 @@ public final class HSpellLoader {
         }
 
         return custom;
+    }
+
+    //Retrieves the integer value of string (which may end with ','). Returns -1 if cannot convert.
+    public static int tryParseInt(String str) {
+        if (str == null) {
+            return -1;
+        }
+        int length = str.length();
+        length = str.endsWith(",") ? length - 1 : length;
+        if (length == 0) {
+            return -1;
+        }
+        int num = 0;
+        for (int i = 0; i < length; i++) {
+            char c = str.charAt(i);
+            if (c <= '/' || c >= ':') {
+                return -1;
+            }
+            int digit = (int) c - (int) '0';
+            num *= 10;
+            num += digit;
+        }
+        return num;
+    }
+
+
+    public static HebrewIndexingAnalyzer getHebrewIndexingAnalyzer() throws IOException {
+        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+        return new HebrewIndexingAnalyzer(new DictHebMorph(radix, prefs), null);
+    }
+
+    public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
+        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+        return new HebrewQueryAnalyzer(new DictHebMorph(radix, prefs), null);
+    }
+
+    public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
+        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+        return new HebrewQueryLightAnalyzer(new DictHebMorph(radix, prefs), null);
+    }
+
+    public static HebrewExactAnalyzer getHebrewExactAnalyzer() throws IOException {
+        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
+        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+        return new HebrewExactAnalyzer(new DictHebMorph(radix, prefs), null);
     }
 }

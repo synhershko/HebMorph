@@ -1,7 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010-2013 by                                            *
+ *   Copyright (C) 2010-2015 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License           *
@@ -91,7 +90,7 @@ public class Lemmatizer {
         Integer prefixMask;
         MorphData md = null;
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
-        HashMap<String,Integer> m_pref = dictHeb.getPref();
+        HashMap<String, Integer> m_pref = dictHeb.getPref();
         // Lookup the word in the custom words list. It is guaranteed to have only one lemma for a word,
         // so we can always access the first entry of a record - if we got any
         // If we find any results, we can immediately return
@@ -102,7 +101,7 @@ public class Lemmatizer {
             }
 
             if (md != null) { // exact match was found in the custom words list
-                ret.addUnique(new HebrewToken(word, (byte) 0,md.getLemmas()[0], 1.0f));
+                ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[0], 1.0f));
                 return ret;
             } else { // try stripping prefixes
                 while (true) {
@@ -178,7 +177,7 @@ public class Lemmatizer {
     public List<HebrewToken> lemmatizeTolerant(final String word) {
         final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
-        HashMap<String,Integer> m_pref = dictHeb.getPref();
+        HashMap<String, Integer> m_pref = dictHeb.getPref();
         // Don't try tolerating long words. Longest Hebrew word is 19 chars long
         // http://en.wikipedia.org/wiki/Longest_words#Hebrew
         if (word.length() > 20) {
@@ -225,7 +224,7 @@ public class Lemmatizer {
         Integer prefixMask;
         MorphData md;
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
-        HashMap<String,Integer> m_pref = dictHeb.getPref();
+        HashMap<String, Integer> m_pref = dictHeb.getPref();
         try {
             if (customWords.lookup(word) != null) return WordType.CUSTOM;
         } catch (IllegalArgumentException e) {

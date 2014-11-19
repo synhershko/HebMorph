@@ -1,7 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010-2013 by                                            *
+ *   Copyright (C) 2010-2015 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License           *
@@ -56,8 +55,8 @@ public class StreamLemmasFilter extends Tokenizer {
     }
 
 
-    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dict, final HashMap<String,Integer> pref, DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
-        this(input, new DictHebMorph(dict,pref), null, commonWords, lemmaFilter);
+    public StreamLemmasFilter(final Reader input, final DictRadix<MorphData> dict, final HashMap<String, Integer> pref, DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+        this(input, new DictHebMorph(dict, pref), null, commonWords, lemmaFilter);
     }
 
     public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {

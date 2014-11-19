@@ -1,7 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010-2013 by                                            *
+ *   Copyright (C) 2010-2015 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License           *
@@ -19,17 +18,17 @@
 package com.code972.hebmorph;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class MorphData {
-    private Lemma[] lemmas;
+    private Lemma[] lemmas = null;
     private short prefixes;
-
 
     public static class Lemma {
         private final int descFlag;
         private final String lemma;
 
-        public Lemma(String lemma, int descFlag){
+        public Lemma(String lemma, int descFlag) {
             this.lemma = lemma;
             this.descFlag = descFlag;
         }
@@ -51,10 +50,13 @@ public class MorphData {
             if (getClass() != obj.getClass())
                 return false;
             Lemma other = (Lemma) obj;
-            if (this.descFlag != (other.descFlag) || !this.lemma.equals(other.lemma)){
+            if (this.descFlag != other.descFlag) {
                 return false;
             }
-            return true;
+            if (this.lemma == null) {
+                return other.lemma == null;
+            }
+            return this.lemma.equals(other.lemma);
         }
 
         @Override
@@ -62,12 +64,23 @@ public class MorphData {
             final int prime = 37;
             int result = 1;
             result = prime * result + descFlag;
-            result = prime * result + lemma.hashCode();
+            result = prime * result + (lemma == null ? 0 : lemma.hashCode());
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return lemma + ":" + descFlag;
         }
     }
 
     public void setLemmas(Lemma[] lemmas) {
+        Arrays.sort(lemmas, new Comparator<Lemma>() {
+            @Override
+            public int compare(Lemma l1, Lemma l2) {
+                return l1.descFlag - l2.descFlag;
+            }
+        });
         this.lemmas = lemmas;
     }
 
@@ -92,9 +105,10 @@ public class MorphData {
         if (getClass() != obj.getClass())
             return false;
         MorphData other = (MorphData) obj;
-        if (!Arrays.equals(lemmas, other.lemmas))
-            return false;
-        return true;
+        if (lemmas == null) {
+            return other.lemmas == null;
+        }
+        return other.lemmas != null && Arrays.equals(lemmas, other.lemmas);
     }
 
     @Override

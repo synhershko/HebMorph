@@ -17,40 +17,43 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
-import com.code972.hebmorph.hspell.HebLoader;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.junit.AfterClass;
+import org.apache.lucene.analysis.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.Reader;
 
-public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStreamTestCase {
-    private static DictHebMorph dict;
-
-    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
-        if (dict == null) {
-            DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefs = null;
-            if (allowHeHasheela) {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
-            } else {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-            }
-            dict = new DictHebMorph(radix, prefs);
+public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
+    Analyzer a = new Analyzer() {
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName,
+                                                         Reader reader) {
+            Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
+            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
+                @Override
+                protected void handleCurrentToken() {
+                    duplicateCurrentToken();
+                    suffixCurrent();
+                }
+            });
         }
-        return dict;
-    }
+    };
 
-    @AfterClass
-    public static void cleanup() {
-        if (dict != null) {
-            dict.clear();
-            dict = null;
+    Analyzer a2 = new Analyzer() {
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName,
+                                                         Reader reader) {
+            Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
+            return new TokenStreamComponents(t, new AddSuffixFilter(t, '$') {
+                @Override
+                protected void handleCurrentToken() {
+                    suffixCurrent();
+                }
+            });
         }
+    };
+
+    public void testBasicTerms() throws IOException {
+        assertAnalyzesTo(a, "book", new String[]{"book$", "book"});
+        assertAnalyzesTo(a2, "book", new String[]{"book$"});
     }
 }
