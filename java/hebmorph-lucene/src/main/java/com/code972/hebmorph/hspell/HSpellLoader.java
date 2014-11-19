@@ -80,8 +80,8 @@ public final class HSpellLoader {
                     }
                     continue;
                 }
-                int i = isInt(line);
-                if (i>=0){
+                int i = tryParseInt(line);
+                if (i >= 0) {
                     dmasks.add(i);
                 }
             }
@@ -300,6 +300,7 @@ public final class HSpellLoader {
             }
             bufPos++;
             if (bufPos % 2 == 0) {
+
                 int i = buf[0] - 'A' + (buf[1] - 'A') * 26;
                 wordMasks.add(dmasks.get(i));
                 bufPos = 0;
@@ -424,24 +425,24 @@ public final class HSpellLoader {
     }
 
     //Retrieves the integer value of string (which may end with ','). Returns -1 if cannot convert.
-    public static int isInt(String str) {
+    public static int tryParseInt(String str) {
         if (str == null) {
             return -1;
         }
         int length = str.length();
-        length = str.endsWith(",")?length-1:length;
+        length = str.endsWith(",") ? length - 1 : length;
         if (length == 0) {
             return -1;
         }
-        int num=0;
-        for (int i=0; i < length; i++) {
+        int num = 0;
+        for (int i = 0; i < length; i++) {
             char c = str.charAt(i);
             if (c <= '/' || c >= ':') {
                 return -1;
             }
-            int digit = (int)c - (int)'0';
-            num*=10;
-            num+=digit;
+            int digit = (int) c - (int) '0';
+            num *= 10;
+            num += digit;
         }
         return num;
     }
