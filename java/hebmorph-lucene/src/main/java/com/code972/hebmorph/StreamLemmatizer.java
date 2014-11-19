@@ -1,7 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010-2013 by                                            *
+ *   Copyright (C) 2010-2015 by                                            *
  *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
- *		Ofer Fort <oferiko at gmail dot com> (initial Java port)           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License           *
@@ -37,7 +36,7 @@ public class StreamLemmatizer extends Lemmatizer {
     public StreamLemmatizer(final Reader input, final DictHebMorph dict,
                             final DictRadix<Byte> specialTokenizationCases) {
         super(dict);
-        _tokenizer = new Tokenizer(input, (dict==null?null:dict.getPref()),specialTokenizationCases);
+        _tokenizer = new Tokenizer(input, (dict == null ? null : dict.getPref()), specialTokenizationCases);
     }
 
     public void reset(final Reader input) {

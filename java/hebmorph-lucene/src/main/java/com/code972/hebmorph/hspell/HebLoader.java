@@ -1,3 +1,20 @@
+/***************************************************************************
+ *   Copyright (C) 2010-2015 by                                            *
+ *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License           *
+ *   version 3, as published by the Free Software Foundation.              *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Affero General Public License for more details.                   *
+ *                                                                         *
+ *   You should have received a copy of the GNU Affero General Public      *
+ *   License along with this program; if not, see                          *
+ *   <http://www.gnu.org/licenses/>.                                       *
+ **************************************************************************/
 package com.code972.hebmorph.hspell;
 
 import com.code972.hebmorph.MorphData;
@@ -12,9 +29,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-/**
- * Created by egozy on 10/13/14.
- */
 public class HebLoader {
 
     public static final int FILE_FORMAT_VERSION = 1;

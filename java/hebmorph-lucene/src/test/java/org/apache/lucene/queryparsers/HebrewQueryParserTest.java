@@ -1,3 +1,20 @@
+/***************************************************************************
+ *   Copyright (C) 2010-2015 by                                            *
+ *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License           *
+ *   version 3, as published by the Free Software Foundation.              *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Affero General Public License for more details.                   *
+ *                                                                         *
+ *   You should have received a copy of the GNU Affero General Public      *
+ *   License along with this program; if not, see                          *
+ *   <http://www.gnu.org/licenses/>.                                       *
+ **************************************************************************/
 package org.apache.lucene.queryparsers;
 
 import com.code972.hebmorph.hspell.HSpellLoader;
@@ -11,8 +28,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.fail;
 
-public class HebrewQueryParserTest
-{
+public class HebrewQueryParserTest {
     @Test
     public void ParsesAcronymsCorrectly() throws ParseException, IOException {
 
@@ -25,12 +41,11 @@ public class HebrewQueryParserTest
 
         qp.parse("מנכ\"לית");
 
-        try
-        {
+        try {
             qp.parse("צה\"\"ל");
             qp.parse("\"צה\"ל");
             fail("Expected exception was not thrown");
+        } catch (ParseException ex) {
         }
-        catch(ParseException ex) { }
     }
 }
