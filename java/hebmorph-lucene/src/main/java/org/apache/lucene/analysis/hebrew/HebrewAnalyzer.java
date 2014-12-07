@@ -22,7 +22,6 @@ import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.Tokenizer;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;

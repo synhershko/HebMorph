@@ -18,8 +18,8 @@
 package org.apache.lucene.analysis.hebrew;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.commongrams.CommonGramsFilter;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymMap;
@@ -61,7 +61,7 @@ public final class SimpleAnalyzer extends Analyzer {
         tok = new LowerCaseFilter(matchVersion, tok);
         tok = new SynonymFilter(tok, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
-            tok = new CommonGramsFilter(matchVersion, tok, commonWords, false);
+            tok = new CommonGramsFilter(matchVersion, tok, commonWords);
         //consider adding a suffix filter?
         return new TokenStreamComponents(src, tok) {
             @Override

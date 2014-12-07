@@ -43,7 +43,7 @@ public class SuffixKeywordFilter extends TokenFilter {
         }
 
         // If the filter is disabled, or this is not a keyword, skip and allow the stem / bigram to be returned
-        if (!keywordAtt.isKeyword() || suffix == null || CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type())) {
+        if (!keywordAtt.isKeyword() || suffix == null || "gram".equals(typeAtt.type())) {
             return true;
         }
 
