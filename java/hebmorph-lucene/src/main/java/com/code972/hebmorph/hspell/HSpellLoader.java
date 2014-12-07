@@ -32,6 +32,13 @@ import java.util.zip.GZIPInputStream;
 
 public final class HSpellLoader {
 
+    public static final String dictionaryFile = "hebrew.wgz";
+    public static final String prefixesFile = dictionaryFile + ".prefixes";
+    public static final String stemsFile = dictionaryFile + ".stems";
+    public static final String descFile = dictionaryFile + ".desc";
+    public static final String sizesFile = dictionaryFile + ".sizes";
+    public static final String dmaskFile = "dmask.c";
+
     public final static String PREFIX_H = "prefix_h.gz", PREFIX_NOH = "prefix_noH.gz";
 
     protected List<Integer> dmasks;
@@ -42,9 +49,9 @@ public final class HSpellLoader {
     protected InputStream fdesc = null, fstem = null;
 
     public HSpellLoader(File hspellFolder, boolean loadMorphData) throws IOException {
-        this(new FileInputStream(new File(hspellFolder, Constants.sizesFile)), new FileInputStream(new File(hspellFolder, Constants.dmaskFile)),
-                new FileInputStream(new File(hspellFolder, Constants.dictionaryFile)), new FileInputStream(new File(hspellFolder, Constants.prefixesFile)),
-                new FileInputStream(new File(hspellFolder, Constants.descFile)), new FileInputStream(new File(hspellFolder, Constants.stemsFile)), loadMorphData);
+        this(new FileInputStream(new File(hspellFolder, sizesFile)), new FileInputStream(new File(hspellFolder, dmaskFile)),
+                new FileInputStream(new File(hspellFolder, dictionaryFile)), new FileInputStream(new File(hspellFolder, prefixesFile)),
+                new FileInputStream(new File(hspellFolder, descFile)), new FileInputStream(new File(hspellFolder, stemsFile)), loadMorphData);
 
         if (!hspellFolder.exists() || !hspellFolder.isDirectory())
             throw new IllegalArgumentException("Invalid hspell data folder provided");
@@ -57,9 +64,9 @@ public final class HSpellLoader {
      * @throws java.io.IOException
      */
     public HSpellLoader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
-        this(classloader.getResourceAsStream(hspellFolder + Constants.sizesFile), classloader.getResourceAsStream(hspellFolder + Constants.dmaskFile),
-                classloader.getResourceAsStream(hspellFolder + Constants.dictionaryFile), classloader.getResourceAsStream(hspellFolder + Constants.prefixesFile),
-                classloader.getResourceAsStream(hspellFolder + Constants.descFile), classloader.getResourceAsStream(hspellFolder + Constants.stemsFile), loadMorphData);
+        this(classloader.getResourceAsStream(hspellFolder + sizesFile), classloader.getResourceAsStream(hspellFolder + dmaskFile),
+                classloader.getResourceAsStream(hspellFolder + dictionaryFile), classloader.getResourceAsStream(hspellFolder + prefixesFile),
+                classloader.getResourceAsStream(hspellFolder + descFile), classloader.getResourceAsStream(hspellFolder + stemsFile), loadMorphData);
     }
 
     public HSpellLoader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
@@ -268,7 +275,7 @@ public final class HSpellLoader {
     }
 
     public static int getWordCountInHSpellFolder(File path) throws IOException {
-        return getWordCountInHSpellFolder(new FileInputStream(new File(path, Constants.sizesFile)));
+        return getWordCountInHSpellFolder(new FileInputStream(new File(path, sizesFile)));
     }
 
     public static int getWordCountInHSpellFolder(InputStream inputStream) throws IOException {

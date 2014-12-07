@@ -18,12 +18,6 @@
 package com.code972.hebmorph.hspell;
 
 public final class Constants {
-    public static final String dictionaryFile = "hebrew.wgz";
-    public static final String prefixesFile = dictionaryFile + ".prefixes";
-    public static final String stemsFile = dictionaryFile + ".stems";
-    public static final String descFile = dictionaryFile + ".desc";
-    public static final String sizesFile = dictionaryFile + ".sizes";
-    public static final String dmaskFile = "dmask.c";
     public static final int MaxWordLength = Byte.MAX_VALUE;
 
     public static interface DMask {
