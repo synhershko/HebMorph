@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
-    public HebrewQueryLightAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
-        super(dict, customWords);
+    public HebrewQueryLightAnalyzer(DictHebMorph dict) throws IOException {
+        super(dict);
     }
 
     @Override
@@ -38,7 +38,6 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
         // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
         // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, dict, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-        src.setCustomWords(customWords);
         src.setKeepOriginalWord(false);
         src.setSuffixForExactMatch(originalTermSuffix);
 

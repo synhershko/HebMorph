@@ -17,9 +17,7 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
 import org.apache.lucene.analysis.AddSuffixFilter;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,8 +28,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class HebrewExactAnalyzer extends HebrewAnalyzer {
-    public HebrewExactAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
-        super(dict, customWords);
+    public HebrewExactAnalyzer(DictHebMorph dict) throws IOException {
+        super(dict);
     }
 
     @Override
@@ -56,6 +54,4 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
         };
         return new TokenStreamComponents(src, tok);
     }
-
-
 }

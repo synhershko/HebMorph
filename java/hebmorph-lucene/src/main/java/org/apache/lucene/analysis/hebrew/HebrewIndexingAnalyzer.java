@@ -17,9 +17,7 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
 import org.apache.lucene.analysis.AddSuffixFilter;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -27,9 +25,10 @@ import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
 import java.io.IOException;
 import java.io.Reader;
+
 public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
-    public HebrewIndexingAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
-        super(dict, customWords);
+    public HebrewIndexingAnalyzer(DictHebMorph dict) throws IOException {
+        super(dict);
     }
 
     @Override
@@ -38,7 +37,6 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         // will ignore $ && will always output all lemmas + origin word$
         // basically, if analyzerType == AnalyzerType.INDEXING)
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, dict, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-        src.setCustomWords(customWords);
         src.setKeepOriginalWord(true);
 
         TokenStream tok = new ASCIIFoldingFilter(src);

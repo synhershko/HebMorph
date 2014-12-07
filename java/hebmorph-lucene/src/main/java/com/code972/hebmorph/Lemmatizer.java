@@ -28,7 +28,6 @@ import java.util.List;
 
 public class Lemmatizer {
     private final DictHebMorph dictHeb;
-    private DictRadix<MorphData> customWords;
 
     public Lemmatizer(final DictHebMorph dict) {
         this.dictHeb = dict;
@@ -91,43 +90,7 @@ public class Lemmatizer {
         MorphData md = null;
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
         HashMap<String, Integer> m_pref = dictHeb.getPref();
-        // Lookup the word in the custom words list. It is guaranteed to have only one lemma for a word,
-        // so we can always access the first entry of a record - if we got any
-        // If we find any results, we can immediately return
-        if (customWords != null) {
-            try {
-                md = customWords.lookup(word);
-            } catch (IllegalArgumentException e) {
-            }
 
-            if (md != null) { // exact match was found in the custom words list
-                ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[0], 1.0f));
-                return ret;
-            } else { // try stripping prefixes
-                while (true) {
-                    // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-                    if (word.length() - prefLen < 2)
-                        break;
-
-                    if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
-                        break;
-
-                    try {
-                        md = customWords.lookup(word.substring(prefLen));
-                    } catch (IllegalArgumentException e) {
-                        md = null;
-                    }
-                    if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-                        if ((LingInfo.DMask2ps(md.getLemmas()[0].getDescFlag()) & prefixMask) > 0) {
-                            ret.addUnique(new HebrewToken(word, prefLen, md.getLemmas()[0], 0.9f));
-                        }
-                    }
-                }
-                if (ret.size() > 0) return ret;
-            }
-        }
-
-        // Continue with looking up the word in the standard dictionary
         try {
             md = m_dict.lookup(word);
         } catch (IllegalArgumentException e) {
@@ -225,32 +188,6 @@ public class Lemmatizer {
         MorphData md;
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
         HashMap<String, Integer> m_pref = dictHeb.getPref();
-        try {
-            if (customWords.lookup(word) != null) return WordType.CUSTOM;
-        } catch (IllegalArgumentException e) {
-        }
-
-        while (true) {
-            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-            if (word.length() - prefLen < 2)
-                break;
-
-            if ((prefixMask = m_pref.get(word.substring(0, ++prefLen))) == null)
-                break;
-
-            try {
-                md = customWords.lookup(word.substring(prefLen));
-            } catch (IllegalArgumentException e) {
-                md = null;
-            }
-            if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-                for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
-                        return WordType.CUSTOM_WITH_PREFIX;
-                    }
-                }
-            }
-        }
 
         try {
             if (m_dict.lookup(word) != null) return WordType.HEBREW;
@@ -322,13 +259,5 @@ public class Lemmatizer {
         }
 
         return WordType.UNRECOGNIZED;
-    }
-
-    public DictRadix<MorphData> getCustomWords() {
-        return customWords;
-    }
-
-    public void setCustomWords(DictRadix<MorphData> customWords) {
-        this.customWords = customWords;
     }
 }

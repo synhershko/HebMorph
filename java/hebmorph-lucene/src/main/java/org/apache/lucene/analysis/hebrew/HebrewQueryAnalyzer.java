@@ -17,9 +17,7 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
 import org.apache.lucene.analysis.AddSuffixFilter;
 import org.apache.lucene.analysis.CommonGramsFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -29,8 +27,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class HebrewQueryAnalyzer extends HebrewAnalyzer {
-    public HebrewQueryAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
-        super(dict, customWords);
+    public HebrewQueryAnalyzer(DictHebMorph dict) throws IOException {
+        super(dict);
     }
 
     @Override
@@ -38,7 +36,6 @@ public class HebrewQueryAnalyzer extends HebrewAnalyzer {
         // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
         // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, dict, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-        src.setCustomWords(customWords);
         src.setSuffixForExactMatch(originalTermSuffix);
         src.setKeepOriginalWord(true);
 

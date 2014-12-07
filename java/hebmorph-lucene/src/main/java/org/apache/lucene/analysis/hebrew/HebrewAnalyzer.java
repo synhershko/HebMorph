@@ -43,7 +43,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
     private static final Byte dummyData = (byte) 0;
 
     protected DictHebMorph dict;
-    protected DictRadix<MorphData> customWords;
     protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
     protected DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
@@ -64,15 +63,9 @@ public abstract class HebrewAnalyzer extends Analyzer {
         return SPECIAL_TOKENIZATION_CASES;
     }
 
-    public DictRadix<MorphData> setCustomWords(InputStream input) throws IOException {
-        customWords = HSpellLoader.loadCustomWords(input, dict.getRadix());
-        return customWords;
-    }
-
-    protected HebrewAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
+    protected HebrewAnalyzer(DictHebMorph dict) throws IOException {
         lemmaFilter = new BasicLemmaFilter();
         this.dict = dict;
-        this.customWords = customWords;
     }
 
     public static boolean isHebrewWord(final CharSequence word) {
@@ -90,8 +83,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
         HEBREW_TOLERATED_WITH_PREFIX,
         NON_HEBREW,
         UNRECOGNIZED,
-        CUSTOM,
-        CUSTOM_WITH_PREFIX,
     }
 
     public WordType isRecognizedWord(final String word, final boolean tolerate) {
@@ -100,35 +91,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
         MorphData md;
         HashMap<String, Integer> prefixesTree = dict.getPref();
         DictRadix<MorphData> dictRadix = dict.getRadix();
-
-        if (customWords != null) {
-            try {
-                if (customWords.lookup(word) != null) return WordType.CUSTOM;
-            } catch (IllegalArgumentException ignored_ex) {
-            }
-
-            while (true) {
-                // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-                if (word.length() - prefLen < 2)
-                    break;
-
-                if ((prefixMask = prefixesTree.get(word.substring(0, ++prefLen))) == null)
-                    break;
-
-                try {
-                    md = customWords.lookup(word.substring(prefLen));
-                } catch (IllegalArgumentException ignored_ex) {
-                    md = null;
-                }
-                if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-                    for (int result = 0; result < md.getLemmas().length; result++) {
-                        if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
-                            return WordType.CUSTOM_WITH_PREFIX;
-                        }
-                    }
-                }
-            }
-        }
 
         if (!isHebrewWord(word))
             return WordType.NON_HEBREW;

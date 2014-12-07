@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 
-
 /**
  * Tokenizes a given stream using HebMorph's Tokenizer, removes prefixes where possible, and tags Tokens
  * with appropriate types where possible
