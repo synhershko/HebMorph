@@ -18,6 +18,7 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
+import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -32,7 +33,10 @@ public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final HebrewTokenizer src = new HebrewTokenizer(reader, HSpellLoader.readDefaultPrefixes());
+            DictRadix<Byte> specialCases = new DictRadix<>();
+            specialCases.addNode("c++", (byte)0);
+
+            final HebrewTokenizer src = new HebrewTokenizer(reader, HSpellLoader.readDefaultPrefixes(), specialCases);
             return new Analyzer.TokenStreamComponents(src);
         }
     };
@@ -61,6 +65,13 @@ public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
     public void testHyphen() throws Exception {
         assertTokenStreamContents(tokenStream("some-dashed-phrase"),
                 new String[] { "some", "dashed", "phrase" });
+    }
+
+    public void testSpecialCases() throws Exception {
+        assertTokenStreamContents(tokenStream("a++ b++ c++"),
+                new String[] { "a", "b", "c++" });
+        assertTokenStreamContents(tokenStream("c++\nc++! c++, c++. (c++)"),
+                new String[] { "c++", "c++", "c++", "c++", "c++" });
     }
 
     TokenStream tokenStream(String text) throws IOException {
