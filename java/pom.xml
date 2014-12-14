@@ -31,7 +31,7 @@
 	                <goal>perform</goal>
 	            </goals>
 	            <configuration>
-	                <pomFileName>java/hebmorph-lucene/pom.xml</pomFileName>
+	                <pomFileName>java/pom.xml</pomFileName>
 	            </configuration>
 	        </execution>
 	    </executions>

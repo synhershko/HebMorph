@@ -69,7 +69,7 @@ public class StreamLemmasFilter extends Tokenizer {
         _streamLemmatizer = new StreamLemmatizer(input, dict, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
-        charUtils = CharacterUtils.getInstance(Version.LUCENE_46);
+        charUtils = CharacterUtils.getInstance(Version.LUCENE_4_9);
     }
 
     public void setSuffixForExactMatch(Character c) {
