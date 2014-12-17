@@ -17,7 +17,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -42,9 +41,9 @@ public class TestSearchAndIndexingCompatibility {
     }
 
     private static void indexAndSearch(String indexingTerm, String searchTerm) throws IOException {
-        Analyzer indexingAnalyzer = HSpellLoader.getHebrewIndexingAnalyzer();
+        Analyzer indexingAnalyzer = TestBase.getHebrewIndexingAnalyzer();
         //Analyzer searchAnalyzer = new HebrewIndexingAnalyzer();
-        Analyzer searchAnalyzer = HSpellLoader.getHebrewQueryAnalyzer();
+        Analyzer searchAnalyzer = TestBase.getHebrewQueryAnalyzer();
 
         HashSet<String> indexedTerms = new HashSet<>();
         TokenStream ts = indexingAnalyzer.tokenStream("foo", indexingTerm);

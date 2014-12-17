@@ -24,17 +24,17 @@ public class MorphDataTester {
     public void lemmaTestEquals() {
         MorphData.Lemma lemma1 = new MorphData.Lemma("asd", 15), lemma2 = new MorphData.Lemma("asd", 15);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma("asd",5);
+        lemma1 = new MorphData.Lemma("asd", 5);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma("asd",5);
+        lemma2 = new MorphData.Lemma("asd", 5);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma("a",5);
+        lemma1 = new MorphData.Lemma("a", 5);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma("a",5);
+        lemma2 = new MorphData.Lemma("a", 5);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma(null,5);
+        lemma1 = new MorphData.Lemma(null, 5);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma(null,5);
+        lemma2 = new MorphData.Lemma(null, 5);
         assert (lemma1.equals(lemma2));
     }
 }

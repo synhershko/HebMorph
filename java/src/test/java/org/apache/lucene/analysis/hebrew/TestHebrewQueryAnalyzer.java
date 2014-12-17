@@ -17,7 +17,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 
@@ -25,7 +24,7 @@ import java.io.IOException;
 
 public class TestHebrewQueryAnalyzer extends BaseTokenStreamTestCase {
     public void testBasics() throws IOException {
-        Analyzer a = HSpellLoader.getHebrewQueryAnalyzer();
+        Analyzer a = TestBase.getHebrewQueryAnalyzer();
 
         assertAnalyzesTo(a, "אימא", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "אימא$", new String[]{"אימא$"}); // recognized word, lemmatized
