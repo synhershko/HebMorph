@@ -25,20 +25,26 @@ public class MorphData {
     private short prefixes;
 
     public static class Lemma {
-        private final int descFlag;
+        private final DescFlag descFlag;
         private final String lemma;
+        private final PrefixType prefix;
 
-        public Lemma(String lemma, int descFlag) {
+        public Lemma(String lemma, DescFlag descFlag, PrefixType prefix) {
             this.lemma = lemma;
             this.descFlag = descFlag;
+            this.prefix = prefix;
         }
 
-        public int getDescFlag() {
+        public DescFlag getDescFlag() {
             return descFlag;
         }
 
         public String getLemma() {
             return lemma;
+        }
+
+        public PrefixType getPrefix() {
+            return prefix;
         }
 
         @Override
@@ -53,6 +59,9 @@ public class MorphData {
             if (this.descFlag != other.descFlag) {
                 return false;
             }
+            if (this.prefix != other.prefix) {
+                return false;
+            }
             if (this.lemma == null) {
                 return other.lemma == null;
             }
@@ -63,14 +72,15 @@ public class MorphData {
         public int hashCode() {
             final int prime = 37;
             int result = 1;
-            result = prime * result + descFlag;
+            result = prime * result + descFlag.hashCode();
+            result = prime * result + prefix.getValue();
             result = prime * result + (lemma == null ? 0 : lemma.hashCode());
             return result;
         }
 
         @Override
         public String toString() {
-            return lemma + ":" + descFlag;
+            return lemma + ":" + descFlag + ":" + prefix;
         }
     }
 
@@ -78,7 +88,7 @@ public class MorphData {
         Arrays.sort(lemmas, new Comparator<Lemma>() {
             @Override
             public int compare(Lemma l1, Lemma l2) {
-                return l1.descFlag - l2.descFlag;
+                return l1.descFlag.getVal()-l2.descFlag.getVal();
             }
         });
         this.lemmas = lemmas;
@@ -124,3 +134,4 @@ public class MorphData {
         return "{ prefix=" + prefixes + " lemmas=" + Arrays.asList(lemmas) + "}";
     }
 }
+

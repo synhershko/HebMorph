@@ -30,7 +30,9 @@ import java.util.zip.GZIPInputStream;
 
 public class DictionaryLoader {
 
-    public static final int FILE_FORMAT_VERSION = 1;
+    public static final int MaxWordLength = Byte.MAX_VALUE;
+    public static final int FILE_FORMAT_VERSION = 3;
+    //version 3 changes: descFlags now includes only necessary attributes.
 
     public final static String DELIMETER = "#",
             PREFIXES_INDICATOR = "#PREFIXES",
@@ -65,22 +67,23 @@ public class DictionaryLoader {
                 throw new IOException("Wrong format detected");
             }
             while ((str = bufferedReader.readLine()) != null) {
-                String[] split = str.split(DELIMETER); // 0=value,1=prefix,2=lemmas,3=descFlags
-                if (split.length != 4) {
+                String[] split = str.split(DELIMETER); // 0=value,1=prefix, 2=lemmas, 3=descFlags, 4=prefix.
+                if (split.length != 5) {
                     throw new IOException("Wrong format detected");
                 }
                 MorphData md = new MorphData();
                 md.setPrefixes(Short.parseShort(split[1]));
                 String[] lemmaStrings = split[2].split(",");
                 String[] descStrings = split[3].split(",");
-                if (lemmaStrings.length != descStrings.length) {
-                    throw new IOException("Number of lemmas does not match number of descFlags");
+                String[] prefixesStrings = split[4].split(",");
+                if (lemmaStrings.length != descStrings.length || lemmaStrings.length != prefixesStrings.length) {
+                    throw new IOException("Number of lemmas does not match number of descFlags or prefixes");
                 }
                 MorphData.Lemma[] lemmas = new MorphData.Lemma[lemmaStrings.length];
 
                 for (int i = 0; i < lemmas.length; i++) { //null and "null" are read the same
                     String lem = lemmaStrings[i].equals("null") ? null : lemmaStrings[i];
-                    lemmas[i] = new MorphData.Lemma(lem, Integer.parseInt(descStrings[i]));
+                    lemmas[i] = new MorphData.Lemma(lem, DescFlag.create(Byte.parseByte(descStrings[i])), PrefixType.create(Byte.parseByte(prefixesStrings[i])));
                 }
                 md.setLemmas(lemmas);
                 dict.addNode(split[0], md);

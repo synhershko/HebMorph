@@ -20,14 +20,13 @@ package org.apache.lucene.queryparsers;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.util.Version;
 
 public class HebrewQueryParser extends QueryParser {
 
     protected static float SuffixedTermBoost = 2.0F;
 
-    public HebrewQueryParser(Version matchVersion, String f, Analyzer a) {
-        super(matchVersion, f, a);
+    public HebrewQueryParser(String f, Analyzer a) {
+        super(f, a);
     }
 
     @Override

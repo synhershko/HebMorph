@@ -22,19 +22,19 @@ import org.junit.Test;
 public class MorphDataTester {
     @Test
     public void lemmaTestEquals() {
-        MorphData.Lemma lemma1 = new MorphData.Lemma("asd", 15), lemma2 = new MorphData.Lemma("asd", 15);
+        MorphData.Lemma lemma1 = new MorphData.Lemma("asd", DescFlag.D_EMPTY, PrefixType.PS_ALL), lemma2 = new MorphData.Lemma("asd", DescFlag.D_EMPTY, PrefixType.PS_ALL);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma("asd",5);
+        lemma1 = new MorphData.Lemma("asd", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma("asd",5);
+        lemma2 = new MorphData.Lemma("asd", DescFlag.D_ACRONYM,PrefixType.PS_ALL);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma("a",5);
+        lemma1 = new MorphData.Lemma("a", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma("a",5);
+        lemma2 = new MorphData.Lemma("a", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (lemma1.equals(lemma2));
-        lemma1 = new MorphData.Lemma(null,5);
+        lemma1 = new MorphData.Lemma(null, DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma(null,5);
+        lemma2 = new MorphData.Lemma(null, DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (lemma1.equals(lemma2));
     }
 }

@@ -31,6 +31,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -65,7 +66,7 @@ public class TermPositionVectorTest extends TestBase {
     public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(LUCENE_VERSION, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer); //use of Version, need to look at this.
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(indexDirectory, config);
 
@@ -100,7 +101,7 @@ public class TermPositionVectorTest extends TestBase {
 
     private void runQuery(String query, int expectedPosition) throws ParseException, IOException {
         HebrewQueryParser hqp =
-                new HebrewQueryParser(LUCENE_VERSION, "Text", analyzer);
+                new HebrewQueryParser("Text", analyzer);
 
         Query q = hqp.parse(query);
 

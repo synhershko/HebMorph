@@ -20,16 +20,15 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.LookupTolerators;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.Tokenizer;
+import com.code972.hebmorph.WordType;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class HebrewAnalyzer extends Analyzer {
-    protected static final Version matchVersion = Version.LUCENE_4_9;
     private static final Byte dummyData = (byte) 0;
 
     protected DictHebMorph dict;
@@ -51,7 +49,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
     public DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
         if (input != null) {
             final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
-                    input, StandardCharsets.UTF_8), matchVersion);
+                    input, StandardCharsets.UTF_8));
 
             final DictRadix<Byte> radix = new DictRadix<>(false);
             for (Object aWordsList : wordsList) {
@@ -75,16 +73,11 @@ public abstract class HebrewAnalyzer extends Analyzer {
         return false;
     }
 
-    public enum WordType {
-        HEBREW,
-        HEBREW_WITH_PREFIX,
-        HEBREW_TOLERATED,
-        HEBREW_TOLERATED_WITH_PREFIX,
-        NON_HEBREW,
-        UNRECOGNIZED,
+    public WordType isRecognizedWord(final String word, final boolean tolerate) {
+        return isRecognizedWord(word, tolerate, this.dict);
     }
 
-    public WordType isRecognizedWord(final String word, final boolean tolerate) {
+    public static WordType isRecognizedWord(final String word, final boolean tolerate, final DictHebMorph dict) {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md;
@@ -122,7 +115,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
             }
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
+                    if ((md.getLemmas()[result].getPrefix().getValue() & prefixMask) > 0) {
                         return WordType.HEBREW_WITH_PREFIX;
                     }
                 }
@@ -154,7 +147,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 if (tolerated != null) {
                     for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                         for (int result = 0; result < lr.getData().getLemmas().length; result++) {
-                            if ((LingInfo.DMask2ps(lr.getData().getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
+                            if ((lr.getData().getLemmas()[result].getPrefix().getValue() & prefixMask) > 0) {
                                 return WordType.HEBREW_TOLERATED_WITH_PREFIX;
                             }
                         }
@@ -162,7 +155,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 }
             }
         }
-
         return WordType.UNRECOGNIZED;
     }
 }
