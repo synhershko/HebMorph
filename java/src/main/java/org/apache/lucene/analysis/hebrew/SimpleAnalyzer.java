@@ -42,7 +42,6 @@ public final class SimpleAnalyzer extends Analyzer {
     private Map<String, char[]> suffixByTokenType = null;
     private HashMap<String, Integer> prefixesTree;
     private final Version matchVersion;
-    private final SynonymMap acronymMergingMap;
 
     public SimpleAnalyzer(Version matchVersion, final HashMap<String, Integer> prefixes) throws IOException {
         this(matchVersion, prefixes, null);
@@ -52,7 +51,6 @@ public final class SimpleAnalyzer extends Analyzer {
         this.commonWords = commonWords;
         this.matchVersion = matchVersion;
         this.prefixesTree = prefixes;
-        this.acronymMergingMap = buildAcronymsMergingMap();
     }
 
     @Override
@@ -60,7 +58,6 @@ public final class SimpleAnalyzer extends Analyzer {
         final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree);
         TokenStream tok = new NiqqudFilter(src);
         tok = new LowerCaseFilter(matchVersion, tok);
-        tok = new SynonymFilter(tok, acronymMergingMap, false);
         if (commonWords != null && commonWords.size() > 0)
             tok = new CommonGramsFilter(matchVersion, tok, commonWords);
         //consider adding a suffix filter?
@@ -78,18 +75,5 @@ public final class SimpleAnalyzer extends Analyzer {
 
         if (!suffixByTokenType.containsKey(tokenType))
             suffixByTokenType.put(tokenType, suffix.toCharArray());
-    }
-
-    public static SynonymMap buildAcronymsMergingMap() throws IOException {
-        SynonymMap.Builder synonymMap = new SynonymMap.Builder(true);
-        synonymMap.add(new CharsRef("אף על פי כן"), new CharsRef("אעפ\"כ"), false);
-        synonymMap.add(new CharsRef("אף על פי"), new CharsRef("אע\"פ"), false);
-        synonymMap.add(new CharsRef("כמו כן"), new CharsRef("כמו\"כ"), false);
-        synonymMap.add(new CharsRef("על ידי"), new CharsRef("ע\"י"), false);
-        synonymMap.add(new CharsRef("על פי"), new CharsRef("ע\"פ"), false);
-        synonymMap.add(new CharsRef("כל כך"), new CharsRef("כ\"כ"), false);
-        synonymMap.add(new CharsRef("בדרך כלל"), new CharsRef("בד\"כ"), false);
-        synonymMap.add(new CharsRef("תל אביב"), new CharsRef("ת\"א"), false);
-        return synonymMap.build();
     }
 }
