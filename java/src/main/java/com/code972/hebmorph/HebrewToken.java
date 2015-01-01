@@ -21,26 +21,27 @@ public class HebrewToken extends Token implements Comparable<Token> {
     private static final long serialVersionUID = -5809495040446607703L;
 
     public HebrewToken(String _word, byte _prefixLength, MorphData.Lemma lemma, float _score) {
-        this(_word, _prefixLength, lemma.getDescFlag(), lemma.getLemma(), _score);
+        this(_word, _prefixLength, lemma.getDescFlag(), lemma.getLemma(), lemma.getPrefix(), _score);
     }
 
-    public HebrewToken(String _word, byte _prefixLength, Integer _mask, String _lemma, float _score) {
+    public HebrewToken(String _word, byte _prefixLength, DescFlag _mask, String _lemma, PrefixType _pref, float _score) {
         super(_word);
         prefixLength = _prefixLength;
+        prefType = _pref;
         setMask(_mask);
-        if (_lemma == null) {
-            lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
-        } else {
+//        if (_lemma == null) {
+//            lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
+//        } else {
             lemma = _lemma;
-        }
+//        }
         setScore(_score);
     }
 
     private float score = 1.0f;
     private byte prefixLength;
-    private Integer mask;
+    private DescFlag mask;
     private String lemma;
-
+    private PrefixType prefType;
     /* (non-Javadoc)
       * @see java.lang.Object#equals(java.lang.Object)
       */
@@ -71,6 +72,13 @@ public class HebrewToken extends Token implements Comparable<Token> {
             return false;
         }
         if (prefixLength != other.prefixLength) {
+            return false;
+        }
+        if (prefType == null) {
+            if (other.prefType != null) {
+                return false;
+            }
+        } else if (!prefType.equals(other.prefType)) {
             return false;
         }
         if (Float.floatToIntBits(score) != Float.floatToIntBits(other.score)) {
@@ -114,11 +122,11 @@ public class HebrewToken extends Token implements Comparable<Token> {
         return score;
     }
 
-    public void setMask(Integer mask) {
+    public void setMask(DescFlag mask) {
         this.mask = mask;
     }
 
-    public Integer getMask() {
+    public DescFlag getMask() {
         return mask;
     }
 

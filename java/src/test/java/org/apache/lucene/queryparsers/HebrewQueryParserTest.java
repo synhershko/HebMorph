@@ -32,7 +32,7 @@ public class HebrewQueryParserTest extends TestBase {
     @Test
     public void ParsesAcronymsCorrectly() throws ParseException, IOException {
 
-        QueryParser qp = new HebrewQueryParser(LUCENE_VERSION, "f", new SimpleAnalyzer(LUCENE_VERSION, HSpellLoader.readDefaultPrefixes()));
+        QueryParser qp = new HebrewQueryParser("f", new SimpleAnalyzer(HSpellLoader.readDefaultPrefixes()));
         qp.parse("צה\"ל");
         qp.parse("\"צהל\"");
         qp.parse("כל הכבוד לצה\"ל");
