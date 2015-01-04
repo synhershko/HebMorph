@@ -19,7 +19,6 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.Constants.DMask;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -67,7 +66,6 @@ public class StreamLemmatizer extends Lemmatizer {
         retTokens.clear();
 
         int tokenType;
-
         // Used to loop over certain noise cases
         while (true) {
             tokenType = _tokenizer.nextToken(nextToken);
@@ -154,7 +152,8 @@ public class StreamLemmatizer extends Lemmatizer {
                 if (retTokens.isEmpty() && ((tokenType & Tokenizer.TokenType.Acronym) > 0)) {
                     // TODO: Perform Gimatria test
                     // TODO: Treat an acronym as a noun and strip affixes accordingly?
-                    retTokens.add(new HebrewToken(nextToken.ref, (byte) 0, DMask.D_ACRONYM, nextToken.ref, 1.0f));
+                    // TODO: proper values for acronym?
+                    retTokens.add(new HebrewToken(nextToken.ref, (byte) 0, DescFlag.D_ACRONYM, nextToken.ref, PrefixType.PS_NONDEF, 1.0f));
                 } else if (tolerateWhenLemmatizingStream && retTokens.isEmpty()) {
                     lemmas = lemmatizeTolerant(nextToken.ref);
                     if ((lemmas != null) && (lemmas.size() > 0)) {

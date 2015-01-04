@@ -25,7 +25,6 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.*;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.CharacterUtils;
-import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -69,7 +68,7 @@ public class StreamLemmasFilter extends Tokenizer {
         _streamLemmatizer = new StreamLemmatizer(input, dict, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
-        charUtils = CharacterUtils.getInstance(Version.LUCENE_4_9);
+        charUtils = CharacterUtils.getInstance();
     }
 
     public void setSuffixForExactMatch(Character c) {
@@ -132,7 +131,7 @@ public class StreamLemmasFilter extends Tokenizer {
 
             keywordAtt.setKeyword(true);
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) == 0) {
-                stack.add(new HebrewToken(word, (byte) 0, 0, word, 1.0f));
+                stack.add(new HebrewToken(word, (byte) 0, DescFlag.D_EMPTY, word, PrefixType.PS_EMPTY, 1.0f));
             }
 
             return true;
@@ -189,7 +188,7 @@ public class StreamLemmasFilter extends Tokenizer {
             }
 
             if (keepOriginalWord)
-                stack.add(new HebrewToken(word, (byte) 0, 0, word, 1.0f));
+                stack.add(new HebrewToken(word, (byte) 0, DescFlag.D_EMPTY, word, PrefixType.PS_EMPTY, 1.0f));
 
             return true;
         }

@@ -19,7 +19,6 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SuffixKeywordFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -35,6 +34,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.junit.*;
 
 import java.io.IOException;
@@ -48,6 +48,9 @@ import static org.junit.Assert.assertEquals;
 public class BasicHebrewTest extends TestBase {
     private Analyzer analyzer;
 
+    public BasicHebrewTest() throws IOException {
+        analyzer = new TestAnalyzer();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -60,7 +63,6 @@ public class BasicHebrewTest extends TestBase {
 
     @Before
     public void setUp() throws Exception {
-        analyzer = new HebrewIndexingAnalyzer(getDictionary(false));
     }
 
     @After
@@ -117,7 +119,7 @@ public class BasicHebrewTest extends TestBase {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Test
     public void testLemmatization() throws Exception {
-        analyzer = new testAnalyzer();
+        analyzer = new TestAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
         ts.reset();
 
@@ -132,7 +134,7 @@ public class BasicHebrewTest extends TestBase {
     @SuppressWarnings("StatementWithEmptyBody")
     @Test
     public void testFinalOffset() throws Exception {
-        analyzer = new testAnalyzer();
+        analyzer = new TestAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
         OffsetAttribute offsetAttribute = ts.addAttribute(OffsetAttribute.class);
         ts.reset();
@@ -140,24 +142,6 @@ public class BasicHebrewTest extends TestBase {
         }
         ts.end();
         assertEquals(5, offsetAttribute.endOffset());
-    }
-
-    class testAnalyzer extends Analyzer {
-
-        @Override
-        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            StreamLemmasFilter src = null;
-            try {
-                src = new StreamLemmasFilter(reader, getDictionary(false), null, new BasicLemmaFilter());
-                src.setKeepOriginalWord(true);
-                src.setSuffixForExactMatch('$');
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            TokenStream tok = new SuffixKeywordFilter(src, '$');
-            return new TokenStreamComponents(src, tok);
-        }
     }
 
     protected void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception {
@@ -172,7 +156,7 @@ public class BasicHebrewTest extends TestBase {
     protected int findInText(String whatToIndex, String whatToSearch) throws Exception {
         final Directory d = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(LUCENE_VERSION, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer); //use of Version, need to look at this.
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(d, config);
         Document doc = new Document();
@@ -181,7 +165,7 @@ public class BasicHebrewTest extends TestBase {
         writer.close();
 
         IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(d));
-        QueryParser qp = new QueryParser(LUCENE_VERSION, "content", analyzer);
+        QueryParser qp = new QueryParser("content", analyzer);
         Query query = qp.parse(whatToSearch);
         ScoreDoc[] hits = searcher.search(query, null, 1000).scoreDocs;
 
@@ -191,4 +175,24 @@ public class BasicHebrewTest extends TestBase {
         return hits.length;
     }
 
+    private class TestAnalyzer extends Analyzer {
+
+        public TestAnalyzer() throws IOException {
+            super();
+        }
+
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+            StreamLemmasFilter src = null;
+            try {
+                src = new StreamLemmasFilter(reader, getDictionary(false), null, new BasicLemmaFilter());
+                src.setKeepOriginalWord(true);
+                src.setSuffixForExactMatch('$');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return new TokenStreamComponents(src);
+        }
+    }
 }
+

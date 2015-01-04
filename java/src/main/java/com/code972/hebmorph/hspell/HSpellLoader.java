@@ -17,14 +17,11 @@
  **************************************************************************/
 package com.code972.hebmorph.hspell;
 
+import com.code972.hebmorph.DescFlag;
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.PrefixType;
 import com.code972.hebmorph.datastructures.DictRadix;
-import org.apache.lucene.analysis.hebrew.HebrewExactAnalyzer;
-import org.apache.lucene.analysis.hebrew.HebrewIndexingAnalyzer;
-import org.apache.lucene.analysis.hebrew.HebrewQueryAnalyzer;
-import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -165,7 +162,7 @@ public final class HSpellLoader {
             final String lookup[] = new String[lookupLen + 1];
 
             try {
-                final char[] sbuf = new char[Constants.MaxWordLength];
+                final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
                 int c = 0, n, slen = 0, i = 0;
                 while ((c = fdict.read()) > -1) {
                     if ((c >= '0') && (c <= '9')) { // No conversion required for chars < 0xBE
@@ -208,7 +205,7 @@ public final class HSpellLoader {
                         } else {
                             lemma = lookup[r];
                         }
-                        lemmas[stemPosition] = new MorphData.Lemma(lemma, descFlags[stemPosition]);
+                        lemmas[stemPosition] = new MorphData.Lemma(lemma, DescFlag.create((byte) (descFlags[stemPosition] & 3)), dmaskToPrefix(descFlags[stemPosition]));
                         stemPosition++;
                     }
                     data.setLemmas(lemmas);
@@ -235,7 +232,7 @@ public final class HSpellLoader {
             DictRadix<MorphData> ret = new DictRadix<MorphData>();
 
             try {
-                final char[] sbuf = new char[Constants.MaxWordLength];
+                final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
                 int c = 0, n, slen = 0;
                 while ((c = fdict.read()) > -1) {
                     if ((c >= '0') && (c <= '9')) { // No conversion required for chars < 0xBE
@@ -373,23 +370,23 @@ public final class HSpellLoader {
                 case "שםעצם":
                     md = new MorphData();
                     md.setPrefixes((short) 63);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_noun)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_NOUN, dmaskToPrefix(descFlags_noun))});
                     break;
                 case "שםחברה":
                 case "שםפרטי":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_person_name)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_person_name))});
                     break;
                 case "שםמקום":
                     md = new MorphData();
                     md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_place_name)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_place_name))});
                     break;
                 case "שםמדויק":
                     md = new MorphData();
                     md.setPrefixes((short) 0);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], descFlags_empty)});
+                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_empty))});
                     break;
             }
 
@@ -454,27 +451,84 @@ public final class HSpellLoader {
         return num;
     }
 
-    public static HebrewIndexingAnalyzer getHebrewIndexingAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewIndexingAnalyzer(new DictHebMorph(radix, prefs));
+    // find the prefixes required by a word according to its details
+    private static PrefixType dmaskToPrefix(Integer dmask) {
+        PrefixType specifier;
+        if ((dmask & DMask.D_TYPEMASK) == DMask.D_VERB) {
+            if ((dmask & DMask.D_TENSEMASK) == DMask.D_IMPERATIVE) {
+                specifier = PrefixType.PS_IMPER;
+            } else if ((dmask & DMask.D_TENSEMASK) != DMask.D_PRESENT) {
+                specifier = PrefixType.PS_VERB;
+            } else if (((dmask & DMask.D_OSMICHUT) > 0) || ((dmask & DMask.D_OMASK) > 0)) {
+                specifier = PrefixType.PS_NONDEF;
+            } else {
+                specifier = PrefixType.PS_ALL;
+            }
+            /*TODO I feel that this may lead to a bug with ליפול and other infinitives that
+             * did not loose their initial lamed.  I should correct this all the way from
+             * woo.pl*/
+            if ((dmask & DMask.D_TENSEMASK) == DMask.D_INFINITIVE) {
+                specifier = PrefixType.PS_L;
+            } else if ((dmask & DMask.D_TENSEMASK) == DMask.D_BINFINITIVE) {
+                specifier = PrefixType.PS_B;
+            }
+        } else if (((dmask & DMask.D_TYPEMASK) == DMask.D_NOUN) || ((dmask & DMask.D_TYPEMASK) == DMask.D_ADJ)) {
+            if (((dmask & DMask.D_OSMICHUT) > 0) || ((dmask & DMask.D_OMASK) > 0) || ((dmask & DMask.D_SPECNOUN) > 0)) {
+                specifier = PrefixType.PS_NONDEF;
+            } else {
+                specifier = PrefixType.PS_ALL;
+            }
+        } else {
+            specifier = PrefixType.PS_ALL;
+        }
+        return specifier;
     }
 
-    public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewQueryAnalyzer(new DictHebMorph(radix, prefs));
-    }
-
-    public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewQueryLightAnalyzer(new DictHebMorph(radix, prefs));
-    }
-
-    public static HebrewExactAnalyzer getHebrewExactAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewExactAnalyzer(new DictHebMorph(radix, prefs));
+    private static interface DMask {
+        public static final int D_NOUN = 1;
+        public static final int D_VERB = 2;
+        public static final int D_ADJ = 3;
+        public static final int D_TYPEMASK = 3;
+        public static final int D_GENDERBASE = 4;
+        public static final int D_MASCULINE = 4;
+        public static final int D_FEMININE = 8;
+        public static final int D_GENDERMASK = 12;
+        public static final int D_GUFBASE = 16;
+        public static final int D_FIRST = 16;
+        public static final int D_SECOND = 32;
+        public static final int D_THIRD = 48;
+        public static final int D_GUFMASK = 48;
+        public static final int D_NUMBASE = 64;
+        public static final int D_SINGULAR = 64;
+        public static final int D_DOUBLE = 128;
+        public static final int D_PLURAL = 192;
+        public static final int D_NUMMASK = 192;
+        public static final int D_TENSEBASE = 256;
+        public static final int D_INFINITIVE = 256;
+        public static final int D_BINFINITIVE = 1536;
+        public static final int D_PAST = 512;
+        public static final int D_PRESENT = 768;
+        public static final int D_FUTURE = 1024;
+        public static final int D_IMPERATIVE = 1280;
+        public static final int D_TENSEMASK = 1792;
+        public static final int D_OGENDERBASE = 2048;
+        public static final int D_OMASCULINE = 2048;
+        public static final int D_OFEMININE = 4096;
+        public static final int D_OGENDERMASK = 6144;
+        public static final int D_OGUFBASE = 8192;
+        public static final int D_OFIRST = 8192;
+        public static final int D_OSECOND = 16384;
+        public static final int D_OTHIRD = 24576;
+        public static final int D_OGUFMASK = 24576;
+        public static final int D_ONUMBASE = 32768;
+        public static final int D_OSINGULAR = 32768;
+        public static final int D_ODOUBLE = 65536;
+        public static final int D_OPLURAL = 98304;
+        public static final int D_ONUMMASK = 98304;
+        public static final int D_OMASK = 129024;
+        public static final int D_OSMICHUT = 131072;
+        public static final int D_SPECNOUN = 262144;
+        public static final int D_STARTBIT = 524288;
+        public static final int D_ACRONYM = 1048576;
     }
 }

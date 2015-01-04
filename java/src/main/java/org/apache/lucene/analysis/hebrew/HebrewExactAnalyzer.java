@@ -38,7 +38,7 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
         final HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref(), SPECIAL_TOKENIZATION_CASES);
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);
-        tok = new LowerCaseFilter(matchVersion, tok);
+        tok = new LowerCaseFilter(tok);
         tok = new AddSuffixFilter(tok, '$') {
             @Override
             protected void handleCurrentToken() {

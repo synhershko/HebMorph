@@ -18,9 +18,9 @@
  **************************************************************************/
 package com.code972.hebmorph.lemmafilters;
 
+import com.code972.hebmorph.DescFlag;
 import com.code972.hebmorph.HebrewToken;
 import com.code972.hebmorph.Token;
-import com.code972.hebmorph.hspell.Constants.DMask;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class BasicLemmaFilter extends LemmaFilterBase {
             }
 
             // Pose a higher threshold to verbs (easier to get irrelevant verbs from toleration)
-            if (((ht.getMask() & DMask.D_TYPEMASK) == DMask.D_VERB) && (ht.getScore() < 0.85f)) {
+            if ((ht.getMask() == DescFlag.D_VERB) && (ht.getScore() < 0.85f)) {
                 return false;
             }
         }

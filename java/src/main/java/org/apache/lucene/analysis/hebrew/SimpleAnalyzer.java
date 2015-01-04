@@ -19,13 +19,8 @@ package org.apache.lucene.analysis.hebrew;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.commongrams.CommonGramsFilter;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.synonym.SynonymFilter;
-import org.apache.lucene.analysis.synonym.SynonymMap;
 import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.util.CharsRef;
-import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -41,15 +36,13 @@ public final class SimpleAnalyzer extends Analyzer {
 
     private Map<String, char[]> suffixByTokenType = null;
     private HashMap<String, Integer> prefixesTree;
-    private final Version matchVersion;
 
-    public SimpleAnalyzer(Version matchVersion, final HashMap<String, Integer> prefixes) throws IOException {
-        this(matchVersion, prefixes, null);
+    public SimpleAnalyzer(final HashMap<String, Integer> prefixes) throws IOException {
+        this(prefixes, null);
     }
 
-    public SimpleAnalyzer(final Version matchVersion, final HashMap<String, Integer> prefixes, final CharArraySet commonWords) throws IOException {
+    public SimpleAnalyzer(final HashMap<String, Integer> prefixes, final CharArraySet commonWords) throws IOException {
         this.commonWords = commonWords;
-        this.matchVersion = matchVersion;
         this.prefixesTree = prefixes;
     }
 
@@ -57,9 +50,7 @@ public final class SimpleAnalyzer extends Analyzer {
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree);
         TokenStream tok = new NiqqudFilter(src);
-        tok = new LowerCaseFilter(matchVersion, tok);
-        if (commonWords != null && commonWords.size() > 0)
-            tok = new CommonGramsFilter(matchVersion, tok, commonWords);
+        tok = new LowerCaseFilter(tok);
         //consider adding a suffix filter?
         return new TokenStreamComponents(src, tok) {
             @Override

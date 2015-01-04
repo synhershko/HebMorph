@@ -18,7 +18,6 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.Constants;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -135,7 +134,7 @@ public class Tokenizer {
     private char[] ioBuffer = new char[IO_BUFFER_SIZE];
     private int ioBufferIndex = 0;
 
-    private final char[] wordBuffer = new char[Constants.MaxWordLength];
+    private final char[] wordBuffer = new char[DictionaryLoader.MaxWordLength];
     private byte currentTokenLength = 0;
     private int tokenType = 0;
 

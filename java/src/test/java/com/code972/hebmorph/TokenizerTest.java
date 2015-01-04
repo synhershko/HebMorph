@@ -153,6 +153,8 @@ public class TokenizerTest {
         assertTokenizesTo("c++.", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
         assertTokenizesTo("בC++", "בC++");
         assertTokenizesTo("בC++ ", "בC++");
+        assertTokenizesTo("a++ b++ c++", new String[]{"a", "b", "c++"});
+        assertTokenizesTo("c++\nc++! c++, c++. (c++)", new String[]{"c++", "c++", "c++", "c++", "c++"});
 //        assertTokenizesTo("C++x0", new String[] { "C", "x0" }); // This passes except in the two-buffer edgecase
 //        assertTokenizesTo("C++x0 ", new String[] { "C", "x0" });  // This passes except in the two-buffer edgecase
 
@@ -313,5 +315,4 @@ public class TokenizerTest {
 
         assertTrue("Arrived here without throwing", true);
     }
-
 }

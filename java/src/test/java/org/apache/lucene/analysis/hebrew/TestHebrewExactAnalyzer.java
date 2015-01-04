@@ -17,18 +17,17 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 
 import java.io.IOException;
 
 public class TestHebrewExactAnalyzer extends BaseTokenStreamTestCase {
     public void testRandomStrings() throws Exception {
-        checkRandomData(random(), HSpellLoader.getHebrewExactAnalyzer(), 1000 * RANDOM_MULTIPLIER);
+        checkRandomData(random(), TestBase.getHebrewExactAnalyzer(), 1000 * RANDOM_MULTIPLIER);
     }
 
     public void testBasics() throws IOException {
-        HebrewExactAnalyzer a = HSpellLoader.getHebrewExactAnalyzer();
+        HebrewExactAnalyzer a = TestBase.getHebrewExactAnalyzer();
 
         checkOneTerm(a, "בדיקה", "בדיקה$");
         checkOneTerm(a, "בדיקה$", "בדיקה$");
