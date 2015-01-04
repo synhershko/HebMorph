@@ -17,6 +17,12 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
+			<td>2.0.0</td>
+			<td>4.10.x</td>
+			<td>1.4.x</td>
+			<td>Upcoming</td>
+		</tr>
+		<tr>
 			<td>1.5.0</td>
 			<td>4.9.0</td>
 			<td>1.3.x</td>
