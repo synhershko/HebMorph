@@ -24,10 +24,21 @@ import java.util.HashMap;
 public class DictHebMorph {
     private HashMap<String, Integer> pref;
     private DictRadix<MorphData> dict;
+    private HashMap<String, MorphData> mds;
+
+    public MorphData lookup (final String key){
+        return mds.get(key);
+    }
 
     public DictHebMorph(DictRadix<MorphData> dict, HashMap<String, Integer> pref) {
         this.pref = pref;
         this.dict = dict;
+        this.mds = new HashMap<>();
+        DictRadix.RadixEnumerator iter = (DictRadix.RadixEnumerator)dict.iterator();
+        while (iter.hasNext()){
+            this.mds.put(iter.getCurrentKey(),(MorphData) iter.next());
+        }
+
     }
 
     //    getters.

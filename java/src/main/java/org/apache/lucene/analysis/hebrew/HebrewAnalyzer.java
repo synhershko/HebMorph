@@ -88,13 +88,13 @@ public abstract class HebrewAnalyzer extends Analyzer {
             return WordType.NON_HEBREW;
 
         try {
-            if (dictRadix.lookup(word) != null) return WordType.HEBREW;
+            if (dict.lookup(word) != null) return WordType.HEBREW;
         } catch (IllegalArgumentException ignored_ex) {
         }
 
         if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
-                if (dictRadix.lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
+                if (dict.lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
             } catch (IllegalArgumentException ignored_ex) {
             }
         }
@@ -109,7 +109,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 break;
 
             try {
-                md = dictRadix.lookup(word.substring(prefLen));
+                md = dict.lookup(word.substring(prefLen));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
