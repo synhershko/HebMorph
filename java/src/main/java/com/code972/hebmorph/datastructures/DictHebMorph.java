@@ -24,10 +24,28 @@ import java.util.HashMap;
 public class DictHebMorph {
     private HashMap<String, Integer> pref;
     private DictRadix<MorphData> dict;
+    private HashMap<String, MorphData> mds;
+
+    public DictHebMorph(){
+        dict = new DictRadix<>();
+        pref = new HashMap<>();
+        mds = new HashMap<>();
+    }
 
     public DictHebMorph(DictRadix<MorphData> dict, HashMap<String, Integer> pref) {
         this.pref = pref;
         this.dict = dict;
+        this.mds = new HashMap<>(dict.getCount());
+        DictRadix.RadixEnumerator iter = (DictRadix.RadixEnumerator)dict.iterator();
+        while (iter.hasNext()){
+            this.mds.put(iter.getCurrentKey(),(MorphData) iter.next());
+        }
+
+    }
+
+    public void addNode(String s, MorphData md) {
+        this.mds.put(s,md);
+        this.dict.addNode(s,md);
     }
 
     //    getters.
@@ -39,9 +57,14 @@ public class DictHebMorph {
         return pref;
     }
 
+    public MorphData lookup (final String key){
+        return mds.get(key);
+    }
+
     public void clear() {
         dict.clear();
         pref.clear();
+        mds.clear();
     }
 
     @Override
@@ -53,6 +76,6 @@ public class DictHebMorph {
         if (getClass() != other.getClass())
             return false;
         DictHebMorph otherDict = (DictHebMorph) other;
-        return (this.dict.equals(otherDict.dict) && this.pref.equals(otherDict.pref));
+        return (this.dict.equals(otherDict.dict) && this.pref.equals(otherDict.pref) && this.mds.equals(otherDict.mds));
     }
 }

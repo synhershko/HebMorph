@@ -87,11 +87,10 @@ public class Lemmatizer {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md = null;
-        DictRadix<MorphData> m_dict = dictHeb.getRadix();
         HashMap<String, Integer> m_pref = dictHeb.getPref();
 
         try {
-            md = m_dict.lookup(word);
+            md = dictHeb.lookup(word);
         } catch (IllegalArgumentException e) {
             md = null;
         }
@@ -101,7 +100,7 @@ public class Lemmatizer {
             }
         } else if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
-                md = m_dict.lookup(word.substring(0, word.length() - 1));
+                md = dictHeb.lookup(word.substring(0, word.length() - 1));
             } catch (IllegalArgumentException e) {
                 md = null;
             }
@@ -121,7 +120,7 @@ public class Lemmatizer {
                 break;
 
             try {
-                md = m_dict.lookup(word.substring(prefLen));
+                md = dictHeb.lookup(word.substring(prefLen));
             } catch (IllegalArgumentException e) {
                 md = null;
             }

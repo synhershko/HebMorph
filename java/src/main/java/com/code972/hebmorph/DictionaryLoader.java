@@ -41,8 +41,7 @@ public class DictionaryLoader {
 
     //loads a dictionary with it's corresponding prefixes. Returns the dictionary, prefixes are stored as static members here.
     public static DictHebMorph loadDicAndPrefixesFromGzip(String fileName) throws IOException {
-        DictRadix<MorphData> dict = new DictRadix<>();
-        HashMap<String, Integer> prefixes = new HashMap<>();
+        DictHebMorph dict = new DictHebMorph();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
         try {
@@ -60,7 +59,7 @@ public class DictionaryLoader {
                 if (split.length != 2) {
                     throw new IOException("Wrong format detected");
                 } else {
-                    prefixes.put(split[0], Integer.parseInt(split[1]));
+                    dict.getPref().put(split[0], Integer.parseInt(split[1]));
                 }
             }
             if (!str.equals(DICTIONARY_INDICATOR)) {
@@ -98,6 +97,6 @@ public class DictionaryLoader {
             } catch (IOException ignored) {
             }
         }
-        return new DictHebMorph(dict, prefixes);
+        return dict;
     }
 }
