@@ -32,32 +32,28 @@ public class DictHebMorph {
         mds = new HashMap<>();
     }
 
-    public DictHebMorph(DictRadix<MorphData> dict, HashMap<String, Integer> pref) {
-        this.pref = pref;
-        this.dict = dict;
-        this.mds = new HashMap<>(dict.getCount());
-        DictRadix.RadixEnumerator iter = (DictRadix.RadixEnumerator)dict.iterator();
-        while (iter.hasNext()){
-            this.mds.put(iter.getCurrentKey(),(MorphData) iter.next());
-        }
-
-    }
-
     public void addNode(String s, MorphData md) {
         this.mds.put(s,md);
         this.dict.addNode(s,md);
     }
 
-    //    getters.
-    public DictRadix<MorphData> getRadix() {
+    public void addNode(char[] s, MorphData md) {
+        addNode(new String(s),md);
+    }
+
+    public final DictRadix<MorphData> getRadix() {
         return dict;
     }
 
-    public HashMap<String, Integer> getPref() {
+    public final HashMap<String, Integer> getPref() {
         return pref;
     }
 
-    public MorphData lookup (final String key){
+    public void setPref(final HashMap<String, Integer> prefs) {
+        this.pref = prefs;
+    }
+
+    public final MorphData lookup (final String key){
         return mds.get(key);
     }
 

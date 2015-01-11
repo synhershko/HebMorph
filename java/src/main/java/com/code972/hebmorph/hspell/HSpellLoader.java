@@ -21,6 +21,7 @@ import com.code972.hebmorph.DescFlag;
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.PrefixType;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 
 import java.io.*;
@@ -71,7 +72,6 @@ public final class HSpellLoader {
         fdict = new GZIPInputStream(dictFile);
         fprefixes = new GZIPInputStream(prefixesFile);
         this.loadMorphData = loadMorphData;
-
         if (loadMorphData) {
             dmasks = new ArrayList<>();
             boolean foundStartLine = false;
@@ -155,12 +155,12 @@ public final class HSpellLoader {
         return map;
     }
 
-    public DictRadix<MorphData> loadDictionaryFromHSpellData() throws IOException {
-
+    public DictHebMorph loadDictionaryFromHSpellData(String prefixPath) throws IOException {
+        DictHebMorph dict = new DictHebMorph();
+        dict.setPref(readPrefixesFromFile(prefixPath));
         if (loadMorphData) {
             // Load the count of morphological data slots required
             final String lookup[] = new String[lookupLen + 1];
-
             try {
                 final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
                 int c = 0, n, slen = 0, i = 0;
@@ -186,8 +186,6 @@ public final class HSpellLoader {
                 } catch (IOException ignored) {
                 }
             }
-
-            final DictRadix<MorphData> ret = new DictRadix<MorphData>();
             try {
                 for (int i = 0; lookup[i] != null; i++) {
                     MorphData data = new MorphData();
@@ -209,7 +207,7 @@ public final class HSpellLoader {
                         stemPosition++;
                     }
                     data.setLemmas(lemmas);
-                    ret.addNode(lookup[i], data);
+                    dict.addNode(lookup[i], data);
                 }
             } finally {
                 if (fprefixes != null) try {
@@ -225,12 +223,7 @@ public final class HSpellLoader {
                 } catch (IOException ignored) {
                 }
             }
-
-            return ret;
-
         } else { // Use optimized version for loading HSpell's dictionary files
-            DictRadix<MorphData> ret = new DictRadix<MorphData>();
-
             try {
                 final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
                 int c = 0, n, slen = 0;
@@ -238,13 +231,11 @@ public final class HSpellLoader {
                     if ((c >= '0') && (c <= '9')) { // No conversion required for chars < 0xBE
                         // new word - finalize old word first (set value)
                         sbuf[slen] = '\0';
-
                         // TODO: Avoid creating new MorphData object, and enhance DictRadix to store
                         // the prefixes mask in the node itself
                         MorphData data = new MorphData();
                         data.setPrefixes((short) fprefixes.read()); // Read prefix hint byte
-                        ret.addNode(sbuf, data);
-
+                        dict.addNode(sbuf, data);
                         // and read how much to go back
                         n = 0;
                         do {
@@ -267,9 +258,8 @@ public final class HSpellLoader {
                 } catch (IOException ignored) {
                 }
             }
-
-            return ret;
         }
+        return dict;
     }
 
     public static int getWordCountInHSpellFolder(File path) throws IOException {
