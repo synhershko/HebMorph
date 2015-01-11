@@ -33,14 +33,12 @@ public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStr
 
     protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
-            DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefs = null;
+            HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
             if (allowHeHasheela) {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
+                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
             } else {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
             }
-            dict = new DictHebMorph(radix, prefs);
         }
         return dict;
     }

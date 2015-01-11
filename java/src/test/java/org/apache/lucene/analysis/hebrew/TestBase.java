@@ -34,14 +34,12 @@ public abstract class TestBase {
 
     protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
         if (dict == null) {
-            DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-            HashMap<String, Integer> prefs = null;
+            HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
             if (allowHeHasheela) {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
+                dict = loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
             } else {
-                prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+                dict = loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
             }
-            dict = new DictHebMorph(radix, prefs);
         }
         return dict;
     }
@@ -65,26 +63,18 @@ public abstract class TestBase {
     }
 
     public static HebrewIndexingAnalyzer getHebrewIndexingAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewIndexingAnalyzer(new DictHebMorph(radix, prefs));
+        return new HebrewIndexingAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
     }
 
     public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewQueryAnalyzer(new DictHebMorph(radix, prefs));
+        return new HebrewQueryAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
     }
 
     public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewQueryLightAnalyzer(new DictHebMorph(radix, prefs));
+        return new HebrewQueryLightAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
     }
 
     public static HebrewExactAnalyzer getHebrewExactAnalyzer() throws IOException {
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        return new HebrewExactAnalyzer(new DictHebMorph(radix, prefs));
+        return new HebrewExactAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
     }
 }

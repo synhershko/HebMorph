@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TermPositionVectorTest extends TestBase {
@@ -110,7 +110,7 @@ public class TermPositionVectorTest extends TestBase {
         int num = td.scoreDocs[0].doc;
         Terms terms = searcher.getIndexReader().getTermVectors(num).terms("Text");
 
-        Set<Term> trms_list = new HashSet<Term>();
+        Set<Term> trms_list = new HashSet<>();
         q.extractTerms(trms_list);
 
         for (Term t : trms_list) {
@@ -124,8 +124,7 @@ public class TermPositionVectorTest extends TestBase {
             //assertEquals(expectedPosition, dpEnum.startOffset());
             //assertEquals(??, dpEnum.endOffset());
             assertEquals(DocIdSetIterator.NO_MORE_DOCS, dpEnum.nextDoc());
-
-            Assert.assertEquals(pos, expectedPosition);
+            assertEquals(pos, expectedPosition);
         }
     }
 }
