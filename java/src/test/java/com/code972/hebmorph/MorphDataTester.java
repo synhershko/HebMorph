@@ -26,7 +26,7 @@ public class MorphDataTester {
         assert (lemma1.equals(lemma2));
         lemma1 = new MorphData.Lemma("asd", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (!lemma1.equals(lemma2));
-        lemma2 = new MorphData.Lemma("asd", DescFlag.D_ACRONYM,PrefixType.PS_ALL);
+        lemma2 = new MorphData.Lemma("asd", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (lemma1.equals(lemma2));
         lemma1 = new MorphData.Lemma("a", DescFlag.D_ACRONYM, PrefixType.PS_ALL);
         assert (!lemma1.equals(lemma2));

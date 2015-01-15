@@ -88,7 +88,7 @@ public class MorphData {
         Arrays.sort(lemmas, new Comparator<Lemma>() {
             @Override
             public int compare(Lemma l1, Lemma l2) {
-                return l1.descFlag.getVal()-l2.descFlag.getVal();
+                return l1.descFlag.getVal() - l2.descFlag.getVal();
             }
         });
         this.lemmas = lemmas;
