@@ -17,11 +17,13 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class MorphData {
-    private Lemma[] lemmas = null;
+    private ArrayList<Lemma> lemmas;
     private short prefixes;
 
     public static class Lemma {
@@ -88,14 +90,28 @@ public class MorphData {
         Arrays.sort(lemmas, new Comparator<Lemma>() {
             @Override
             public int compare(Lemma l1, Lemma l2) {
-                return l1.descFlag.getVal()-l2.descFlag.getVal();
+                return l1.descFlag.getVal() - l2.descFlag.getVal();
             }
         });
-        this.lemmas = lemmas;
+        this.lemmas = new ArrayList<>(Arrays.asList(lemmas));
     }
 
     public Lemma[] getLemmas() {
-        return lemmas;
+        return lemmas.toArray(new Lemma[lemmas.size()]);
+    }
+
+    public void addLemma(Lemma lemma) {
+        lemmas.add(lemma);
+        Collections.sort(lemmas, new Comparator<Lemma>() {
+            @Override
+            public int compare(Lemma l1, Lemma l2) {
+                return l1.descFlag.getVal() - l2.descFlag.getVal();
+            }
+        });
+    }
+
+    public void clearLemmas(){
+        lemmas.clear();
     }
 
     public void setPrefixes(short prefixes) {
@@ -118,14 +134,14 @@ public class MorphData {
         if (lemmas == null) {
             return other.lemmas == null;
         }
-        return other.lemmas != null && Arrays.equals(lemmas, other.lemmas);
+        return other.lemmas != null && lemmas.equals(other.lemmas);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(lemmas);
+        result = prime * result + lemmas.hashCode();
         return result;
     }
 
