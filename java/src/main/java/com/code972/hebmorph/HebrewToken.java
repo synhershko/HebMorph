@@ -32,7 +32,7 @@ public class HebrewToken extends Token implements Comparable<Token> {
 //        if (_lemma == null) {
 //            lemma = _word.substring(prefixLength); // Support null lemmas while still taking into account prefixes
 //        } else {
-            lemma = _lemma;
+        lemma = _lemma;
 //        }
         setScore(_score);
     }
@@ -42,6 +42,7 @@ public class HebrewToken extends Token implements Comparable<Token> {
     private DescFlag mask;
     private String lemma;
     private PrefixType prefType;
+
     /* (non-Javadoc)
       * @see java.lang.Object#equals(java.lang.Object)
       */

@@ -15,16 +15,21 @@
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>hebmorph-lucene</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <name>hebmorph-lucene</name>
-    <description>Enabling Hebrew search through Lucene. Part of the HebMorph project, for making Hebrew properly searchable</description>
+    <description>Enabling Hebrew search through Lucene. Part of the HebMorph project, for making Hebrew properly
+        searchable
+    </description>
     <url>http://code972.com/</url>
     <licenses>
         <license>
             <name>Affero GPL3</name>
             <url>http://www.gnu.org/licenses/agpl.html</url>
             <distribution>repo</distribution>
-            <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of works, specifically designed to ensure cooperation with the community in the case of network server software.</comments>
+            <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of
+                works, specifically designed to ensure cooperation with the community in the case of network server
+                software.
+            </comments>
         </license>
     </licenses>
     <developers>
@@ -34,12 +39,12 @@
             <url>http://code972.com</url>
         </developer>
     </developers>
-    
+
     <scm>
         <url>https://github.com/synhershko/HebMorph</url>
-	<connection>scm:git:ssh://git@github.com/synhershko/HebMorph.git</connection>
-	<developerConnection>scm:git:ssh://git@github.com/synhershko/HebMorph.git</developerConnection>
-    </scm>    
+        <connection>scm:git:ssh://git@github.com/synhershko/HebMorph.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/synhershko/HebMorph.git</developerConnection>
+    </scm>
 
     <build>
         <plugins>
@@ -64,6 +69,30 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -74,6 +103,14 @@
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-egozy-hebmorphtemp-hebmorph</id>
+            <name>egozy-hebmorphtemp-hebmorph</name>
+            <url>https://api.bintray.com/maven/egozy/hebmorphtemp/hebmorph</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -116,14 +153,12 @@
             <version>${lucene.version}</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.3.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
