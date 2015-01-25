@@ -18,8 +18,6 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +25,6 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 
 public abstract class TestBase {
     private static DictHebMorph dict;
