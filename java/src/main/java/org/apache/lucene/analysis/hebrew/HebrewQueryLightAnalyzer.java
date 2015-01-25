@@ -31,6 +31,10 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
         super(dict);
     }
 
+    public HebrewQueryLightAnalyzer() throws IOException {
+        super();
+    }
+
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)

@@ -32,6 +32,10 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
         super(dict);
     }
 
+    public HebrewExactAnalyzer() throws IOException {
+        super();
+    }
+
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         // on exact - we don't care about suffixes at all, we always output original word with suffix only

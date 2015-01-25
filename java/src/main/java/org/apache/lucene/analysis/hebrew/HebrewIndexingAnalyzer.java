@@ -31,6 +31,10 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         super(dict);
     }
 
+    public HebrewIndexingAnalyzer() throws IOException {
+        super();
+    }
+
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         // on indexing we should always keep both the stem and marked original word
