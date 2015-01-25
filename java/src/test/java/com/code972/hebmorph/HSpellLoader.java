@@ -15,12 +15,8 @@
  *   License along with this program; if not, see                          *
  *   <http://www.gnu.org/licenses/>.                                       *
  **************************************************************************/
-package com.code972.hebmorph.hspell;
+package com.code972.hebmorph;
 
-import com.code972.hebmorph.DescFlag;
-import com.code972.hebmorph.DictionaryLoader;
-import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.PrefixType;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 
@@ -54,18 +50,6 @@ public final class HSpellLoader {
 
         if (!hspellFolder.exists() || !hspellFolder.isDirectory())
             throw new IllegalArgumentException("Invalid hspell data folder provided");
-    }
-
-    /**
-     * @param classloader
-     * @param hspellFolder  resources folder in which the hspell data is in; must end with /
-     * @param loadMorphData
-     * @throws java.io.IOException
-     */
-    public HSpellLoader(final ClassLoader classloader, final String hspellFolder, final boolean loadMorphData) throws IOException {
-        this(classloader.getResourceAsStream(hspellFolder + sizesFile), classloader.getResourceAsStream(hspellFolder + dmaskFile),
-                classloader.getResourceAsStream(hspellFolder + dictionaryFile), classloader.getResourceAsStream(hspellFolder + prefixesFile),
-                classloader.getResourceAsStream(hspellFolder + descFile), classloader.getResourceAsStream(hspellFolder + stemsFile), loadMorphData);
     }
 
     public HSpellLoader(InputStream sizesFile, InputStream dmasksFile, InputStream dictFile, InputStream prefixesFile, InputStream descFile, InputStream stemsFile, boolean loadMorphData) throws IOException {
@@ -262,10 +246,6 @@ public final class HSpellLoader {
         return dict;
     }
 
-    public static int getWordCountInHSpellFolder(File path) throws IOException {
-        return getWordCountInHSpellFolder(new FileInputStream(new File(path, sizesFile)));
-    }
-
     public static int getWordCountInHSpellFolder(InputStream inputStream) throws IOException {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()));
         reader.readLine();
@@ -337,87 +317,6 @@ public final class HSpellLoader {
         return ' ';
     }
 
-    private final static int descFlags_noun = 69;
-    private final static int descFlags_person_name = 262145;
-    private final static int descFlags_place_name = 262153;
-    private final static int descFlags_empty = 0;
-
-    public static DictRadix<MorphData> loadCustomWords(final InputStream customWordsStream, final DictRadix<MorphData> dictRadix) throws IOException {
-        if (customWordsStream == null)
-            return null;
-
-        final BufferedReader input = new BufferedReader(new InputStreamReader(customWordsStream, Charset.forName("UTF-8")));
-        final Hashtable<String, String> secondPass = new Hashtable<>();
-        final DictRadix<MorphData> custom = new DictRadix<>();
-        String line;
-        while ((line = input.readLine()) != null) {
-            String[] cells = line.split(" ");
-            if (cells.length < 2)
-                continue;
-
-            MorphData md = null;
-            switch (cells[1]) {
-                case "שםעצם":
-                    md = new MorphData();
-                    md.setPrefixes((short) 63);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_NOUN, dmaskToPrefix(descFlags_noun))});
-                    break;
-                case "שםחברה":
-                case "שםפרטי":
-                    md = new MorphData();
-                    md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_person_name))});
-                    break;
-                case "שםמקום":
-                    md = new MorphData();
-                    md.setPrefixes((short) 8);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_place_name))});
-                    break;
-                case "שםמדויק":
-                    md = new MorphData();
-                    md.setPrefixes((short) 0);
-                    md.setLemmas(new MorphData.Lemma[]{new MorphData.Lemma(cells[0], DescFlag.D_PROPER, dmaskToPrefix(descFlags_empty))});
-                    break;
-            }
-
-            if (md == null) { // allow to associate new entries with other custom entries
-                try {
-                    md = custom.lookup(cells[1], false);
-                } catch (IllegalArgumentException ignored_ex) {
-                }
-            }
-
-            if (md == null) {
-                try {
-                    md = dictRadix.lookup(cells[1], false);
-                } catch (IllegalArgumentException ignored_ex) {
-                }
-            }
-
-            if (md != null) {
-                custom.addNode(cells[0], md);
-            } else {
-                secondPass.put(cells[0], cells[1]);
-            }
-        }
-
-        for (final Map.Entry<String, String> entry : secondPass.entrySet()) {
-            try {
-                custom.lookup(entry.getKey(), false);
-                continue; // we already stored this word somehow
-            } catch (IllegalArgumentException expected_ex) {
-            }
-
-            try {
-                final MorphData md = custom.lookup(entry.getValue(), false);
-                if (md != null) custom.addNode(entry.getKey(), md);
-            } catch (IllegalArgumentException ignored_ex) {
-            }
-        }
-
-        return custom;
-    }
-
     //Retrieves the integer value of string (which may end with ','). Returns -1 if cannot convert.
     public static int tryParseInt(String str) {
         if (str == null) {
@@ -479,46 +378,13 @@ public final class HSpellLoader {
         public static final int D_VERB = 2;
         public static final int D_ADJ = 3;
         public static final int D_TYPEMASK = 3;
-        public static final int D_GENDERBASE = 4;
-        public static final int D_MASCULINE = 4;
-        public static final int D_FEMININE = 8;
-        public static final int D_GENDERMASK = 12;
-        public static final int D_GUFBASE = 16;
-        public static final int D_FIRST = 16;
-        public static final int D_SECOND = 32;
-        public static final int D_THIRD = 48;
-        public static final int D_GUFMASK = 48;
-        public static final int D_NUMBASE = 64;
-        public static final int D_SINGULAR = 64;
-        public static final int D_DOUBLE = 128;
-        public static final int D_PLURAL = 192;
-        public static final int D_NUMMASK = 192;
-        public static final int D_TENSEBASE = 256;
         public static final int D_INFINITIVE = 256;
         public static final int D_BINFINITIVE = 1536;
-        public static final int D_PAST = 512;
         public static final int D_PRESENT = 768;
-        public static final int D_FUTURE = 1024;
         public static final int D_IMPERATIVE = 1280;
         public static final int D_TENSEMASK = 1792;
-        public static final int D_OGENDERBASE = 2048;
-        public static final int D_OMASCULINE = 2048;
-        public static final int D_OFEMININE = 4096;
-        public static final int D_OGENDERMASK = 6144;
-        public static final int D_OGUFBASE = 8192;
-        public static final int D_OFIRST = 8192;
-        public static final int D_OSECOND = 16384;
-        public static final int D_OTHIRD = 24576;
-        public static final int D_OGUFMASK = 24576;
-        public static final int D_ONUMBASE = 32768;
-        public static final int D_OSINGULAR = 32768;
-        public static final int D_ODOUBLE = 65536;
-        public static final int D_OPLURAL = 98304;
-        public static final int D_ONUMMASK = 98304;
         public static final int D_OMASK = 129024;
         public static final int D_OSMICHUT = 131072;
         public static final int D_SPECNOUN = 262144;
-        public static final int D_STARTBIT = 524288;
-        public static final int D_ACRONYM = 1048576;
     }
 }
