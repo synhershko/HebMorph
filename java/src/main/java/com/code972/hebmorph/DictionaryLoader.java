@@ -18,14 +18,9 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 public class DictionaryLoader {
@@ -98,5 +93,18 @@ public class DictionaryLoader {
             }
         }
         return dict;
+    }
+
+    public static DictHebMorph lookForDefaultDictionary() throws IOException {
+        String home = System.getProperty("user.home");
+        String[] gZipFilePaths = {"./dictH.gz", "/var/lib/hebmorph/dictH.gz", home + "/hebmorph/dictH.gz"};
+        File file;
+        for (String path : gZipFilePaths) {
+            file = new File(path);
+            if (file.exists()) {
+                return loadDicAndPrefixesFromGzip(path);
+            }
+        }
+        return null;
     }
 }
