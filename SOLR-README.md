@@ -8,10 +8,15 @@ Tutorial for integrating HebMorph with Elasticsearch can be found here http://co
 ## Solr installation guide
 
 ## Prerequisites
+
 * Solr (Versions supported: 4.10.x and above).
+
 * A Solr Collection.
+
 ( If you do not have these already set-up, please refer to http://lucene.apache.org/solr/resources.html#tutorials )
+
 * hebmorph-lucene.jar (can be downloaded from ***).
+
 * Hebrew dictionary files. 
 
 
@@ -21,16 +26,23 @@ Add the following line to solrconfig.xml which can be found at solr/conf directo
     <lib path="[hebmorph_path]" />
 ```
 You need to define your schemas. If you do not know how schemas work in Solr, refer to http://wiki.apache.org/solr/SchemaXml.
+
 HebMorph contains 4 different hebrew analyzers. Those analyzers are already customized to work as are, and all we need to do in order to use them is to add the follwing line to the field-type you want to use hebmorph on.
+
 ```
 	<analyzer type="index" class="org.apache.lucene.analysis.hebrew.HebrewIndexingAnalyzer" /> 
 	or
 	<analyzer type="query" class="org.apache.lucene.analysis.hebrew.HebrewQueryAnalyzer" />
 ```
+
 Where HebrewIndexingAnalyzer and HebrewQueryAnalyzer are the analyzers chosen. Analyzers are:
+
 HebrewIndexingAnalyzer: <description>
+
 HebrewExactAnalyzer: <description>
+
 HebrewQueryAnalyzer: <description>
+
 HebrewQueryLightAnalyzer: <description>
 
 That's it. Restart Solr and your chosen analyzer(s) should automatically apply when querying or indexing new data.
