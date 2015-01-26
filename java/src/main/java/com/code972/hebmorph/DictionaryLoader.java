@@ -97,7 +97,7 @@ public class DictionaryLoader {
 
     public static DictHebMorph lookForDefaultDictionary() throws IOException {
         String home = System.getProperty("user.home");
-        String[] gZipFilePaths = {"./dictH.gz", "/var/lib/hebmorph/dictH.gz", home + "/hebmorph/dictH.gz"};
+        String[] gZipFilePaths = {"./hebmorph.dict", "/var/lib/hebmorph/hebmorph.dict", home + "/hebmorph/hebmorph.dict"};
         File file;
         for (String path : gZipFilePaths) {
             file = new File(path);
