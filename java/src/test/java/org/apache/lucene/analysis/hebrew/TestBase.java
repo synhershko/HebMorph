@@ -17,13 +17,16 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
+import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.HSpellLoader;
+import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import org.junit.AfterClass;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class TestBase {

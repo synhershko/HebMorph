@@ -21,6 +21,7 @@ import com.carrotsearch.randomizedtesting.RandomizedContext;
 import com.carrotsearch.randomizedtesting.RandomizedRunner;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

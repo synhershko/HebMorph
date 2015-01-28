@@ -17,6 +17,7 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
