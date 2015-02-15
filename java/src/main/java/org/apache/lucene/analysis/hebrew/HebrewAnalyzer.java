@@ -17,9 +17,13 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.*;
+import com.code972.hebmorph.LookupTolerators;
+import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.Tokenizer;
+import com.code972.hebmorph.WordType;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
@@ -27,6 +31,7 @@ import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -63,7 +68,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
     }
 
     public HebrewAnalyzer() throws IOException {
-        this(DictionaryLoader.lookForDefaultDictionary());
+        this(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H));
     }
 
     public static boolean isHebrewWord(final CharSequence word) {
