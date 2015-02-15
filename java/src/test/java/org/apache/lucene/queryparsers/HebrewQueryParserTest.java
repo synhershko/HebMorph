@@ -17,7 +17,7 @@
  **************************************************************************/
 package org.apache.lucene.queryparsers;
 
-import com.code972.hebmorph.HSpellLoader;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.hebrew.SimpleAnalyzer;
 import org.apache.lucene.analysis.hebrew.TestBase;
 import org.apache.lucene.queryparser.classic.ParseException;
