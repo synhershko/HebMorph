@@ -8,7 +8,8 @@ public enum PrefixType {
     PS_NONDEF((byte) 8),
     PS_IMPER((byte) 16),
     PS_MISC((byte) 32),
-    PS_ALL((byte) 63);
+    PS_KL((byte) 64),
+    PS_ALL((byte) 127);
     private final byte val;
 
     PrefixType(byte val) {
@@ -35,7 +36,9 @@ public enum PrefixType {
                 return PS_IMPER;
             case 32:
                 return PS_MISC;
-            case 63:
+            case 64:
+                return PS_KL;
+            case 127:
                 return PS_ALL;
             default:
                 throw new IllegalArgumentException(); // default, guess this doesn't really have to make sense

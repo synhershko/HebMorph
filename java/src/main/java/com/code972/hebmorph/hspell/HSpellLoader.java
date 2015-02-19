@@ -18,7 +18,6 @@
 package com.code972.hebmorph.hspell;
 
 import com.code972.hebmorph.DescFlag;
-import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.PrefixType;
 import com.code972.hebmorph.datastructures.DictHebMorph;
@@ -30,7 +29,13 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 public final class HSpellLoader {
-
+    public static final int MaxWordLength = Byte.MAX_VALUE;
+    public static final int FILE_FORMAT_VERSION = 2;
+    public final static String DELIMETER = "#",
+            PREFIXES_INDICATOR = "#PREFIXES",
+            DICTIONARY_INDICATOR = "#DICTIONARY";
+    
+    public static final Charset ENCODING_USED = Charset.forName("UTF-8");
     public static final String dictionaryFile = "hebrew.wgz";
     public static final String prefixesFile = dictionaryFile + ".prefixes";
     public static final String stemsFile = dictionaryFile + ".stems";
@@ -98,7 +103,7 @@ public final class HSpellLoader {
 
     public static String getHspellPath() {
         String hspellPath = null;
-        ClassLoader classLoader = DictionaryLoader.class.getClassLoader();
+        ClassLoader classLoader = HSpellLoader.class.getClassLoader();
         File folder = new File(classLoader.getResource("").getPath());
         while (true) {
             File tmp = new File(folder, "hspell-data-files");
@@ -129,10 +134,10 @@ public final class HSpellLoader {
         BufferedReader bufferedReader = null;
         try {
             reader = new GZIPInputStream(new FileInputStream(prefixPath));
-            bufferedReader = new BufferedReader(new InputStreamReader(reader, DictionaryLoader.ENCODING_USED));
+            bufferedReader = new BufferedReader(new InputStreamReader(reader, ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null) {
-                String[] split = str.split(DictionaryLoader.DELIMETER);
+                String[] split = str.split(DELIMETER);
                 if (split.length != 2) {
                     throw new IOException("Wrong format detected\n");
                 } else {
@@ -162,7 +167,7 @@ public final class HSpellLoader {
             // Load the count of morphological data slots required
             final String lookup[] = new String[lookupLen + 1];
             try {
-                final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
+                final char[] sbuf = new char[MaxWordLength];
                 int c = 0, n, slen = 0, i = 0;
                 while ((c = fdict.read()) > -1) {
                     if ((c >= '0') && (c <= '9')) { // No conversion required for chars < 0xBE
@@ -225,7 +230,7 @@ public final class HSpellLoader {
             }
         } else { // Use optimized version for loading HSpell's dictionary files
             try {
-                final char[] sbuf = new char[DictionaryLoader.MaxWordLength];
+                final char[] sbuf = new char[MaxWordLength];
                 int c = 0, n, slen = 0;
                 while ((c = fdict.read()) > -1) {
                     if ((c >= '0') && (c <= '9')) { // No conversion required for chars < 0xBE
