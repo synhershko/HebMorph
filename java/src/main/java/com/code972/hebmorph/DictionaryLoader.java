@@ -24,7 +24,8 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 public class DictionaryLoader {
-
+    public static final int MaxWordLength = Byte.MAX_VALUE;
+    public static final Charset ENCODING_USED = Charset.forName("UTF-8");
     public static DictHebMorph lookForDefaultDictionary() throws IOException {
         HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()),true);
         return loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
