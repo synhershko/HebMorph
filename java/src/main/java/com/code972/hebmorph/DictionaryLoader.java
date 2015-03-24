@@ -33,7 +33,7 @@ public class DictionaryLoader {
         return loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
     }
 
-    public static DictHebMorph LoadDictFromPath(String path) throws IOException {
+    public static DictHebMorph loadDictFromPath(String path) throws IOException {
         File file = new File(path);
         if (file.isDirectory()) {
             HSpellLoader loader = new HSpellLoader(new File(path), true);
