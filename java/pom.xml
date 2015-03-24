@@ -73,16 +73,24 @@
                     </execution>
                 </executions>
             </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>hebmorph-lucene</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>bintray-synhershko-HebMorph-com.code972.hebmorph:hebmorph-lucene</id>
-            <name>synhershko-HebMorph-com.code972.hebmorph:hebmorph-lucene</name>
-            <url>https://api.bintray.com/maven/synhershko/HebMorph/com.code972.hebmorph:hebmorph-lucene</url>
-        </repository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>
