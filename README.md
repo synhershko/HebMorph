@@ -71,21 +71,11 @@ For the analyzer support, get hebmorph-lucene:
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
-            <version>1.5.0</version>
+            <version>2.0.2</version>
             <scope>compile</scope>
         </dependency>
 ```
 
-Direct reference to hebmorph-core is only needed if you need to use internal HebMorph structures:
-
-```
-        <dependency>
-            <groupId>com.code972.hebmorph</groupId>
-            <artifactId>hebmorph-core</artifactId>
-            <version>1.5.0</version>
-            <scope>compile</scope>
-        </dependency>
-```
 
 ## Lucene.NET compatibility
 
@@ -93,7 +83,7 @@ The .NET version of the library is compatible with Lucene.NET version 3.0.3, but
 
 ## License
 
-HebMorph is copyright (C) 2010-2014, Itamar Syn-Hershko.
+HebMorph is copyright (C) 2010-2015, Itamar Syn-Hershko.
 HebMorph currently relies on Hspell, copyright (C) 2000-2013, Nadav Har'El and Dan Kenigsberg (http://hspell.ivrix.org.il/).
 
 It is released to the public licensed under the GNU Affero General Public License v3. See the LICENSE file included in this distribution. Note that not only the programs in the distribution, but also the
