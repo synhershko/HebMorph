@@ -17,8 +17,7 @@ Tutorial for integrating HebMorph with Elasticsearch can be found here http://co
 
 * hebmorph-lucene.jar (can be downloaded from ***).
 
-* Hebrew dictionary files. 
-
+* Hebrew dictionary files. The open-sourced hspell files can be downloaded from https://github.com/synhershko/HebMorph/tree/master/hspell-data-files.
 
 ## Integrating HebMorph
 In this guide, I'll be using 'example' as my <b> instanceDir </b>, and 'collection1' as my <b> core </b>. Replace those with yours. If you don't know them, you can easily find them by opening your browser and navigating to http://localhost:8983/solr/#/~cores (replace with your host:port).
