@@ -21,7 +21,6 @@ import com.carrotsearch.randomizedtesting.RandomizedContext;
 import com.carrotsearch.randomizedtesting.RandomizedRunner;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(RandomizedRunner.class)
 @TimeoutSuite(millis = 10000000)
-public class RandomizedTokenizerTests {
+public class RandomizedTokenizerTests extends TestBase {
 
     String[] customWords = new String[]{"C++", "C++X0", "i-phone", "i-pad", ".NET",
             "VB.NET", "F#", "C#", "נביעות+", "Google+"};
@@ -60,7 +59,7 @@ public class RandomizedTokenizerTests {
         }
 
         List<String> tokens = new ArrayList<>();
-        final Tokenizer tokenizer = new Tokenizer(null, HSpellLoader.readDefaultPrefixes());
+        final Tokenizer tokenizer = new Tokenizer(null, getDictionary().getPref());
         StringBuilder sb = new StringBuilder();
         int lastPos = 0;
         for (WordAndPosition wordAndPosition : wordsPicked) {

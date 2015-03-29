@@ -74,7 +74,7 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(false), null, null);
+        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), null, null);
         System.out.print("DictHebMorph initialized;");
 
         final HashSet<String> results = performSearch(a);
@@ -90,8 +90,7 @@ public class RealDataTest extends TestBase {
 
     @Test
     public void testMultiThreaded() throws IOException {
-        //final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), LingInfo.buildPrefixTree(false), null, null);
-        final Analyzer a = new HebrewIndexingAnalyzer(getDictionary(false));
+        final Analyzer a = new HebrewIndexingAnalyzer(getDictionary());
         System.out.println("DictHebMorph initialized");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(16);

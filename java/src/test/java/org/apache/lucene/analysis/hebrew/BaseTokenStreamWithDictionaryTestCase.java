@@ -17,28 +17,19 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.junit.AfterClass;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStreamTestCase {
     private static DictHebMorph dict;
 
-    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
+    protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
-            if (allowHeHasheela) {
-                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
-            } else {
-                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-            }
+            dict = DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
         }
         return dict;
     }

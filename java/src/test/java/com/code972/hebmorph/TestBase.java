@@ -18,8 +18,6 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,19 +25,14 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 
 public abstract class TestBase {
+    public static String DICT_PATH = "./../hspell-data-files/";
     private static DictHebMorph dict;
 
-    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
+    protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
-            if (allowHeHasheela) {
-                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
-            } else {
-                dict =  loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-            }
+            dict = DictionaryLoader.loadDictFromPath(DICT_PATH);
         }
         return dict;
     }

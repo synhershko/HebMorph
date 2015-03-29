@@ -17,29 +17,21 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.MorphData;
+import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.junit.AfterClass;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class TestBase {
     private static DictHebMorph dict;
 
-    protected synchronized DictHebMorph getDictionary(boolean allowHeHasheela) throws IOException {
+    protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
-            if (allowHeHasheela) {
-                dict = loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
-            } else {
-                dict = loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-            }
+            dict = DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
         }
         return dict;
     }
@@ -63,18 +55,18 @@ public abstract class TestBase {
     }
 
     public static HebrewIndexingAnalyzer getHebrewIndexingAnalyzer() throws IOException {
-        return new HebrewIndexingAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
+        return new HebrewIndexingAnalyzer(DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
     }
 
     public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
-        return new HebrewQueryAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
+        return new HebrewQueryAnalyzer(DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
     }
 
     public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
-        return new HebrewQueryLightAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
+        return new HebrewQueryLightAnalyzer(DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
     }
 
     public static HebrewExactAnalyzer getHebrewExactAnalyzer() throws IOException {
-        return new HebrewExactAnalyzer(new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH));
+        return new HebrewExactAnalyzer(DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
     }
 }

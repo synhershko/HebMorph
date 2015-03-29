@@ -18,24 +18,28 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import com.code972.hebmorph.hspell.HSpellLoader;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-public class TestHebrewTokenizer extends BaseTokenStreamTestCase {
+public class TestHebrewTokenizer extends BaseTokenStreamWithDictionaryTestCase {
 
+    final private DictHebMorph dict;
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final HebrewTokenizer src = new HebrewTokenizer(reader, HSpellLoader.readDefaultPrefixes());
+            final HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref());
             return new Analyzer.TokenStreamComponents(src);
         }
     };
+
+    public TestHebrewTokenizer() throws IOException {
+        dict = getDictionary();
+    }
 
     /**
      * blast some random strings through the analyzer

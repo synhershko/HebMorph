@@ -52,7 +52,7 @@ public class RealWorldTests extends TestBase {
         List<Token> results = new ArrayList<Token>();
 
         final String contents = readFileToString(filename);
-        final StreamLemmatizer sl = new StreamLemmatizer(new StringReader(contents), getDictionary(false), specialTokenizationCases);
+        final StreamLemmatizer sl = new StreamLemmatizer(new StringReader(contents), getDictionary(), specialTokenizationCases);
         while (sl.getLemmatizeNextToken(token, results) != 0) {
             System.out.println(token.ref);
         }

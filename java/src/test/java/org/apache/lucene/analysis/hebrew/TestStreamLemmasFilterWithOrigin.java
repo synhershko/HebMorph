@@ -29,7 +29,7 @@ public class TestStreamLemmasFilterWithOrigin extends BaseTokenStreamWithDiction
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(false));
+                src = new StreamLemmasFilter(reader, getDictionary());
                 src.setKeepOriginalWord(true);
             } catch (IOException e) {
                 e.printStackTrace();

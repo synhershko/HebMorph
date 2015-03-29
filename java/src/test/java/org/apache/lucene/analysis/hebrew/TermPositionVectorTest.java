@@ -53,7 +53,7 @@ public class TermPositionVectorTest extends TestBase {
     @Before
     public void setUp() throws Exception {
         fieldType = initFieldType();
-        analyzer = new HebrewIndexingAnalyzer(getDictionary(true));
+        analyzer = new HebrewIndexingAnalyzer(getDictionary());
     }
 
     @After
