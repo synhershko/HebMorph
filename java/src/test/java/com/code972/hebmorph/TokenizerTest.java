@@ -17,7 +17,6 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
@@ -30,9 +29,13 @@ import java.io.StringReader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TokenizerTest {
+public class TokenizerTest extends TestBase {
 
-    private final Tokenizer tokenizer = new Tokenizer(null, HSpellLoader.readDefaultPrefixes());
+    private final Tokenizer tokenizer;
+
+    public TokenizerTest() throws IOException {
+        tokenizer = new Tokenizer(null, getDictionary().getPref());
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -203,7 +206,7 @@ public class TokenizerTest {
         int curPos = 0;
 
         Tokenizer t = new Tokenizer(
-                new HTMLStripCharFilter(new StringReader("test <a href=\"foo\">test</a> test test")), HSpellLoader.readDefaultPrefixes()
+                new HTMLStripCharFilter(new StringReader("test <a href=\"foo\">test</a> test test")), getDictionary().getPref()
         );
 
         Reference<String> ref = new Reference<String>("");
@@ -222,7 +225,7 @@ public class TokenizerTest {
         String input = "test1 <a href=\"foo\">testlink</a> test2 test3";
 
         BaseCharFilter filter = new HTMLStripCharFilter(new StringReader(input));
-        Tokenizer t = new Tokenizer(filter, HSpellLoader.readDefaultPrefixes());
+        Tokenizer t = new Tokenizer(filter, getDictionary().getPref());
 
         Reference<String> token = new Reference<String>("");
 
@@ -306,7 +309,7 @@ public class TokenizerTest {
                 "נשוילבלשניתצביהולדןבתושלשמעוןפרסוהואמשמשכרופאוהאישישלפרס.";
 
 
-        Tokenizer tokenizer = new Tokenizer(null, HSpellLoader.readDefaultPrefixes());
+        Tokenizer tokenizer = new Tokenizer(null, getDictionary().getPref());
         Reference<String> test = new Reference<String>("");
         tokenizer.reset(new StringReader(text));
 

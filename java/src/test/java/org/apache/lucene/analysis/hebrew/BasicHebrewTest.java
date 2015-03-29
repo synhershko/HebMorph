@@ -185,7 +185,7 @@ public class BasicHebrewTest extends TestBase {
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(false), null, new BasicLemmaFilter());
+                src = new StreamLemmasFilter(reader, getDictionary(), null, new BasicLemmaFilter());
                 src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {

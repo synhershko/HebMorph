@@ -17,7 +17,6 @@
  **************************************************************************/
 package org.apache.lucene.queryparsers;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.hebrew.SimpleAnalyzer;
 import org.apache.lucene.analysis.hebrew.TestBase;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -32,7 +31,7 @@ public class HebrewQueryParserTest extends TestBase {
     @Test
     public void ParsesAcronymsCorrectly() throws ParseException, IOException {
 
-        QueryParser qp = new HebrewQueryParser("f", new SimpleAnalyzer(HSpellLoader.readDefaultPrefixes()));
+        QueryParser qp = new HebrewQueryParser("f", new SimpleAnalyzer(getDictionary().getPref()));
         qp.parse("צה\"ל");
         qp.parse("\"צהל\"");
         qp.parse("כל הכבוד לצה\"ל");

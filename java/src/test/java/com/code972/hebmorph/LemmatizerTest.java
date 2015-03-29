@@ -57,7 +57,7 @@ public class LemmatizerTest extends TestBase {
         //StringReader reader = new StringReader("להישרדות בהישרדות ההישרדות מהישרדות ניסיון הניסיון הביטוח  בביטוח לביטוח שביטוח מביטוחים");
         int expectedNumberOfNonHebrewWords = 0;
         StringReader reader = new StringReader(text);
-        m_lemmatizer = new StreamLemmatizer(reader, getDictionary(false));
+        m_lemmatizer = new StreamLemmatizer(reader, getDictionary());
 
         String word = "";
         List<Token> tokens = new ArrayList<Token>();
