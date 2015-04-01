@@ -20,7 +20,7 @@ More details at http://code972.com/HebMorph
 			<td>2.0.x</td>
 			<td>4.10.x</td>
 			<td>1.4.x, 1.5.x</td>
-			<td>Upcoming</td>
+			<td>24/3/2015</td>
 		</tr>
 		<tr>
 			<td>1.5.0</td>
