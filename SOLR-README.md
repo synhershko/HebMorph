@@ -24,9 +24,9 @@ In this guide, I'll be using 'example' as my <b> instanceDir </b>, and 'collecti
 
 Add the following line to solrconfig.xml which can be found at solr/<i>collection1</i>/conf directory, within your solr-instanceDir. For example [solr home]/<i>example</i>/solr/<i>collection1</i>/conf/solrconfig.xml.
 ```
-    <lib path="[hebmorph_path]" />
+    <lib path="PATH/TO/hebmorph-lucene.jar" />
 ```
-Replace [hebmorph_path] with the location of your hebmorph-lucene.jar
+Replace PATH/TO/hebmorph-lucene.jar with the location of your hebmorph-lucene.jar
 
 Now, you need to place your dictionary files in one of the predefined locations. Currently, you should place the dictionary files in the home of you solr <b> instanceDir </b> folder. That is, [solr home]/<i>example</i>/ folder.
 
@@ -74,6 +74,11 @@ That's it. Restart Solr and your chosen analyzer(s) should automatically apply w
 
 In order to see if the analyzer works, browse to the Analysis section in solr-admin (http://localhost:8983/solr/#/<i>collection1</i>/analysis). Write any phrase ("בדיקת עברית"), select any fieldname which represents a text ("content","title", etc.) and analyze. Then, choose the fieldtype "text_en" and analyze. You should see the clear differences.
 
+## Commercial
+
+Hebmorph is released open-sourced, alongside with hspell dictionary files. The Commercial option will grant you further support in making Hebrew search even better, and it comes with a proprietary dictionary. For more information, check out http://code972.com/hebmorph.
+
+## LICENSE
 It is released to the public licensed under the GNU Affero General Public License v3. See the LICENSE file included in this distribution. Note that not only the programs in the distribution, but also the
 dictionary files and the generated word lists, are licensed under the AGPL.
 There is no warranty of any kind for the contents of this distribution.
