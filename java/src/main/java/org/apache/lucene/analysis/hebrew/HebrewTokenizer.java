@@ -41,7 +41,8 @@ public final class HebrewTokenizer extends Tokenizer {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     //	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+//    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+    private final HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     public HebrewTokenizer(final Reader _input, HashMap<String, Integer> prefixes) {
@@ -132,16 +133,16 @@ public final class HebrewTokenizer extends Tokenizer {
 
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Hebrew) > 0) {
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0) {
-                typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Acronym));
+                hebTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.Acronym);
             } else if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Construct) > 0) {
-                typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Construct));
+                hebTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.Construct);
             } else {
-                typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Hebrew));
+                hebTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.Hebrew);
             }
         } else if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Numeric) > 0) {
-            typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.Numeric));
+            hebTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.Numeric);
         } else {
-            typeAtt.setType(tokenTypeSignature(TOKEN_TYPES.NonHebrew));
+            hebTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.NonHebrew);
         }
 
         return true;

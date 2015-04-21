@@ -39,43 +39,8 @@ public class Tokenizer {
     public static final char[] Geresh = {'\'', '\u05F3', '\u2018', '\u2019', '\u201B', '\uFF07'};
     public static final char[] Gershayim = {'\"', '\u05F4', '\u201C', '\u201D', '\u201F', '\u275E', '\uFF02'};
     public static final char[] Makaf = {'-', '\u2012', '\u2013', '\u2014', '\u2015', '\u05BE'};
-    public static final char[] CharsFollowingPrefixes = concatenateCharArrays(Geresh, Gershayim, Makaf);
+    public static final char[] CharsFollowingPrefixes = HebrewUtils.concatenateCharArrays(Geresh, Gershayim, Makaf);
     public static final char[] LettersAcceptingGeresh = {'ז', 'ג', 'ץ', 'צ', 'ח'};
-
-    public static boolean isOfChars(char c, char[] options) {
-        for (char o : options) {
-            if (c == o) return true;
-        }
-        return false;
-    }
-
-    public static char[] concatenateCharArrays(char[]... arrays) {
-        int count = 0;
-        for (char[] a : arrays) {
-            count += a.length;
-        }
-
-        char[] ret = new char[count];
-        int offs = 0;
-        for (char[] a : arrays) {
-            System.arraycopy(a, 0, ret, offs, a.length);
-            offs += a.length;
-        }
-
-        return ret;
-    }
-
-    public static boolean isHebrewLetter(char c) {
-        return ((c >= 1488) && (c <= 1514));
-    }
-
-    public static boolean isFinalHebrewLetter(char c) {
-        return (c == 1507 || c == 1498 || c == 1501 || c == 1509 || c == 1503);
-    }
-
-    public static boolean isNiqqudChar(char c) {
-        return ((c >= 1456) && (c <= 1465)) || (c == '\u05C1' || c == '\u05C2' || c == '\u05BB' || c == '\u05BC');
-    }
 
     private Reader input;
     private int dataLen = 0, inputOffset = 0;
@@ -171,7 +136,7 @@ public class Tokenizer {
 
     private boolean isRecognizedException(char[] token, int tokenLen, byte length, boolean exact) {
         int i = 0;
-        while (i < tokenLen && isHebrewLetter(token[i])) {
+        while (i < tokenLen && HebrewUtils.isHebrewLetter(token[i])) {
             if (!isLegalPrefix(token, i + 1, hebrewPrefixes)) {
                 i = 0;
                 break;
@@ -220,8 +185,8 @@ public class Tokenizer {
             boolean appendCurrentChar = false;
 
             if (currentTokenLength == 0) { // first char, figure out what it is
-                if (isHebrewLetter(c)) {
-                    if (!isFinalHebrewLetter(c)) {
+                if (HebrewUtils.isHebrewLetter(c)) {
+                    if (!HebrewUtils.isFinalHebrewLetter(c)) {
                         tokenType |= TokenType.Hebrew;
                         appendCurrentChar = true;
                     }
@@ -257,29 +222,29 @@ public class Tokenizer {
                         }
                     }
                     appendCurrentChar = true;
-                } else if (isHebrewLetter(c) || isNiqqudChar(c)) {
+                } else if (HebrewUtils.isHebrewLetter(c) || HebrewUtils.isNiqqudChar(c)) {
                     appendCurrentChar = true;
                 } else if (Character.isLetterOrDigit(c)) {
                     if (tokenType == TokenType.Hebrew)
                         tokenType |= TokenType.Mixed;
                     appendCurrentChar = true;
-                } else if (isOfChars(c, Gershayim)) {
+                } else if (HebrewUtils.isOfChars(c, Gershayim)) {
                     c = '"';
                     // Tokenize if previous char wasn't part of a word
-                    if (!isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !isNiqqudChar(wordBuffer[currentTokenLength - 1]))
+                    if (!HebrewUtils.isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !HebrewUtils.isNiqqudChar(wordBuffer[currentTokenLength - 1]))
                         break;
 
                     // TODO: Is it possible to support cases like שה"שםעצם in the tokenizer?
                     tokenType |= TokenType.Acronym;
                     appendCurrentChar = true;
-                } else if (isOfChars(c, Geresh)) {
+                } else if (HebrewUtils.isOfChars(c, Geresh)) {
                     c = '\'';
                     // Tokenize if previous char wasn't part of a word or another Geresh (which we handle below)
                     // and only do this for Hebrew tokens
                     if ((tokenType & TokenType.Hebrew) > 0) {
                         // TODO: Is it possible to handle cases which are similar to Merchaot - ה'חלל הפנוי' here?
-                        if (!isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !isNiqqudChar(wordBuffer[currentTokenLength - 1])
-                                && !isOfChars(wordBuffer[currentTokenLength - 1], Geresh))
+                        if (!HebrewUtils.isHebrewLetter(wordBuffer[currentTokenLength - 1]) && !HebrewUtils.isNiqqudChar(wordBuffer[currentTokenLength - 1])
+                                && !HebrewUtils.isOfChars(wordBuffer[currentTokenLength - 1], Geresh))
                             break;
                     }
 
@@ -289,7 +254,7 @@ public class Tokenizer {
                     appendCurrentChar = true;
                 } else {
                     // Flag makaf connected words as constructs
-                    if (isOfChars(c, Makaf)) {
+                    if (HebrewUtils.isOfChars(c, Makaf)) {
                         tokenType |= TokenType.Construct;
                         c = '-';
                         // TODO: Detect words where Makaf is used for shortening a word (א-ל, י-ם and similar), instead of tokenizing on it
@@ -312,7 +277,7 @@ public class Tokenizer {
                 // Note that tokens larger than 128 chars will get clipped.
 
                 // Fix a common replacement of double-Geresh with Gershayim; call it Gershayim normalization if you wish
-                if (isOfChars(c, Geresh)) {
+                if (HebrewUtils.isOfChars(c, Geresh)) {
                     if (wordBuffer[currentTokenLength - 1] == c) {
                         wordBuffer[currentTokenLength - 1] = '"';
                         tokenType |= TokenType.Acronym;
@@ -336,14 +301,14 @@ public class Tokenizer {
             tokenLengthInSource = Math.max(inputOffset + ioBufferIndex - 1 - tokenOffset, 0);
         }
 
-        if (isOfChars(wordBuffer[currentTokenLength - 1], Gershayim)) {
+        if (HebrewUtils.isOfChars(wordBuffer[currentTokenLength - 1], Gershayim)) {
             wordBuffer[--currentTokenLength] = '\0';
             tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include Gershayim in the offset calculation
         }
         // Geresh trimming; only try this if it isn't one-char in length (without the Geresh)
         if ((currentTokenLength > 2) && wordBuffer[currentTokenLength - 1] == '\'') {
             // All letters which this Geresh may mean something for
-            if (((tokenType & TokenType.Hebrew) == 0) || !isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh)) {
+            if (((tokenType & TokenType.Hebrew) == 0) || !HebrewUtils.isOfChars(wordBuffer[currentTokenLength - 2], LettersAcceptingGeresh)) {
                 wordBuffer[--currentTokenLength] = '\0';
                 tokenLengthInSource = Math.max(tokenLengthInSource - 1, 0); // Don't include this Geresh in the offset calculation
             }
@@ -359,8 +324,8 @@ public class Tokenizer {
         int start = 0, pos = 0;
         boolean started = false;
         while (pos + start < currentTokenLength) {
-            if (!started && !isHebrewLetter(wordBuffer[start]) &&
-                    !isNiqqudChar(wordBuffer[start]) && !Character.isLetterOrDigit(wordBuffer[start])) {
+            if (!started && !HebrewUtils.isHebrewLetter(wordBuffer[start]) &&
+                    !HebrewUtils.isNiqqudChar(wordBuffer[start]) && !Character.isLetterOrDigit(wordBuffer[start])) {
                 start++;
                 continue;
             }
@@ -368,17 +333,17 @@ public class Tokenizer {
             started = true;
 
             Character c = wordBuffer[pos + start];
-            if (isHebrewLetter(c) || isNiqqudChar(c)) {
+            if (HebrewUtils.isHebrewLetter(c) || HebrewUtils.isNiqqudChar(c)) {
                 tokenType |= TokenType.Hebrew;
             } else if (Character.isLetterOrDigit(c)) {
                 if (tokenType == TokenType.Hebrew)
                     tokenType |= TokenType.Mixed;
                 else
                     tokenType |= TokenType.NonHebrew;
-            } else if (isOfChars(c, Gershayim)) {
+            } else if (HebrewUtils.isOfChars(c, Gershayim)) {
                 c = '"';
                 tokenType |= TokenType.Acronym;
-            } else if (isOfChars(c, Geresh)) {
+            } else if (HebrewUtils.isOfChars(c, Geresh)) {
                 c = '\'';
             } else {
                 break;

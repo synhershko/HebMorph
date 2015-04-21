@@ -15,7 +15,7 @@
  *   License along with this program; if not, see                          *
  *   <http://www.gnu.org/licenses/>.                                       *
  **************************************************************************/
-package org.apache.lucene.analysis.hebrew;
+package org.apache.lucene.analysis.hebrew.TokenFilters;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -27,10 +27,9 @@ import java.io.IOException;
 public final class NiqqudFilter extends TokenFilter {
     public NiqqudFilter(TokenStream input) {
         super(input);
-        termAtt = addAttribute(CharTermAttribute.class);
     }
 
-    private CharTermAttribute termAtt;
+    private CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
 
     @Override
     public final boolean incrementToken() throws IOException {

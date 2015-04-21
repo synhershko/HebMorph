@@ -70,7 +70,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
 
     public static boolean isHebrewWord(final CharSequence word) {
         for (int i = 0; i < word.length(); i++) {
-            if (Tokenizer.isHebrewLetter(word.charAt(i)))
+            if (HebrewUtils.isHebrewLetter(word.charAt(i)))
                 return true;
         }
         return false;
