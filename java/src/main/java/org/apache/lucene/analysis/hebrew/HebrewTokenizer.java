@@ -43,7 +43,6 @@ public final class HebrewTokenizer extends Tokenizer {
     //	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
 //    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
-    private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     public HebrewTokenizer(final Reader _input, HashMap<String, Integer> prefixes) {
         this(_input, prefixes, null);
@@ -123,13 +122,13 @@ public final class HebrewTokenizer extends Tokenizer {
 
             break;
         }
-
         // Record the term string
 
         termAtt.copyBuffer(nextTokenVal.toCharArray(), 0, nextTokenVal.length());
         offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
+
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0)
-            keywordAtt.setKeyword(true);
+            hebTypeAtt.setExact(true);
 
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Hebrew) > 0) {
             if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Acronym) > 0) {

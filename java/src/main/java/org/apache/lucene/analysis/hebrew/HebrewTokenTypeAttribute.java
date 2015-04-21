@@ -19,4 +19,8 @@ public interface HebrewTokenTypeAttribute extends Attribute{
 
     public void setType(HebrewType type);
     public HebrewType getType();
+    public boolean isHebrew();
+    public boolean isExact();
+    public boolean isNumeric();
+    public void setExact(boolean isExact);
 }
