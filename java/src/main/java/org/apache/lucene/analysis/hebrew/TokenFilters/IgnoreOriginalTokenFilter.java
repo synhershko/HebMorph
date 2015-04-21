@@ -20,6 +20,6 @@ public class IgnoreOriginalTokenFilter extends FilteringTokenFilter{
     @Override
     protected boolean accept() throws IOException {
         // basically, ignore original word only if it's a hebrew word;
-        return !hebTypeAtt.isHebrew();
+        return !hebTypeAtt.isHebrew() || hebTypeAtt.isExact();
     }
 }
