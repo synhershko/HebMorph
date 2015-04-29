@@ -22,7 +22,7 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixToTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.HebrewLemmatizerTokenFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.IgnoreOriginalTokenFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
@@ -52,7 +52,7 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
         tok = new LowerCaseFilter(tok);
         tok = new HebrewLemmatizerTokenFilter(tok, dict, false, false);
         tok = new IgnoreOriginalTokenFilter(tok);
-        tok = new AddSuffixToTokenFilter(tok, '$');
+        tok = new AddSuffixTokenFilter(tok, '$');
         return new TokenStreamComponents(src, tok);
 
     }

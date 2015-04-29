@@ -26,13 +26,13 @@ import org.apache.lucene.analysis.tokenattributes.*;
 
 import java.io.IOException;
 
-public final class AddSuffixToTokenFilter extends TokenFilter {
+public final class AddSuffixTokenFilter extends TokenFilter {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
 
     private final Character suffix;
 
-    public AddSuffixToTokenFilter(final TokenStream input, final Character suffixToAdd) {
+    public AddSuffixTokenFilter(final TokenStream input, final Character suffixToAdd) {
         super(input);
         this.suffix = suffixToAdd;
     }

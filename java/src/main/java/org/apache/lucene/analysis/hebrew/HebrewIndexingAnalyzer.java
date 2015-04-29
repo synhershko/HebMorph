@@ -49,7 +49,7 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         tok = new ASCIIFoldingFilter(tok);
         tok = new LowerCaseFilter(tok);
         tok = new HebrewLemmatizerTokenFilter(tok, dict);
-        tok = new AddSuffixToTokenFilter(tok, '$');
+        tok = new AddSuffixTokenFilter(tok, '$');
         return new TokenStreamComponents(src, tok);
     }
 
