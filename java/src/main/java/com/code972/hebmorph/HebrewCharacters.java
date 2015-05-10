@@ -17,6 +17,8 @@
  **************************************************************************/
 package com.code972.hebmorph;
 
+import java.util.HashMap;
+
 /**
  * Hebrew language constants
  *
@@ -55,4 +57,24 @@ public final class HebrewCharacters {
     // Punctuation
     public static char GERESH = '\u05F3';
     public static char GERSHAYIM = '\u05F4';
+
+    private static HashMap<Character, Character> alternateCharacters = new HashMap<>();
+    static{
+        alternateCharacters.put('\uFB20', AYIN);
+        alternateCharacters.put('\uFB21', ALEPH);
+        alternateCharacters.put('\uFB22', DALET);
+        alternateCharacters.put('\uFB23', HE);
+        alternateCharacters.put('\uFB24', KAF);
+        alternateCharacters.put('\uFB25', LAMED);
+        alternateCharacters.put('\uFB26', MEM_FINAL);
+        alternateCharacters.put('\uFB27', RESH);
+        alternateCharacters.put('\uFB28', TAV);
+    }
+
+    public static char collapseAlternate(char ch){
+        if (alternateCharacters.containsKey(ch)){
+            return alternateCharacters.get(ch);
+        }
+        return ch;
+    }
 }
