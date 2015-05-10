@@ -182,6 +182,8 @@ public class Tokenizer {
             }
 
             char c = ioBuffer[ioBufferIndex++];
+            c = HebrewCharacters.collapseAlternate(c);
+
             boolean appendCurrentChar = false;
 
             if (currentTokenLength == 0) { // first char, figure out what it is

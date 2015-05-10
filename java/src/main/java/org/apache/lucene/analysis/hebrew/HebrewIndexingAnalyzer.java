@@ -42,8 +42,7 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         // on indexing we should always keep both the stem and marked original word
         // will ignore $ && will always output all lemmas + origin word$
         // basically, if analyzerType == AnalyzerType.INDEXING)
-        // TODO: use special tokenization cases, maybe common words too
-        HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref());
+        HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref(), SPECIAL_TOKENIZATION_CASES);
         src.setSuffixForExactMatch(originalTermSuffix);
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);

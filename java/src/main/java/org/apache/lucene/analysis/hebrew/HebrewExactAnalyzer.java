@@ -41,8 +41,7 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
     @Override
     protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
         // on exact - we don't care about suffixes at all, we always output original word with suffix only
-        // TODO: use special tokenization cases
-        final HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref());
+        final HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref(), SPECIAL_TOKENIZATION_CASES);
         src.setSuffixForExactMatch(originalTermSuffix);
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);
