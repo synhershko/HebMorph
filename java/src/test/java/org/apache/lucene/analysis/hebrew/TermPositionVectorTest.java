@@ -22,7 +22,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.*;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparsers.HebrewQueryParser;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -31,7 +30,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,7 +64,7 @@ public class TermPositionVectorTest extends TestBase {
     public void storesPositionCorrectly() throws Exception {
         indexDirectory = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer); //use of Version, need to look at this.
+        IndexWriterConfig config = new IndexWriterConfig(analyzer); //use of Version, need to look at this.
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(indexDirectory, config);
 
@@ -88,7 +86,6 @@ public class TermPositionVectorTest extends TestBase {
 
     private FieldType initFieldType() {
         FieldType type = new FieldType();
-        type.setIndexed(true);
         type.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
         type.setTokenized(true);
         type.setStored(false);
@@ -111,10 +108,11 @@ public class TermPositionVectorTest extends TestBase {
         Terms terms = searcher.getIndexReader().getTermVectors(num).terms("Text");
 
         Set<Term> trms_list = new HashSet<>();
-        q.extractTerms(trms_list);
+        searcher.createWeight(q,true).extractTerms(trms_list);
+//        q.extractTerms(trms_list);
 
         for (Term t : trms_list) {
-            TermsEnum termsEnum = terms.iterator(TermsEnum.EMPTY);
+            TermsEnum termsEnum = terms.iterator();
             boolean isFound = termsEnum.seekExact(t.bytes());
             Assert.assertTrue(isFound);
 

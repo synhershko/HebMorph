@@ -14,11 +14,10 @@ import java.io.Reader;
 public class TestIgnoreOriginalTokenFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName,
-                                                         Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer t = null;
             try {
-                t = new HebrewTokenizer(reader, getDictionary().getPref());
+                t = new HebrewTokenizer(getDictionary().getPref());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -35,12 +34,11 @@ public class TestIgnoreOriginalTokenFilter extends BaseTokenStreamWithDictionary
 
     Analyzer a2 = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName,
-                                                         Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer t = null;
             TokenStream tok = null;
             try {
-                t = new HebrewTokenizer(reader, getDictionary().getPref());
+                t = new HebrewTokenizer(getDictionary().getPref());
                 tok = new IgnoreOriginalTokenFilter(new HebrewLemmatizerTokenFilter(t,getDictionary()));
             } catch (IOException e) {
                 e.printStackTrace();

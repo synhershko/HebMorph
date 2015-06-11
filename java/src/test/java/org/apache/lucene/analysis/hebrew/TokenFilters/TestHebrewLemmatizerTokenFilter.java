@@ -29,11 +29,11 @@ import java.io.Reader;
 public class TestHebrewLemmatizerTokenFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer src = null;
             TokenStream tok = null;
             try {
-                src = new HebrewTokenizer(reader, getDictionary().getPref());
+                src = new HebrewTokenizer(getDictionary().getPref());
                 tok = new HebrewLemmatizerTokenFilter(src, getDictionary());
             } catch (IOException e) {
                 e.printStackTrace();

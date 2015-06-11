@@ -26,17 +26,23 @@ import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
 import java.io.IOException;
 import java.io.Reader;
 
-public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
+public class TestAddSuffixFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName,
-                                                         Reader reader) {
-            Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
+        protected TokenStreamComponents createComponents(String fieldName) {
+            Tokenizer t = null;
+            try {
+                t = new HebrewTokenizer(getDictionary().getPref());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return new TokenStreamComponents(t, new AddSuffixTokenFilter(t, '$'));
         }
     };
 
     public void testBasicTerms() throws IOException {
-        assertAnalyzesTo(a, "book", new String[]{"book$", "book"});
+        assertAnalyzesTo(a, "book", new String[]{"book$"});
+        assertAnalyzesTo(a, "שלום", new String[]{"שלום$"});
+        assertAnalyzesTo(a, "123", new String[]{"123"});
     }
 }

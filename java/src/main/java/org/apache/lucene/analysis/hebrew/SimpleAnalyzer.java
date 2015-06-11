@@ -48,8 +48,8 @@ public final class SimpleAnalyzer extends Analyzer {
     }
 
     @Override
-    protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree);
+    protected TokenStreamComponents createComponents(final String fieldName) {
+        final HebrewTokenizer src = new HebrewTokenizer(prefixesTree);
         TokenStream tok = new NiqqudFilter(src);
         tok = new LowerCaseFilter(tok);
         //consider adding a suffix filter?

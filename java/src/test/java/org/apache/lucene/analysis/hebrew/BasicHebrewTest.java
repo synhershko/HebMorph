@@ -156,7 +156,7 @@ public class BasicHebrewTest extends TestBase {
     protected int findInText(String whatToIndex, String whatToSearch) throws Exception {
         final Directory d = new RAMDirectory();
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer); //use of Version, need to look at this.
+        IndexWriterConfig config = new IndexWriterConfig(analyzer); //use of Version, need to look at this.
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter writer = new IndexWriter(d, config);
         Document doc = new Document();
@@ -182,10 +182,10 @@ public class BasicHebrewTest extends TestBase {
         }
 
         @Override
-        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             StreamLemmasFilter src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary(), null, new BasicLemmaFilter());
+                src = new StreamLemmasFilter(getDictionary(), null, new BasicLemmaFilter());
                 src.setKeepOriginalWord(true);
                 src.setSuffixForExactMatch('$');
             } catch (IOException e) {
