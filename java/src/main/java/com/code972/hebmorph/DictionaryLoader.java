@@ -34,6 +34,9 @@ public class DictionaryLoader {
     }
 
     public static DictHebMorph loadDictFromPath(String path) throws IOException {
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
         File file = new File(path);
         if (file.isDirectory()) {
             HSpellLoader loader = new HSpellLoader(new File(path), true);

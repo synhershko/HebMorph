@@ -101,12 +101,12 @@ public class StreamLemmatizer extends Lemmatizer {
                 // proper separation
                 if ((tokenType & Tokenizer.TokenType.Mixed) > 0 || (tokenType & Tokenizer.TokenType.Custom) > 0) {
                     int curChar = 0, startOfNonHebrew;
-                    while (curChar < nextToken.ref.length() && Tokenizer.isHebrewLetter(nextToken.ref.charAt(curChar))) {
+                    while (curChar < nextToken.ref.length() && HebrewUtils.isHebrewLetter(nextToken.ref.charAt(curChar))) {
                         curChar++;
                     }
                     if (curChar > 0 && curChar < nextToken.ref.length() - 1 && isLegalPrefix(nextToken.ref.substring(0, curChar))) {
                         startOfNonHebrew = curChar;
-                        while (curChar < nextToken.ref.length() && !Tokenizer.isHebrewLetter(nextToken.ref.charAt(curChar))) {
+                        while (curChar < nextToken.ref.length() && !HebrewUtils.isHebrewLetter(nextToken.ref.charAt(curChar))) {
                             curChar++;
                         }
                         if (curChar == nextToken.ref.length()) {

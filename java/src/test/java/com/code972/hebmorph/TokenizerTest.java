@@ -318,4 +318,18 @@ public class TokenizerTest extends TestBase {
 
         assertTrue("Arrived here without throwing", true);
     }
+
+    @Test
+    public void testCollapseAlternateLetters() throws IOException {
+        assertTokenizesTo("\uFB20", "ע");
+        assertTokenizesTo("\uFB21", "א");
+        assertTokenizesTo("\uFB22", "ד");
+        assertTokenizesTo("\uFB23", "ה");
+        assertTokenizesTo("\uFB24", "כ");
+        assertTokenizesTo("\uFB25", "ל");
+        assertTokenizesTo("ש\uFB26", "שם");
+        assertTokenizesTo("\uFB27", "ר");
+        assertTokenizesTo("\uFB28", "ת");
+        assertTokenizesTo("\uFB20\uFB22 \uFB28\uFB27\uFB22 \uFB23\uFB25\uFB26 שלו\uFB26", new String[]{"עד", "תרד", "הלם", "שלום"});
+    }
 }

@@ -15,10 +15,11 @@
  *   License along with this program; if not, see                          *
  *   <http://www.gnu.org/licenses/>.                                       *
  **************************************************************************/
-package org.apache.lucene.analysis.hebrew;
+package org.apache.lucene.analysis.hebrew.TokenFilters;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.hebrew.HebrewTokenTypeAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import java.io.IOException;
@@ -27,10 +28,10 @@ import java.io.IOException;
 public final class NiqqudFilter extends TokenFilter {
     public NiqqudFilter(TokenStream input) {
         super(input);
-        termAtt = addAttribute(CharTermAttribute.class);
     }
 
-    private CharTermAttribute termAtt;
+    private CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+    private HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
 
     @Override
     public final boolean incrementToken() throws IOException {
@@ -38,7 +39,9 @@ public final class NiqqudFilter extends TokenFilter {
             return false;
         }
 
-        // TODO: Limit this check to Hebrew Tokens only
+        if (!hebTypeAtt.isHebrew()){
+            return true;
+        }
 
         char[] buffer = termAtt.buffer();
         int length = termAtt.length(), j = 0;

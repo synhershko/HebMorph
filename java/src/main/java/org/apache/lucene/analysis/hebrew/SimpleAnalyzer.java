@@ -20,6 +20,7 @@ package org.apache.lucene.analysis.hebrew;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
 import org.apache.lucene.analysis.util.CharArraySet;
 
 import java.io.IOException;

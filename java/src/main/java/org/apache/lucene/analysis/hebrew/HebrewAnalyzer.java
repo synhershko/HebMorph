@@ -20,15 +20,12 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.*;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
-import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +36,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
     private static final Byte dummyData = (byte) 0;
 
     protected DictHebMorph dict;
-    protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
     protected DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
 
@@ -60,7 +56,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
     }
 
     protected HebrewAnalyzer(DictHebMorph dict) throws IOException {
-        lemmaFilter = new BasicLemmaFilter();
         this.dict = dict;
     }
 
@@ -70,7 +65,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
 
     public static boolean isHebrewWord(final CharSequence word) {
         for (int i = 0; i < word.length(); i++) {
-            if (Tokenizer.isHebrewLetter(word.charAt(i)))
+            if (HebrewUtils.isHebrewLetter(word.charAt(i)))
                 return true;
         }
         return false;
