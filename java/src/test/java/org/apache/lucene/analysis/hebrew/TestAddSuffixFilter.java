@@ -19,24 +19,32 @@ package org.apache.lucene.analysis.hebrew;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
 
 import java.io.IOException;
 import java.io.Reader;
 
-public class TestAddSuffixFilter extends BaseTokenStreamTestCase {
+public class TestAddSuffixFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
         protected TokenStreamComponents createComponents(String fieldName,
                                                          Reader reader) {
-            Tokenizer t = new MockTokenizer(reader, MockTokenizer.KEYWORD, false);
+            Tokenizer t = null;
+            try {
+                t = new HebrewTokenizer(reader, getDictionary().getPref());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return new TokenStreamComponents(t, new AddSuffixTokenFilter(t, '$'));
         }
     };
 
     public void testBasicTerms() throws IOException {
-        assertAnalyzesTo(a, "book", new String[]{"book$", "book"});
+        assertAnalyzesTo(a, "book", new String[]{"book$"});
+        assertAnalyzesTo(a, "שלום", new String[]{"שלום$"});
+        assertAnalyzesTo(a, "123", new String[]{"123"});
+        assertAnalyzesTo(a, "book שלום 123", new String[]{"book$", "שלום$", "123"});
+
     }
 }
