@@ -167,7 +167,7 @@ public class BasicHebrewTest extends TestBase {
         IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(d));
         QueryParser qp = new QueryParser("content", analyzer);
         Query query = qp.parse(whatToSearch);
-        ScoreDoc[] hits = searcher.search(query, null, 1000).scoreDocs;
+        ScoreDoc[] hits = searcher.search(query, 1000).scoreDocs;
 
         writer.close();
         d.close();

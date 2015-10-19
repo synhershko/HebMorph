@@ -81,15 +81,15 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser {
     public static Query parse(String query, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException {
         if (fields.length > flags.length)
             throw new IllegalArgumentException("fields.length != flags.length");
-        BooleanQuery bQuery = new BooleanQuery();
+        BooleanQuery.Builder bQueryBuilder = new BooleanQuery.Builder();
         for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(fields[i], analyzer);
             Query q = qp.parse(query);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
-                bQuery.add(q, flags[i]);
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).clauses().size() > 0)) {
+                bQueryBuilder.add(q,flags[i]);
             }
         }
-        return bQuery;
+        return bQueryBuilder.build();
     }
 
     /// <summary> Parses a query which searches on the fields specified.
@@ -122,15 +122,15 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser {
     public static Query parse(String[] queries, String[] fields, Analyzer analyzer) throws ParseException {
         if (queries.length != fields.length)
             throw new IllegalArgumentException("queries.length != fields.length");
-        BooleanQuery bQuery = new BooleanQuery();
+        BooleanQuery.Builder bQueryBuilder = new BooleanQuery.Builder();
         for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(fields[i], analyzer);
             Query q = qp.parse(queries[i]);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
-                bQuery.add(q, BooleanClause.Occur.SHOULD);
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).clauses().size() > 0)) {
+                bQueryBuilder.add(q, BooleanClause.Occur.SHOULD);
             }
         }
-        return bQuery;
+        return bQueryBuilder.build();
     }
 
     /// <summary> Parses a query, searching on the fields specified. Use this if you need
@@ -178,15 +178,15 @@ public class HebrewMultiFieldQueryParser extends MultiFieldQueryParser {
     public static Query parse(String[] queries, String[] fields, BooleanClause.Occur[] flags, Analyzer analyzer) throws ParseException {
         if (!(queries.length == fields.length && queries.length == flags.length))
             throw new IllegalArgumentException("queries, fields, and flags array have have different length");
-        BooleanQuery bQuery = new BooleanQuery();
+        BooleanQuery.Builder bQueryBuilder = new BooleanQuery.Builder();
         for (int i = 0; i < fields.length; i++) {
             QueryParser qp = new HebrewQueryParser(fields[i], analyzer);
             Query q = qp.parse(queries[i]);
-            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).getClauses().length > 0)) {
-                bQuery.add(q, flags[i]);
+            if (q != null && (!(q instanceof BooleanQuery) || ((BooleanQuery) q).clauses().size() > 0)) {
+                bQueryBuilder.add(q, flags[i]);
             }
         }
-        return bQuery;
+        return bQueryBuilder.build();
     }
 }
 

@@ -116,7 +116,7 @@ public class TermPositionVectorTest extends TestBase {
             boolean isFound = termsEnum.seekExact(t.bytes());
             Assert.assertTrue(isFound);
 
-            DocsAndPositionsEnum dpEnum = termsEnum.docsAndPositions(null, null);
+            PostingsEnum dpEnum = termsEnum.postings(null);
             assertTrue(dpEnum.nextDoc() != DocIdSetIterator.NO_MORE_DOCS);
             int pos = dpEnum.nextPosition();
             //assertEquals(expectedPosition, dpEnum.startOffset());
