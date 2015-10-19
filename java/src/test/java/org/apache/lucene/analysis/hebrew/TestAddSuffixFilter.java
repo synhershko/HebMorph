@@ -19,7 +19,6 @@ package org.apache.lucene.analysis.hebrew;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.MockTokenizer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
 
@@ -44,5 +43,6 @@ public class TestAddSuffixFilter extends BaseTokenStreamWithDictionaryTestCase {
         assertAnalyzesTo(a, "book", new String[]{"book$"});
         assertAnalyzesTo(a, "שלום", new String[]{"שלום$"});
         assertAnalyzesTo(a, "123", new String[]{"123"});
+        assertAnalyzesTo(a, "book שלום 123", new String[]{"book$", "שלום$", "123"});
     }
 }
