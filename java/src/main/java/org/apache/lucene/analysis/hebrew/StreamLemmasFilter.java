@@ -49,17 +49,17 @@ public class StreamLemmasFilter extends Tokenizer {
     private final Set<String> previousLemmas = new HashSet<String>();
     private boolean keepOriginalWord;
 
-    public StreamLemmasFilter(final Reader input, final DictHebMorph dict) {
-        this(input, dict, null, null, null);
+    public StreamLemmasFilter(final DictHebMorph dict) {
+        this(dict, null, null, null);
     }
 
-    public StreamLemmasFilter(final Reader input, final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
-        this(input, dict, null, commonWords, lemmaFilter);
+    public StreamLemmasFilter(final DictHebMorph dict, final CharArraySet commonWords, final LemmaFilterBase lemmaFilter) {
+        this(dict, null, commonWords, lemmaFilter);
     }
 
-    public StreamLemmasFilter(Reader _input, DictHebMorph dict,
+    public StreamLemmasFilter(DictHebMorph dict,
                               DictRadix<Byte> specialTokenizationCases, CharArraySet commonWords, LemmaFilterBase lemmaFilter) {
-        super(_input);
+        super();
         _streamLemmatizer = new StreamLemmatizer(input, dict, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;

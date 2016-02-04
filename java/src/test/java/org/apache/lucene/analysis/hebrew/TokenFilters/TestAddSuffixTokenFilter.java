@@ -13,11 +13,10 @@ import java.io.Reader;
 public class TestAddSuffixTokenFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName,
-                                                         Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer t = null;
             try {
-                t = new HebrewTokenizer(reader, getDictionary().getPref());
+                t = new HebrewTokenizer(getDictionary().getPref());
             } catch (IOException e) {
                 e.printStackTrace();
             }

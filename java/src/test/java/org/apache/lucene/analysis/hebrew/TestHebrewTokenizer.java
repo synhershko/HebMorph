@@ -31,8 +31,8 @@ public class TestHebrewTokenizer extends BaseTokenStreamWithDictionaryTestCase {
     final private DictHebMorph dict;
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            final HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref());
+        protected TokenStreamComponents createComponents(String fieldName) {
+            final HebrewTokenizer src = new HebrewTokenizer(dict.getPref());
             return new Analyzer.TokenStreamComponents(src);
         }
     };

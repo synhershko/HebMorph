@@ -45,12 +45,12 @@ public final class HebrewTokenizer extends Tokenizer {
     private final HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
-    public HebrewTokenizer(final Reader _input, HashMap<String, Integer> prefixes) {
-        this(_input, prefixes, null);
+    public HebrewTokenizer(HashMap<String, Integer> prefixes) {
+        this(prefixes, null);
     }
 
-    public HebrewTokenizer(final Reader _input, final HashMap<String, Integer> _prefixesTree, final DictRadix<Byte> specialCases) {
-        super(_input);
+    public HebrewTokenizer(final HashMap<String, Integer> _prefixesTree, final DictRadix<Byte> specialCases) {
+        super();
         hebMorphTokenizer = new com.code972.hebmorph.Tokenizer(input, _prefixesTree, specialCases);
         prefixesTree = _prefixesTree;
     }

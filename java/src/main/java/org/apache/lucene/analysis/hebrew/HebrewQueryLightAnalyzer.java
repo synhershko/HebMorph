@@ -41,10 +41,10 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
     }
 
     @Override
-    protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
+    protected TokenStreamComponents createComponents(final String fieldName) {
         // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
         // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
-        HebrewTokenizer src = new HebrewTokenizer(reader, dict.getPref(), SPECIAL_TOKENIZATION_CASES);
+        HebrewTokenizer src = new HebrewTokenizer(dict.getPref(), SPECIAL_TOKENIZATION_CASES);
         src.setSuffixForExactMatch(originalTermSuffix);
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);

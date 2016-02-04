@@ -28,11 +28,10 @@ import java.io.Reader;
 public class TestAddSuffixFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName,
-                                                         Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer t = null;
             try {
-                t = new HebrewTokenizer(reader, getDictionary().getPref());
+                t = new HebrewTokenizer(getDictionary().getPref());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -45,6 +44,5 @@ public class TestAddSuffixFilter extends BaseTokenStreamWithDictionaryTestCase {
         assertAnalyzesTo(a, "שלום", new String[]{"שלום$"});
         assertAnalyzesTo(a, "123", new String[]{"123"});
         assertAnalyzesTo(a, "book שלום 123", new String[]{"book$", "שלום$", "123"});
-
     }
 }

@@ -27,10 +27,10 @@ import java.io.Reader;
 public class TestStreamLemmasFilter extends BaseTokenStreamWithDictionaryTestCase {
     Analyzer a = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        protected TokenStreamComponents createComponents(String fieldName) {
             Tokenizer src = null;
             try {
-                src = new StreamLemmasFilter(reader, getDictionary());
+                src = new StreamLemmasFilter(getDictionary());
             } catch (IOException e) {
                 e.printStackTrace();
             }
