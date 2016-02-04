@@ -17,6 +17,24 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
+			<td>2.3.x</td>
+			<td>5.4.x</td>
+			<td>2.2.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
+			<td>2.2.x</td>
+			<td>5.3.x</td>
+			<td>2.0.x -> 2.1.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
+			<td>2.1.x</td>
+			<td>4.10.4</td>
+			<td>1.6 -> 1.7.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
 			<td>2.0.x</td>
 			<td>4.10.x</td>
 			<td>1.4.x, 1.5.x</td>
