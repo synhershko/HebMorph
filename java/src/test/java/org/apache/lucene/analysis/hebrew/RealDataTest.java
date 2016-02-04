@@ -62,7 +62,7 @@ public class RealDataTest extends TestBase {
 
             return new TokenStreamComponents(src) {
                 @Override
-                protected void setReader(final Reader reader) throws IOException {
+                protected void setReader(final Reader reader) {
                     super.setReader(reader);
                 }
             };
