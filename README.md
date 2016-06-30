@@ -2,7 +2,7 @@ HebMorph is an open-source effort for making Hebrew properly searchable by vario
 
 More details at http://code972.com/HebMorph
 
-![](https://travis-ci.org/synhershko/HebMorph.svg?branch=master)
+[![Build Status](https://drone.io/github.com/synhershko/HebMorph/status.png)](https://drone.io/github.com/synhershko/HebMorph/latest)  ![https://travis-ci.org/synhershko/HebMorph](https://travis-ci.org/synhershko/HebMorph.svg?branch=master)
 
 ## Lucene / Elasticsearch compatibility
 
@@ -17,11 +17,47 @@ More details at http://code972.com/HebMorph
 	</thead>
 	<tbody>
 		<tr>
+			<td>2.3.x</td>
+			<td>5.4.x</td>
+			<td>2.2.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
+			<td>2.2.x</td>
+			<td>5.3.x</td>
+			<td>2.0.x -> 2.1.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
+			<td>2.1.x</td>
+			<td>4.10.4</td>
+			<td>1.6 -> 1.7.x</td>
+			<td>4/2/2016</td>
+		</tr>
+		<tr>
+			<td>2.0.x</td>
+			<td>4.10.x</td>
+			<td>1.4.x, 1.5.x</td>
+			<td>24/3/2015</td>
+		</tr>
+		<tr>
+			<td>1.5.0</td>
+			<td>4.9.0</td>
+			<td>1.3.x</td>
+			<td>9/9/2014</td>
+		</tr>
+		<tr>
+			<td>1.4.x</td>
+			<td>4.8.x</td>
+			<td>1.x -> 1.2.x</td>
+			<td>August 2014</td>
+		</tr>
+		<tr>
 			<td>1.3.x</td>
 			<td>4.6.x</td>
 			<td>0.90.8 -> 0.90.13</td>
-			<td>09/02/2014</td>
-		</tr>	
+			<td>June 2014</td>
+		</tr>
 		<tr>
 			<td>1.2.0</td>
 			<td>4.5.x</td>
@@ -53,21 +89,11 @@ For the analyzer support, get hebmorph-lucene:
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
-            <version>1.1</version>
+            <version>2.0.2</version>
             <scope>compile</scope>
         </dependency>
 ```
 
-Direct reference to hebmorph-core is only needed if you need to use internal HebMorph structures:
-
-```
-        <dependency>
-            <groupId>com.code972.hebmorph</groupId>
-            <artifactId>hebmorph-core</artifactId>
-            <version>1.1</version>
-            <scope>compile</scope>
-        </dependency>
-```
 
 ## Lucene.NET compatibility
 
@@ -75,7 +101,7 @@ The .NET version of the library is compatible with Lucene.NET version 3.0.3, but
 
 ## License
 
-HebMorph is copyright (C) 2010-2013, Itamar Syn-Hershko.
+HebMorph is copyright (C) 2010-2015, Itamar Syn-Hershko.
 HebMorph currently relies on Hspell, copyright (C) 2000-2013, Nadav Har'El and Dan Kenigsberg (http://hspell.ivrix.org.il/).
 
 It is released to the public licensed under the GNU Affero General Public License v3. See the LICENSE file included in this distribution. Note that not only the programs in the distribution, but also the

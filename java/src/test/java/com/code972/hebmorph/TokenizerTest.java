@@ -1,0 +1,335 @@
+/***************************************************************************
+ *   Copyright (C) 2010-2015 by                                            *
+ *      Itamar Syn-Hershko <itamar at code972 dot com>                     *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License           *
+ *   version 3, as published by the Free Software Foundation.              *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Affero General Public License for more details.                   *
+ *                                                                         *
+ *   You should have received a copy of the GNU Affero General Public      *
+ *   License along with this program; if not, see                          *
+ *   <http://www.gnu.org/licenses/>.                                       *
+ **************************************************************************/
+package com.code972.hebmorph;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.analysis.charfilter.BaseCharFilter;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringReader;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class TokenizerTest extends TestBase {
+
+    private final Tokenizer tokenizer;
+
+    public TokenizerTest() throws IOException {
+        tokenizer = new Tokenizer(null, getDictionary().getPref());
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        tokenizer.setSuffixForExactMatch('$');
+    }
+
+    private void assertTokenizesTo(String stream, String token) throws IOException {
+        assertTokenizesTo(stream, token, 0);
+    }
+
+    private void assertTokenizesTo(String stream, String token, int tokenType) throws IOException {
+        assertTokenizesTo(stream, new String[]{token}, tokenType == 0 ? null : new int[]{tokenType});
+    }
+
+    private void assertTokenizesTo(String stream, String[] tokens) throws IOException {
+        assertTokenizesTo(stream, tokens, null);
+    }
+
+    private void assertTokenizesTo(String text, String[] tokens, int[] tokenTypes) throws IOException {
+        assert tokenTypes == null || tokens.length == tokenTypes.length;
+
+        for (int j = 4096 - text.length() - 3; j < 4096 + text.length() + 2; j++) {
+            tokenizer.reset(new StringReader(StringUtils.repeat(" ", j) + text));
+            int i = 0, tokenType;
+            Reference<String> test = new Reference<String>("");
+            while ((tokenType = tokenizer.nextToken(test)) > 0) {
+                assertEquals("[Added space " + j + "]", tokens[i], test.ref);
+                if (tokenTypes != null)
+                    assertEquals(tokenTypes[i], tokenType);
+                i++;
+            }
+            assertEquals("[Added space " + j + "]", tokens.length, i);
+        }
+    }
+
+    @Test
+    public void tokenizesCorrectly() throws IOException {
+        // NonHebrew
+        assertTokenizesTo("test", "test");
+        assertTokenizesTo("test's", "test's");
+        assertTokenizesTo("tests'", "tests");
+        assertTokenizesTo("test123", "test123");
+        assertTokenizesTo("test two", new String[]{"test", "two"});
+        assertTokenizesTo("jkldfjksdlfjsldfsdfsdfsdf", "jkldfjksdlfjsldfsdfsdfsdf");
+
+        // NonHebrew, non-English
+        assertTokenizesTo("décimo", "décimo");
+        assertTokenizesTo("traducción", "traducción");
+        assertTokenizesTo("Úlcera", "Úlcera");
+        assertTokenizesTo("ía", "ía");
+        assertTokenizesTo("el árbol", new String[]{"el", "árbol"});
+
+        assertTokenizesTo("בדיקה", "בדיקה");
+        assertTokenizesTo("בדיקה.", "בדיקה");
+        assertTokenizesTo("בדיקה..", "בדיקה");
+
+        assertTokenizesTo("בדיקה שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה.שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה. שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה,שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה+שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה-שניה", new String[]{"בדיקה", "שניה"});
+        assertTokenizesTo("בדיקה\u05BEשניה", new String[]{"בדיקה", "שניה"});
+
+        assertTokenizesTo(" (\"דייט בחשיכה\",פרק 5) ", new String[]{"דייט", "בחשיכה", "פרק", "5"});
+
+        assertTokenizesTo("בדיקה\"", "בדיקה");
+
+        assertTokenizesTo("\u05AAבדיקה", "בדיקה"); // ignores leading niqqud (invalid case)
+        assertTokenizesTo("\u05AAבדיקה..", "בדיקה");
+        assertTokenizesTo("ב\u05B0דיקה", "ב\u05B0דיקה"); // doesn't strip Niqqud
+        //assertTokenizesTo("ב\u05A0דיקה", "ב\u05A0דיקה"); // ignores Taamei Mikra
+
+        assertTokenizesTo("ץבדיקה", "בדיקה");
+
+        assertTokenizesTo("שלומי999", "שלומי999");
+        assertTokenizesTo("שלומיabc", "שלומיabc");
+        assertTokenizesTo("אימג’בנק", "אימג'בנק");
+
+        assertTokenizesTo("בלונים$", "בלונים", Tokenizer.TokenType.Hebrew | Tokenizer.TokenType.Exact);
+        assertTokenizesTo("test$", "test", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Exact);
+        assertTokenizesTo("123$", "123", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Numeric | Tokenizer.TokenType.Exact);
+
+        // Gershayim unification
+        assertTokenizesTo("צה\"ל", "צה\"ל");
+        assertTokenizesTo("צה''ל", "צה\"ל");
+        assertTokenizesTo("צה\u05F3\u05F3ל", "צה\"ל");
+        assertTokenizesTo("צה\uFF07\uFF07ל", "צה\"ל");
+        assertTokenizesTo("צה\u201Cל", "צה\"ל");
+
+        // Geresh
+        assertTokenizesTo("ד'אור", "ד'אור");
+        assertTokenizesTo("אורנג'", "אורנג'");
+        assertTokenizesTo("אורנג\u05F3", "אורנג'");
+        assertTokenizesTo("אורנג\uFF07", "אורנג'");
+        assertTokenizesTo("אורנג' שלום", new String[]{"אורנג'", "שלום"});
+        assertTokenizesTo("סמית'", "סמית");
+
+        assertTokenizesTo("ומש\"א$", "ומש\"א");
+
+        assertTokenizesTo("של", "של");
+        assertTokenizesTo("שלך", "שלך");
+        assertTokenizesTo("לשלם", "לשלם");
+    }
+
+    @Test
+    public void tokenizesWithExceptions() throws IOException {
+        tokenizesCorrectly();
+
+        assertTokenizesTo("C++", "C");
+        assertTokenizesTo("C++ ", "C");
+        tokenizer.addSpecialCase("C++");
+        assertTokenizesTo("C++", "C++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("c++", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("C++ ", "C++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("C++.", "C++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("c++ ", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("c++.", "c++", Tokenizer.TokenType.NonHebrew | Tokenizer.TokenType.Custom);
+        assertTokenizesTo("בC++", "בC++");
+        assertTokenizesTo("בC++ ", "בC++");
+        assertTokenizesTo("a++ b++ c++", new String[]{"a", "b", "c++"});
+        assertTokenizesTo("c++\nc++! c++, c++. (c++)", new String[]{"c++", "c++", "c++", "c++", "c++"});
+//        assertTokenizesTo("C++x0", new String[] { "C", "x0" }); // This passes except in the two-buffer edgecase
+//        assertTokenizesTo("C++x0 ", new String[] { "C", "x0" });  // This passes except in the two-buffer edgecase
+
+        assertTokenizesTo(".NET", "NET");
+        tokenizer.addSpecialCase(".NET");
+        assertTokenizesTo(".NET", ".NET");
+        assertTokenizesTo(".NET.", ".NET");
+        assertTokenizesTo(".NET ", ".NET");
+        assertTokenizesTo(".NETify", "NETify");
+
+        assertTokenizesTo("B+++", "B");
+        tokenizer.addSpecialCase("B+++");
+        assertTokenizesTo("B+++", "B+++");
+//        assertTokenizesTo("B+++x0", new String[] { "B", "x0" });  // This passes except in the two-buffer edgecase
+
+
+        assertTokenizesTo("שלום+", "שלום");
+        tokenizer.addSpecialCase("שלום+");
+        assertTokenizesTo("שלום+", "שלום+");
+        assertTokenizesTo("שלום", "שלום");
+        //assertTokenizesTo("שלום+בדיקה", new String[] { "שלום", "בדיקה" }); // This passes except in the two-buffer edgecase
+
+        tokenizesCorrectly();
+    }
+
+    @Test
+    public void incrementsOffsetCorrectly() throws IOException {
+        int[] expectedOffsets = {0, 5, 10, 15};
+        int curPos = 0;
+
+        Reference<String> token = new Reference<String>("");
+        tokenizer.reset(new StringReader("test test test test"));
+        while (true) {
+            int token_type = tokenizer.nextToken(token);
+            if (token_type == 0)
+                break;
+
+            assertEquals(expectedOffsets[curPos++], tokenizer.getOffset());
+            assertEquals(4, tokenizer.getLengthInSource());
+        }
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyWithAnotherReader() throws IOException {
+        int[] expectedOffsets = {0, 5, 10, 15};
+        int curPos = 0;
+
+        Tokenizer t = new Tokenizer(
+                new HTMLStripCharFilter(new StringReader("test <a href=\"foo\">test</a> test test")), getDictionary().getPref()
+        );
+
+        Reference<String> ref = new Reference<String>("");
+        while (true) {
+            int token_type = t.nextToken(ref);
+            if (token_type == 0)
+                break;
+
+            assertEquals(expectedOffsets[curPos++], t.getOffset());
+            assertEquals(4, t.getLengthInSource());
+        }
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyWithAnotherReader2() throws IOException {
+        String input = "test1 <a href=\"foo\">testlink</a> test2 test3";
+
+        BaseCharFilter filter = new HTMLStripCharFilter(new StringReader(input));
+        Tokenizer t = new Tokenizer(filter, getDictionary().getPref());
+
+        Reference<String> token = new Reference<String>("");
+
+        t.nextToken(token);
+        assertEquals(0, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(20, filter.correctOffset(t.getOffset()));
+        assertEquals(8, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(33, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
+
+        t.nextToken(token);
+        assertEquals(39, filter.correctOffset(t.getOffset()));
+        assertEquals(5, t.getLengthInSource());
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyAlsoWhenBuffered() throws IOException {
+        Reference<String> token = new Reference<String>("");
+
+        String input = "";
+        for (int repeat = 0; repeat < 4000; repeat++) {
+            input += "test test test test ";
+        }
+
+        tokenizer.reset(new StringReader(input));
+        int previousOffest = -5;
+        while (true) {
+            int token_type = tokenizer.nextToken(token);
+            if (token_type == 0)
+                break;
+
+            assertEquals(previousOffest, tokenizer.getOffset() - 5);
+            assertEquals(4, tokenizer.getLengthInSource());
+            previousOffest = tokenizer.getOffset();
+        }
+    }
+
+    @Test
+    public void IncrementsOffsetCorrectlyWithTerminatingGeresh() throws IOException {
+        final String input = "מ'מפלגות המרכז' מפגש'";
+
+        final Reference<String> test = new Reference<String>("");
+        tokenizer.reset(new StringReader(input));
+        tokenizer.nextToken(test);
+        assertEquals("מ'מפלגות", test.ref);
+        assertEquals(0, tokenizer.getOffset());
+        assertEquals(8, tokenizer.getLengthInSource());
+
+        tokenizer.nextToken(test);
+        assertEquals("המרכז'", test.ref);
+        assertEquals(9, tokenizer.getOffset());
+        assertEquals(6, tokenizer.getLengthInSource());
+
+        tokenizer.nextToken(test);
+        assertEquals("מפגש", test.ref);
+        assertEquals(16, tokenizer.getOffset());
+        assertEquals(4, tokenizer.getLengthInSource());
+    }
+
+    @Test
+    public void DiscardsSurroundingGershayim() throws IOException {
+        final Reference<String> test = new Reference<String>("");
+
+        tokenizer.reset(new StringReader("\"צבא\""));
+        tokenizer.nextToken(test);
+        assertEquals("צבא", test.ref);
+        assertEquals(3, tokenizer.getLengthInSource());
+        assertEquals(1, tokenizer.getOffset());
+    }
+
+    @Test
+    public void longTokenTest() throws IOException {
+        String text = "רפאלולדןהואפרופסורלרפואהישראלימלמדבאוניברסיטתתלאביבסגןמנהלביתהחוליםשיבאופעילחברתימתמחהבכירוגיהכלליתובכלידם" +
+                "ולדןנולדבצרפתועלהלישראלבגילהואשימשבביתהחוליםשיבאכמנהלהאגףכירורגיהומנהלהיחידהלכלידם" +
+                "ולדןפעילוחברבהנהלהבעמותתרופאיםלזכויותאדםוכמוכןחברבהנהלתארגוןלתתולדןזכהבאותלגיוןהכבודהצרפתישלממשלתצרפתבזכותעלפעילותובמסגרתרופאיםלזכויותאדםלקידוםשיתוףהפעולהביןפלסטיניםלישראליםהאותהוענקלועלידישרהחוץשלצרפתרנארקושנרבטקסבשגרירותצרפתבתלאביב" +
+                "נשוילבלשניתצביהולדןבתושלשמעוןפרסוהואמשמשכרופאוהאישישלפרס.";
+
+
+        Tokenizer tokenizer = new Tokenizer(null, getDictionary().getPref());
+        Reference<String> test = new Reference<String>("");
+        tokenizer.reset(new StringReader(text));
+
+        while (tokenizer.nextToken(test) > 0) {
+        }
+
+        assertTrue("Arrived here without throwing", true);
+    }
+
+    @Test
+    public void testCollapseAlternateLetters() throws IOException {
+        assertTokenizesTo("\uFB20", "ע");
+        assertTokenizesTo("\uFB21", "א");
+        assertTokenizesTo("\uFB22", "ד");
+        assertTokenizesTo("\uFB23", "ה");
+        assertTokenizesTo("\uFB24", "כ");
+        assertTokenizesTo("\uFB25", "ל");
+        assertTokenizesTo("ש\uFB26", "שם");
+        assertTokenizesTo("\uFB27", "ר");
+        assertTokenizesTo("\uFB28", "ת");
+        assertTokenizesTo("\uFB20\uFB22 \uFB28\uFB27\uFB22 \uFB23\uFB25\uFB26 שלו\uFB26", new String[]{"עד", "תרד", "הלם", "שלום"});
+    }
+}

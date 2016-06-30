@@ -16,6 +16,9 @@ dotnet/packages/*
 build/
 workspace.xml
 tasks.xml
-java/*/target/
+java/target/
 *.java~
 Backup/
+/.idea/
+*.iml
+*.releaseBackup
