@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>5.4.1</lucene.version>
+        <lucene.version>5.5.0</lucene.version>
     </properties>
 
     <parent>
@@ -14,7 +14,7 @@
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>hebmorph-lucene</artifactId>
     <packaging>jar</packaging>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.3.3-SNAPSHOT</version>
     <name>hebmorph-lucene</name>
     <description>Enabling Hebrew search in Lucene. Part of the HebMorph project, for making Hebrew properly
         searchable
