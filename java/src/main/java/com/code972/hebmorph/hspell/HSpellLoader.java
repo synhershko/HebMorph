@@ -122,7 +122,7 @@ public final class HSpellLoader {
         return hspellPath;
     }
 
-    public static HashMap<String, Integer> readDefaultPrefixes() throws FileNotFoundException {
+    public static HashMap<String, Integer> readDefaultPrefixes() throws IOException {
     	return readPrefixesFromFile(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_NOH)));
     }
 
