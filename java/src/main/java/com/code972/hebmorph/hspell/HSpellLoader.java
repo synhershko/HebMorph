@@ -122,17 +122,17 @@ public final class HSpellLoader {
         return hspellPath;
     }
 
-    public static HashMap<String, Integer> readDefaultPrefixes() {
-        return readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
+    public static HashMap<String, Integer> readDefaultPrefixes() throws FileNotFoundException {
+    	return readPrefixesFromFile(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_NOH)));
     }
 
     //used when loading using the Loader and thus prefixes aren't loaded automatically
-    public static HashMap<String, Integer> readPrefixesFromFile(String prefixPath) {
+    public static HashMap<String, Integer> readPrefixesFromFile(InputStream inputStream) {
         HashMap<String, Integer> map = new HashMap<>();
         GZIPInputStream reader = null;
         BufferedReader bufferedReader = null;
         try {
-            reader = new GZIPInputStream(new FileInputStream(prefixPath));
+            reader = new GZIPInputStream(inputStream);
             bufferedReader = new BufferedReader(new InputStreamReader(reader, DictionaryLoader.ENCODING_USED));
             String str;
             while ((str = bufferedReader.readLine()) != null) {
@@ -159,9 +159,9 @@ public final class HSpellLoader {
         return map;
     }
 
-    public DictHebMorph loadDictionaryFromHSpellData(String prefixPath) throws IOException {
+    public DictHebMorph loadDictionaryFromHSpellData(InputStream inputStream) throws IOException {
         DictHebMorph dict = new DictHebMorph();
-        dict.setPref(readPrefixesFromFile(prefixPath));
+        dict.setPref(readPrefixesFromFile(inputStream));
         if (loadMorphData) {
             // Load the count of morphological data slots required
             final String lookup[] = new String[lookupLen + 1];
