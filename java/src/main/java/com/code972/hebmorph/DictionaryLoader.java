@@ -21,6 +21,7 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.hspell.HSpellLoader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -30,7 +31,7 @@ public class DictionaryLoader {
 
     public static DictHebMorph lookForDefaultDictionary() throws IOException {
         HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
-        return loader.loadDictionaryFromHSpellData(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_H);
+        return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_H)));
     }
 
     public static DictHebMorph loadDictFromPath(String path) throws IOException {
@@ -40,7 +41,7 @@ public class DictionaryLoader {
         File file = new File(path);
         if (file.isDirectory()) {
             HSpellLoader loader = new HSpellLoader(new File(path), true);
-            return loader.loadDictionaryFromHSpellData(path + HSpellLoader.PREFIX_H);
+            return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(path, HSpellLoader.PREFIX_H)));
         }else{
             throw new IOException("Expected a folder. Cannot load dictionary from HSpell files.");
         }
