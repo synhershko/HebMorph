@@ -19,6 +19,6 @@ tasks.xml
 java/target/
 *.java~
 Backup/
-/.idea/
+.idea/
 *.iml
 *.releaseBackup
