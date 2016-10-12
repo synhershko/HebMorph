@@ -21,6 +21,7 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
 import org.junit.AfterClass;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public abstract class TestBase {
 
     protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            dict = DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
+            dict = new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
         }
         return dict;
     }
@@ -63,28 +64,28 @@ public abstract class TestBase {
 
     public static HebrewIndexingAnalyzer getHebrewIndexingAnalyzer() throws IOException {
         if (dict == null) {
-            dict = (DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
         return new HebrewIndexingAnalyzer(dict);
     }
 
     public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
         if (dict == null) {
-            dict = (DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
         return new HebrewQueryAnalyzer(dict);
     }
 
     public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
         if (dict == null) {
-            dict = (DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
         return new HebrewQueryLightAnalyzer(dict);
     }
 
     public static HebrewExactAnalyzer getHebrewExactAnalyzer() throws IOException {
         if (dict == null) {
-            dict = (DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
         return new HebrewExactAnalyzer(dict);
     }

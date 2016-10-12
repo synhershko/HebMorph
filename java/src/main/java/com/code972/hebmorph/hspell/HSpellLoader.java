@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public final class HSpellLoader {
+final class HSpellLoader {
 
     public final static String DELIMETER = "#",
             PREFIXES_INDICATOR = "#PREFIXES",

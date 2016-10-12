@@ -18,6 +18,7 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +33,7 @@ public abstract class TestBase {
 
     protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            dict = DictionaryLoader.loadDictFromPath(DICT_PATH);
+            dict = new HSpellDictionaryLoader().loadDictionaryFromPath(DICT_PATH);
         }
         return dict;
     }

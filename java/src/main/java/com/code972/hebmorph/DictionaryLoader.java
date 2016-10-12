@@ -18,32 +18,15 @@
 package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.hspell.HSpellLoader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class DictionaryLoader {
-    public static final int MaxWordLength = Byte.MAX_VALUE;
-    public static final Charset ENCODING_USED = Charset.forName("UTF-8");
+public interface DictionaryLoader {
+    int MaxWordLength = Byte.MAX_VALUE;
+    Charset ENCODING_USED = Charset.forName("UTF-8");
 
-    public static DictHebMorph lookForDefaultDictionary() throws IOException {
-        HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
-        return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_H)));
-    }
+    DictHebMorph loadDictionaryFromPath(final String path) throws IOException;
 
-    public static DictHebMorph loadDictFromPath(String path) throws IOException {
-        if (!path.endsWith("/")) {
-            path += "/";
-        }
-        File file = new File(path);
-        if (file.isDirectory()) {
-            HSpellLoader loader = new HSpellLoader(new File(path), true);
-            return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(path, HSpellLoader.PREFIX_H)));
-        }else{
-            throw new IOException("Expected a folder. Cannot load dictionary from HSpell files.");
-        }
-    }
+    DictHebMorph loadDictionaryFromDefaultPath() throws IOException;
 }

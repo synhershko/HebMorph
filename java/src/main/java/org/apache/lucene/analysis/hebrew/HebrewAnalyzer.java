@@ -20,6 +20,7 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.*;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
@@ -60,7 +61,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
     }
 
     public HebrewAnalyzer() throws IOException {
-        this(DictionaryLoader.lookForDefaultDictionary());
+        this(new HSpellDictionaryLoader().loadDictionaryFromDefaultPath());
     }
 
     public static boolean isHebrewWord(final CharSequence word) {

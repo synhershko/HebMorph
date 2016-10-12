@@ -19,6 +19,7 @@ package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.junit.AfterClass;
 
@@ -29,7 +30,7 @@ public abstract class BaseTokenStreamWithDictionaryTestCase extends BaseTokenStr
 
     protected synchronized DictHebMorph getDictionary() throws IOException {
         if (dict == null) {
-            dict = DictionaryLoader.loadDictFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
+            dict = new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH);
         }
         return dict;
     }
