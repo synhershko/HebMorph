@@ -5,9 +5,9 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.hebrew.HebrewTokenTypeAttribute;
-import org.apache.lucene.analysis.hebrew.HebrewTokenizer;
-import org.apache.lucene.analysis.tokenattributes.*;
-import org.apache.lucene.analysis.util.CharacterUtils;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 
 import java.io.IOException;
 import java.util.ArrayList;

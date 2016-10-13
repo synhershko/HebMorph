@@ -21,14 +21,16 @@ import com.code972.hebmorph.*;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
+import org.apache.lucene.analysis.CharacterUtils;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.*;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.CharacterUtils;
+import org.apache.lucene.analysis.CharArraySet;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class StreamLemmasFilter extends Tokenizer {
     private final StreamLemmatizer _streamLemmatizer;
@@ -39,8 +41,6 @@ public class StreamLemmasFilter extends Tokenizer {
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
     private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
-
-    private final CharacterUtils charUtils;
 
     private final LemmaFilterBase lemmaFilter;
     private final List<Token> stack = new ArrayList<Token>();
@@ -63,7 +63,6 @@ public class StreamLemmasFilter extends Tokenizer {
         _streamLemmatizer = new StreamLemmatizer(input, dict, specialTokenizationCases);
         this.commonWords = commonWords != null ? commonWords : CharArraySet.EMPTY_SET;
         this.lemmaFilter = lemmaFilter;
-        charUtils = CharacterUtils.getInstance();
     }
 
     public void setSuffixForExactMatch(Character c) {
@@ -210,7 +209,7 @@ public class StreamLemmasFilter extends Tokenizer {
     }
 
     private void applyLowercaseFilter() {
-        charUtils.toLowerCase(termAtt.buffer(), 0, termAtt.length());
+        CharacterUtils.toLowerCase(termAtt.buffer(), 0, termAtt.length());
     }
 
     protected void createHebrewToken(HebrewToken hebToken) {

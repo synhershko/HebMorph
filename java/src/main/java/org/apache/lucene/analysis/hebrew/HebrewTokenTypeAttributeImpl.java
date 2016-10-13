@@ -1,6 +1,8 @@
 package org.apache.lucene.analysis.hebrew;
 
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.AttributeReflector;
 
 /**
  * Created by Egozy on 19/04/2015.
@@ -40,6 +42,12 @@ public class HebrewTokenTypeAttributeImpl extends AttributeImpl implements Hebre
     public void clear() {
         type = HebrewType.Unknown;
         isExact = false;
+    }
+
+    @Override
+    public void reflectWith(AttributeReflector reflector) {
+        reflector.reflect(KeywordAttribute.class, "isExact", isExact);
+        reflector.reflect(KeywordAttribute.class, "type", type);
     }
 
     public void copyTo(AttributeImpl target) {

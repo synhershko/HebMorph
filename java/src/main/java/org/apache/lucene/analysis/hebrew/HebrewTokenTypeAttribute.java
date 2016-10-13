@@ -3,10 +3,11 @@ package org.apache.lucene.analysis.hebrew;
 import org.apache.lucene.util.Attribute;
 
 /**
- * Created by Egozy on 19/04/2015.
+ * This attribute is used to pass info on tokens as parsed and identified
+ * by the HebMorph tokenizer
  */
 public interface HebrewTokenTypeAttribute extends Attribute{
-    public static enum HebrewType{
+    enum HebrewType{
         Unknown,
         Hebrew,
         NonHebrew,
@@ -17,10 +18,10 @@ public interface HebrewTokenTypeAttribute extends Attribute{
         Lemma;
     }
 
-    public void setType(HebrewType type);
-    public HebrewType getType();
-    public boolean isHebrew();
-    public boolean isExact();
-    public boolean isNumeric();
-    public void setExact(boolean isExact);
+    void setType(HebrewType type);
+    HebrewType getType();
+    boolean isHebrew();
+    boolean isExact();
+    boolean isNumeric();
+    void setExact(boolean isExact);
 }
