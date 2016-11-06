@@ -12,6 +12,11 @@ import java.io.IOException;
  */
 public class HSpellDictionaryLoader implements DictionaryLoader {
     @Override
+    public String dictionaryLoaderName() {
+        return "hspell";
+    }
+
+    @Override
     public DictHebMorph loadDictionaryFromPath(String path) throws IOException {
         if (!path.endsWith("/")) {
             path += "/";

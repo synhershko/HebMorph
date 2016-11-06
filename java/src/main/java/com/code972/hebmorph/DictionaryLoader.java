@@ -26,6 +26,8 @@ public interface DictionaryLoader {
     int MaxWordLength = Byte.MAX_VALUE;
     Charset ENCODING_USED = Charset.forName("UTF-8");
 
+    String dictionaryLoaderName();
+
     DictHebMorph loadDictionaryFromPath(final String path) throws IOException;
 
     DictHebMorph loadDictionaryFromDefaultPath() throws IOException;
