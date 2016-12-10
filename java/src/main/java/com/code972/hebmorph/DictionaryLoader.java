@@ -28,6 +28,8 @@ public interface DictionaryLoader {
 
     String dictionaryLoaderName();
 
+    String[] dictionaryPossiblePaths();
+
     DictHebMorph loadDictionaryFromPath(final String path) throws IOException;
 
     DictHebMorph loadDictionaryFromDefaultPath() throws IOException;

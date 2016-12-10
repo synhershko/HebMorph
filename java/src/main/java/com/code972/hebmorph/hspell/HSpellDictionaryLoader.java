@@ -17,6 +17,11 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
     }
 
     @Override
+    public String[] dictionaryPossiblePaths() {
+        return new String[] {"plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/"};
+    }
+
+    @Override
     public DictHebMorph loadDictionaryFromPath(String path) throws IOException {
         if (!path.endsWith("/")) {
             path += "/";
