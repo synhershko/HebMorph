@@ -20,14 +20,13 @@
 package org.apache.lucene.analysis.hebrew;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
 import java.io.IOException;
-import java.io.Reader;
 
 public class HebrewExactAnalyzer extends HebrewAnalyzer {
     public HebrewExactAnalyzer(DictHebMorph dict) throws IOException {
