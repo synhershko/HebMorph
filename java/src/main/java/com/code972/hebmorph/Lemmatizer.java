@@ -19,9 +19,8 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.datastructures.RealSortedList;
-import com.code972.hebmorph.datastructures.RealSortedList.SortOrder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -82,8 +81,10 @@ public class Lemmatizer {
     }
 
     public List<HebrewToken> lemmatize(final String word) {
-        final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+        return lemmatize(word, new ArrayList<>());
+    }
 
+    public List<HebrewToken> lemmatize(final String word, final List<HebrewToken> ret) {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md = null;
@@ -96,7 +97,7 @@ public class Lemmatizer {
         }
         if (md != null) {
             for (int result = 0; result < md.getLemmas().length; result++) {
-                ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
+                ret.add(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
             }
         } else if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
@@ -106,7 +107,7 @@ public class Lemmatizer {
             }
             if (md != null) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    ret.addUnique(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
+                    ret.add(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
                 }
             }
         }
@@ -127,7 +128,7 @@ public class Lemmatizer {
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
                     if ((md.getLemmas()[result].getPrefix().getValue() & prefixMask) > 0) {
-                        ret.addUnique(new HebrewToken(word, prefLen, md.getLemmas()[result], 0.9f));
+                        ret.add(new HebrewToken(word, prefLen, md.getLemmas()[result], 0.9f));
                     }
                 }
             }
@@ -136,7 +137,10 @@ public class Lemmatizer {
     }
 
     public List<HebrewToken> lemmatizeTolerant(final String word) {
-        final RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+        return lemmatizeTolerant(word, new ArrayList<>());
+    }
+
+    public List<HebrewToken> lemmatizeTolerant(final String word, final List<HebrewToken> ret) {
         DictRadix<MorphData> m_dict = dictHeb.getRadix();
         HashMap<String, Integer> m_pref = dictHeb.getPref();
         // Don't try tolerating long words. Longest Hebrew word is 19 chars long
@@ -152,7 +156,7 @@ public class Lemmatizer {
         if (tolerated != null) {
             for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                 for (int result = 0; result < lr.getData().getLemmas().length; result++) {
-                    ret.addUnique(new HebrewToken(lr.getWord(), (byte) 0, lr.getData().getLemmas()[result], lr.getScore()));
+                    ret.add(new HebrewToken(lr.getWord(), (byte) 0, lr.getData().getLemmas()[result], lr.getScore()));
                 }
             }
         }
@@ -171,7 +175,7 @@ public class Lemmatizer {
                 for (DictRadix<MorphData>.LookupResult lr : tolerated) {
                     for (int result = 0; result < lr.getData().getLemmas().length; result++) {
                         if ((lr.getData().getLemmas()[result].getPrefix().getValue() & prefixMask) > 0) {
-                            ret.addUnique(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
+                            ret.add(new HebrewToken(word.substring(0, prefLen) + lr.getWord(), prefLen, lr.getData().getLemmas()[result], lr.getScore() * 0.9f));
                         }
                     }
                 }

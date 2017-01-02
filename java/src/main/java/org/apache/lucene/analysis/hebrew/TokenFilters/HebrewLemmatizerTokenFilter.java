@@ -24,14 +24,15 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private final HebrewTokenTypeAttribute hebrewTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
 
-    private DictHebMorph dict;
     private Lemmatizer lemmatizer;
 
     private List<Token> previousLemmas = new ArrayList<>();
-    private final Set<String> duplicateLemmas = new HashSet<>(); // this stores lemmas we've seen for a word, to remove duplicated lemmas
     private int previousStartOffset, previousEndOffset;
     private boolean previousTolerated = false, lemmatizeExactHebrewWords, lemmatizeExactNonHebrewWords;
     private HebrewTokenTypeAttribute.HebrewType previousType;
+
+    private final Set<String> duplicateLemmas = new HashSet<>(20); // this stores lemmas we've seen for a word, to remove duplicated lemmas
+    private final List<HebrewToken> tokensList = new ArrayList<>(20);
 
     public HebrewLemmatizerTokenFilter(TokenStream input, DictHebMorph dict) {
         this(input, dict, true, true);
@@ -39,7 +40,6 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
 
     public HebrewLemmatizerTokenFilter(TokenStream input, DictHebMorph dict, boolean lemmatizeExactHebrewWords, boolean lemmatizeExactNonHebrewWords) {
         super(input);
-        this.dict = dict;
         this.lemmatizer = new Lemmatizer(dict);
         this.lemmatizeExactHebrewWords = lemmatizeExactHebrewWords;
         this.lemmatizeExactNonHebrewWords = lemmatizeExactNonHebrewWords;
@@ -93,15 +93,17 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
             String word = termAtt.toString();
 
             // try to lemmatize
-            List<HebrewToken> tempList = lemmatizer.lemmatize(word);
+            tokensList.clear();
+            lemmatizer.lemmatize(word, tokensList);
             // word wasn't found in the dictionary - try tolerating it
-            if (tempList.isEmpty()) {
-                tempList = lemmatizer.lemmatizeTolerant(word);
+            if (tokensList.isEmpty()) {
+                lemmatizer.lemmatizeTolerant(word, tokensList);
                 previousTolerated = true;
             }
+
             // add words to the previousLemmas : remove duplicates and tokens which aren't ranked high enough if they came from tolerating.
             // TODO: consider the ranking as an additional filter
-            for (HebrewToken hebToken : tempList) {
+            for (HebrewToken hebToken : tokensList) {
                 if (isValidToken(hebToken) || !previousTolerated) {
                     if (duplicateLemmas.add(hebToken.getLemma())) {
                         previousLemmas.add(hebToken);
@@ -110,8 +112,8 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
             }
             // TODO:
             // this is just a workaround - current analyzer adds all low-rated tokens if no token is high enough
-            if (!tempList.isEmpty() && previousLemmas.isEmpty()) {
-                for (HebrewToken hebToken : tempList) {
+            if (!tokensList.isEmpty() && previousLemmas.isEmpty()) {
+                for (HebrewToken hebToken : tokensList) {
                     if (duplicateLemmas.add(hebToken.getLemma())) {
                         previousLemmas.add(hebToken);
                     }

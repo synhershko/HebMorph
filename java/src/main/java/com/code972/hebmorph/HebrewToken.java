@@ -43,9 +43,6 @@ public class HebrewToken extends Token implements Comparable<Token> {
     private String lemma;
     private PrefixType prefType;
 
-    /* (non-Javadoc)
-      * @see java.lang.Object#equals(java.lang.Object)
-      */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -88,9 +85,6 @@ public class HebrewToken extends Token implements Comparable<Token> {
         return true;
     }
 
-    /* (non-Javadoc)
-      * @see java.lang.Object#hashCode()
-      */
     @Override
     public int hashCode() {
         final int prime = 31;
