@@ -10,10 +10,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Egozy on 12/04/2015.
@@ -100,6 +97,9 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
                 lemmatizer.lemmatizeTolerant(word, tokensList);
                 previousTolerated = true;
             }
+            // TODO the resulting list needs to be sorted once we start relying on order and other lemma metadata
+            // TODO Collections.sort(tokensList);
+            // TODO Collections.reverse(tokensList);
 
             // add words to the previousLemmas : remove duplicates and tokens which aren't ranked high enough if they came from tolerating.
             // TODO: consider the ranking as an additional filter
