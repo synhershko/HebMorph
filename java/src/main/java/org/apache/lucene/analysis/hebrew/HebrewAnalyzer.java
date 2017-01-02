@@ -124,7 +124,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
         if (tolerate) {
             // Don't try tolerating long words. Longest Hebrew word is 19 chars long
             // http://en.wikipedia.org/wiki/Longest_words#Hebrew
-            if (word.length() > 20) {
+            if (word.length() > 19) {
                 return WordType.UNRECOGNIZED;
             }
 
