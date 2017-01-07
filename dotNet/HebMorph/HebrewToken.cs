@@ -25,6 +25,12 @@ namespace HebMorph
 {
     public class HebrewToken : Token, IComparable
     {
+        public WordType Type { get; set; }
+        public float Score { get; set; }
+        public byte PrefixLength { get; set; }
+        public string Lemma { get; set; }
+        internal HSpell.DMask Mask { get; set; }
+
         public HebrewToken(string _word, byte _prefixLength, HSpell.DMask _mask, string _lemma, float _score)
             : base(_word)
         {
@@ -36,11 +42,6 @@ namespace HebMorph
                 this.Lemma = _lemma;
             this.Score = _score;
         }
-
-        public float Score = 1.0f;
-        public byte PrefixLength;
-        public HSpell.DMask Mask;
-        public string Lemma;
 
         public override bool Equals(object obj)
         {

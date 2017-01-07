@@ -19,6 +19,7 @@
  * 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -54,6 +55,19 @@ namespace HebMorph
         {
             if (m_prefixes.Lookup(str) > 0)
                 return true;
+
+            return false;
+        }
+
+        public static bool IsHebrewWord(string word)
+        {
+            foreach (var c in word)
+            {
+                if (Tokenizer.IsHebrewLetter(c))
+                {
+                    return true;
+                }
+            }
 
             return false;
         }
@@ -101,18 +115,16 @@ namespace HebMorph
             return sb.ToString();
         }
 
-        public IList<HebrewToken> Lemmatize(string word)
+        public IEnumerable<HebrewToken> Lemmatize(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
-
-            var ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
 
             MorphData md = m_dict.Lookup(word);
             if (md != null)
             {
                 for (int result = 0; result < md.Lemmas.Length; result++)
                 {
-                    ret.AddUnique(new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f));
+                    yield return new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f) {Type = WordType.HEBREW};
                 }
             }
             else if (word.EndsWith("'")) // Try ommitting closing Geresh
@@ -122,7 +134,7 @@ namespace HebMorph
                 {
                     for (int result = 0; result < md.Lemmas.Length; result++)
                     {
-                        ret.AddUnique(new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f));
+                        yield return new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f) {Type = WordType.HEBREW};
                     }
                 }
             }
@@ -143,29 +155,32 @@ namespace HebMorph
                 {
                     for (int result = 0; result < md.Lemmas.Length; result++)
                     {
-                        if (((int)HSpell.LingInfo.dmask2ps(md.DescFlags[result]) & prefixMask) > 0)
-                            ret.AddUnique(new HebrewToken(word, prefLen, md.DescFlags[result], md.Lemmas[result], 0.9f));
+                        if (((int) HSpell.LingInfo.dmask2ps(md.DescFlags[result]) & prefixMask) > 0)
+                            yield return new HebrewToken(word, prefLen, md.DescFlags[result], md.Lemmas[result], 0.9f) {Type = WordType.HEBREW_WITH_PREFIX};
                     }
                 }
             }
-
-            return ret;
         }
 
-        public IList<HebrewToken> LemmatizeTolerant(string word)
+        public IEnumerable<HebrewToken> LemmatizeTolerant(string word)
         {
             // TODO: Verify word to be non-empty and contain Hebrew characters?
 
-            RealSortedList<HebrewToken> ret = new RealSortedList<HebrewToken>(SortOrder.Desc);
+            // Don't try tolerating long words. Longest Hebrew word is 19 chars long
+            // http://en.wikipedia.org/wiki/Longest_words#Hebrew
+            if (word.Length > 19)
+            {
+                yield break;
+            }
 
-        	List<DictRadix<MorphData>.LookupResult> tolerated = m_dict.LookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
+        	var tolerated = m_dict.LookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
             if (tolerated != null)
             {
-                foreach (DictRadix<MorphData>.LookupResult lr in tolerated)
+                foreach (var lr in tolerated)
                 {
                     for (int result = 0; result < lr.Data.Lemmas.Length; result++)
                     {
-                        ret.AddUnique(new HebrewToken(lr.Word, 0, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score));
+                        yield return new HebrewToken(lr.Word, 0, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score) {Type = WordType.HEBREW_TOLERATED};
                     }
                 }
             }
@@ -188,14 +203,43 @@ namespace HebMorph
                     {
                         for (int result = 0; result < lr.Data.Lemmas.Length; result++)
                         {
-                            if (((int)HSpell.LingInfo.dmask2ps(lr.Data.DescFlags[result]) & prefixMask) > 0)
-                                ret.AddUnique(new HebrewToken(word.Substring(0, prefLen) + lr.Word, prefLen, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score * 0.9f));
+                            if (((int) HSpell.LingInfo.dmask2ps(lr.Data.DescFlags[result]) & prefixMask) > 0)
+                                yield return new HebrewToken(word.Substring(0, prefLen) + lr.Word, prefLen, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score*0.9f)
+                                { Type = WordType.HEBREW_TOLERATED_WITH_PREFIX };
                         }
                     }
                 }
             }
+        }
 
-			return ret;
+        public WordType Lemmatize(string word, IList<HebrewToken> tokens)
+        {
+            if (tokens.Count > 0)
+                throw new ArgumentException("Output list has to be empty", nameof(tokens));
+
+            if (!IsHebrewWord(word))
+                return WordType.NON_HEBREW;
+
+            var ret = WordType.UNRECOGNIZED;
+            foreach (var token in Lemmatize(word))
+            {
+                tokens.Add(token);
+                if (token.Type > ret)
+                    ret = token.Type;
+            }
+            if (tokens.Count > 0)
+                return ret;
+
+            foreach (var token in LemmatizeTolerant(word))
+            {
+                tokens.Add(token);
+                if (token.Type > ret)
+                    ret = token.Type;
+            }
+            if (tokens.Count > 0)
+                return ret;
+
+            return WordType.UNRECOGNIZED;
         }
     }
 }

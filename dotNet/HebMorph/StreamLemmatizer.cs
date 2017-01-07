@@ -22,6 +22,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using HebMorph.DataStructures;
 using HebMorph.HSpell;
@@ -142,8 +143,8 @@ namespace HebMorph
 						break;
 					}
 
-                	IList<HebrewToken> lemmas = Lemmatize(nextToken);
-                    if (lemmas.Count > 0)
+                	var lemmas = Lemmatize(nextToken).ToArray();
+                    if (lemmas.Length > 0)
                     {
                         // TODO: Filter Stop Words based on morphological data (hspell 'x' identification)
                         // TODO: Check for worthy lemmas, if there are none then perform tolerant lookup and check again...
@@ -164,8 +165,8 @@ namespace HebMorph
                     }
                     else if (TolerateWhenLemmatizingStream && retTokens.Count == 0)
                     {
-                        lemmas = LemmatizeTolerant(nextToken);
-                        if (lemmas.Count > 0)
+                        lemmas = LemmatizeTolerant(nextToken).ToArray();
+                        if (lemmas.Length > 0)
                         {
                             // TODO: Keep only worthy lemmas, based on characteristics and score / confidence
 
