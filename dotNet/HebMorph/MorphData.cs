@@ -19,29 +19,37 @@
  * 
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
+using HebMorph.HSpell;
 
 namespace HebMorph
 {
     public class MorphData
     {
-        public HSpell.DMask[] DescFlags;
-        public string[] Lemmas;
-        public byte Prefixes;
+        public List<Entry> Lemmas { get; set; }
+        public byte Prefixes { get; set; }
+
+        public void AddLemma(Entry lemma)
+        {
+            Lemmas.Add(lemma);
+        }
+
+        public void ClearLemmas()
+        {
+            Lemmas.Clear();
+        }
 
         public override bool Equals(object obj)
         {
             MorphData o = obj as MorphData;
             if (o == null) return false;
 
-            if (DescFlags.Length != o.DescFlags.Length)
+            if (Lemmas.Count != o.Lemmas.Count)
                 return false;
 
-            for (int i = 0; i < DescFlags.Length; i++)
+            for (int i = 0; i < Lemmas.Count; i++)
             {
-                if (DescFlags[i] != o.DescFlags[i] || !Lemmas[i].Equals(o.Lemmas[i]))
+                if (Lemmas[i] != o.Lemmas[i] || !Lemmas[i].Equals(o.Lemmas[i]))
                     return false;
             }
             return true;
@@ -49,7 +57,31 @@ namespace HebMorph
 
         public override int GetHashCode()
         {
-            return DescFlags.GetHashCode() * Lemmas.GetHashCode();
+            return Lemmas.GetHashCode();
+        }
+
+        public enum DescFlag
+        {
+            D_EMPTY = 0,
+            D_NOUN = 1,
+            D_VERB = 2,
+            D_ADJ = 3,
+            D_PROPER = 4,
+            D_ACRONYM = 5,
+        }
+
+        public class Entry
+        {
+            public Entry(string lem, DescFlag descFlag, PrefixType prefixType)
+            {
+                Lemma = lem;
+                DescFlag = descFlag;
+                Prefix = prefixType;
+            }
+
+            public string Lemma { get; set; }
+            public PrefixType Prefix { get; set; }
+            public DescFlag DescFlag { get; set; }
         }
     }
 }

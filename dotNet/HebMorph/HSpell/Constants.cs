@@ -1299,12 +1299,14 @@ namespace HebMorph.HSpell
     [Flags]
     public enum PrefixType : byte
     {
-        PS_ALL = 63,
+        PS_EMPTY = 0,
         PS_B = 1,
         PS_L = 2,
         PS_VERB = 4,
         PS_NONDEF = 8,
         PS_IMPER = 16,
         PS_MISC = 32,
+        PS_ALL = 127,
+        PS_KL = 64,
     }
 }

@@ -214,25 +214,28 @@ namespace HebMorph.HSpell
 
                     for (int i = 0; lookup[i] != null; i++)
                     {
-                        MorphData data = new MorphData();
-                        data.Prefixes = Convert.ToByte(fprefixes.ReadByte()); // Read prefix hint byte
-                        data.DescFlags = dataLoader.ReadDescFile();
+                        MorphData data = new MorphData {Prefixes = Convert.ToByte(fprefixes.ReadByte())};
+                        // Read prefix hint byte
+                        var DescFlags = dataLoader.ReadDescFile();
 
                         var stemReferences = dataLoader.ReadStemFile();
-                        data.Lemmas = new string[stemReferences.Count];
+                        data.Lemmas = new List<MorphData.Entry>(stemReferences.Count);
                         int stemPosition = 0;
                         foreach (int r in stemReferences)
                         {
                             // This is a bypass for the psuedo-stem "שונות", as defined by hspell
                             // TODO: Try looking into changing this in hspell itself
+                            string lemma;
                             if (lookup[r].Equals("שונות") && !lookup[r].Equals(lookup[i]))
                             {
-                                data.Lemmas[stemPosition++] = null;
+                                lemma = null;
                             }
                             else
                             {
-                                data.Lemmas[stemPosition++] = lookup[r];
+                                lemma = lookup[r];
                             }
+                            data.Lemmas[stemPosition] = new MorphData.Entry(lemma, (MorphData.DescFlag)((byte)DescFlags[stemPosition] & 3), dmaskToPrefix((byte)DescFlags[stemPosition]));
+                            stemPosition++;
                         }
                         ret.AddNode(lookup[i], data);
                     }
@@ -278,6 +281,58 @@ namespace HebMorph.HSpell
                     return ret;
                 }
             }
+        }
+
+        // find the prefixes required by a word according to its details
+        private static PrefixType dmaskToPrefix(int dmask)
+        {
+            PrefixType specifier;
+            if ((dmask & (int)DMask.D_TYPEMASK) == (byte)DMask.D_VERB)
+            {
+                if ((dmask & (int)DMask.D_TENSEMASK) == (int)DMask.D_IMPERATIVE)
+                {
+                    specifier = PrefixType.PS_IMPER;
+                }
+                else if ((dmask & (int)DMask.D_TENSEMASK) != (int)DMask.D_PRESENT)
+                {
+                    specifier = PrefixType.PS_VERB;
+                }
+                else if (((dmask & (int)DMask.D_OSMICHUT) > 0) || ((dmask & (int)DMask.D_OMASK) > 0))
+                {
+                    specifier = PrefixType.PS_NONDEF;
+                }
+                else
+                {
+                    specifier = PrefixType.PS_ALL;
+                }
+                /*TODO I feel that this may lead to a bug with ליפול and other infinitives that
+                 * did not loose their initial lamed.  I should correct this all the way from
+                 * woo.pl*/
+                if ((dmask & (int)DMask.D_TENSEMASK) == (int)DMask.D_INFINITIVE)
+                {
+                    specifier = PrefixType.PS_L;
+                }
+                else if ((dmask & (int)DMask.D_TENSEMASK) == (int)DMask.D_BINFINITIVE)
+                {
+                    specifier = PrefixType.PS_B;
+                }
+            }
+            else if (((dmask & (int)DMask.D_TYPEMASK) == (int)DMask.D_NOUN) || ((dmask & (int)DMask.D_TYPEMASK) == (int)DMask.D_ADJ))
+            {
+                if (((dmask & (int)DMask.D_OSMICHUT) > 0) || ((dmask & (int)DMask.D_OMASK) > 0) || ((dmask & (int)DMask.D_SPECNOUN) > 0))
+                {
+                    specifier = PrefixType.PS_NONDEF;
+                }
+                else
+                {
+                    specifier = PrefixType.PS_ALL;
+                }
+            }
+            else
+            {
+                specifier = PrefixType.PS_ALL;
+            }
+            return specifier;
         }
 
         // Mapping is based on

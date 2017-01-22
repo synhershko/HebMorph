@@ -21,6 +21,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using HebMorph.DataStructures;
@@ -122,9 +123,9 @@ namespace HebMorph
             MorphData md = m_dict.Lookup(word);
             if (md != null)
             {
-                for (int result = 0; result < md.Lemmas.Length; result++)
+                foreach (var result in md.Lemmas)
                 {
-                    yield return new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f) {Type = WordType.HEBREW};
+                    yield return new HebrewToken(word, 0, (DMask)(byte)result.DescFlag, result.Lemma, 1.0f) {Type = WordType.HEBREW};
                 }
             }
             else if (word.EndsWith("'")) // Try ommitting closing Geresh
@@ -132,9 +133,9 @@ namespace HebMorph
                 md = m_dict.Lookup(word.Substring(0, word.Length - 1));
                 if (md != null)
                 {
-                    for (int result = 0; result < md.Lemmas.Length; result++)
+                    foreach (var result in md.Lemmas)
                     {
-                        yield return new HebrewToken(word, 0, md.DescFlags[result], md.Lemmas[result], 1.0f) {Type = WordType.HEBREW};
+                        yield return new HebrewToken(word, 0, (DMask)(byte)result.DescFlag, result.Lemma, 1.0f) {Type = WordType.HEBREW};
                     }
                 }
             }
@@ -153,10 +154,10 @@ namespace HebMorph
                 md = m_dict.Lookup(word.Substring(prefLen));
                 if (md != null && (md.Prefixes & prefixMask) > 0)
                 {
-                    for (int result = 0; result < md.Lemmas.Length; result++)
+                    foreach (var result in md.Lemmas)
                     {
-                        if (((int) HSpell.LingInfo.dmask2ps(md.DescFlags[result]) & prefixMask) > 0)
-                            yield return new HebrewToken(word, prefLen, md.DescFlags[result], md.Lemmas[result], 0.9f) {Type = WordType.HEBREW_WITH_PREFIX};
+                        if (((int) HSpell.LingInfo.dmask2ps((DMask)(byte)result.DescFlag) & prefixMask) > 0)
+                            yield return new HebrewToken(word, prefLen, (DMask)(byte)result.DescFlag, result.Lemma, 0.9f) {Type = WordType.HEBREW_WITH_PREFIX};
                     }
                 }
             }
@@ -178,9 +179,9 @@ namespace HebMorph
             {
                 foreach (var lr in tolerated)
                 {
-                    for (int result = 0; result < lr.Data.Lemmas.Length; result++)
+                    foreach (var result in lr.Data.Lemmas)
                     {
-                        yield return new HebrewToken(lr.Word, 0, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score) {Type = WordType.HEBREW_TOLERATED};
+                        yield return new HebrewToken(lr.Word, 0, (DMask)(byte)result.DescFlag, result.Lemma, lr.Score) {Type = WordType.HEBREW_TOLERATED};
                     }
                 }
             }
@@ -201,10 +202,10 @@ namespace HebMorph
                 {
                     foreach (DictRadix<MorphData>.LookupResult lr in tolerated)
                     {
-                        for (int result = 0; result < lr.Data.Lemmas.Length; result++)
+                        foreach (var result in lr.Data.Lemmas)
                         {
-                            if (((int) HSpell.LingInfo.dmask2ps(lr.Data.DescFlags[result]) & prefixMask) > 0)
-                                yield return new HebrewToken(word.Substring(0, prefLen) + lr.Word, prefLen, lr.Data.DescFlags[result], lr.Data.Lemmas[result], lr.Score*0.9f)
+                            if (((int) HSpell.LingInfo.dmask2ps((DMask)(byte)result.DescFlag) & prefixMask) > 0)
+                                yield return new HebrewToken(word.Substring(0, prefLen) + lr.Word, prefLen, (DMask)(byte)result.DescFlag, result.Lemma, lr.Score*0.9f)
                                 { Type = WordType.HEBREW_TOLERATED_WITH_PREFIX };
                         }
                     }
