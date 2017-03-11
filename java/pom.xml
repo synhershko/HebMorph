@@ -14,7 +14,7 @@
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>hebmorph-lucene</artifactId>
     <packaging>jar</packaging>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.0</version>
     <name>hebmorph-lucene</name>
     <description>Enabling Hebrew search in Lucene. Part of the HebMorph project, for making Hebrew properly
         searchable
