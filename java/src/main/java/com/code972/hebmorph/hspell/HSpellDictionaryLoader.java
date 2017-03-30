@@ -45,8 +45,4 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
         HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
         return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_NOH)));
     }
-
-    public static void main(String[] args) {
-        System.out.println(Paths.get("plugins", "analysis-hebrew", "hspell-data-files").toString());
-    }
 }
