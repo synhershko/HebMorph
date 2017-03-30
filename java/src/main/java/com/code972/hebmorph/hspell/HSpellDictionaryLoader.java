@@ -6,6 +6,7 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * DictionaryLoader implementation for loading hspell data files
@@ -18,7 +19,10 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
 
     @Override
     public String[] dictionaryPossiblePaths() {
-        return new String[] {"plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/"};
+        return new String[]{
+                Paths.get("plugins", "analysis-hebrew", "hspell-data-files").toString(),
+                "/var/lib/hspell-data-files/"
+        };
     }
 
     @Override
@@ -40,5 +44,9 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
     public DictHebMorph loadDictionaryFromDefaultPath() throws IOException {
         HSpellLoader loader = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true);
         return loader.loadDictionaryFromHSpellData(new FileInputStream(new File(HSpellLoader.getHspellPath(), HSpellLoader.PREFIX_NOH)));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Paths.get("plugins", "analysis-hebrew", "hspell-data-files").toString());
     }
 }
