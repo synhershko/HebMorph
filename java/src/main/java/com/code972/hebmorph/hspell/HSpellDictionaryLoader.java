@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 /**
  * DictionaryLoader implementation for loading hspell data files
@@ -18,11 +19,21 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
     }
 
     @Override
+    @Deprecated
     public String[] dictionaryPossiblePaths() {
-        return new String[]{
-                Paths.get("plugins", "analysis-hebrew", "hspell-data-files").toString(),
-                "/var/lib/hspell-data-files/"
-        };
+        return getPossiblePaths();
+    }
+
+    @Override
+    public String[] getPossiblePaths(final String ... basePaths) {
+        final HashSet<String> paths = new HashSet<>();
+        if (basePaths != null) {
+            for (final String basePath : basePaths) {
+                paths.add(Paths.get(basePath, "hspell-data-files").toAbsolutePath().toString());
+            }
+        }
+        paths.add("/var/lib/hspell-data-files/");
+        return paths.toArray(new String[paths.size()]);
     }
 
     @Override

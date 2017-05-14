@@ -28,7 +28,10 @@ public interface DictionaryLoader {
 
     String dictionaryLoaderName();
 
+    @Deprecated
     String[] dictionaryPossiblePaths();
+
+    String[] getPossiblePaths(String ... basePaths);
 
     DictHebMorph loadDictionaryFromPath(final String path) throws IOException;
 
