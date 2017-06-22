@@ -99,7 +99,11 @@ public class Lemmatizer {
             for (int result = 0; result < md.getLemmas().length; result++) {
                 ret.add(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
             }
-        } else if (word.endsWith("'")) { // Try ommitting closing Geresh
+
+            if (md.haltIfFound())
+                return ret;
+
+        } else if (word.endsWith("'")) { // Try omitting closing Geresh
             try {
                 md = dictHeb.lookup(word.substring(0, word.length() - 1));
             } catch (IllegalArgumentException e) {
@@ -109,6 +113,9 @@ public class Lemmatizer {
                 for (int result = 0; result < md.getLemmas().length; result++) {
                     ret.add(new HebrewToken(word, (byte) 0, md.getLemmas()[result], 1.0f));
                 }
+
+                if (md.haltIfFound())
+                    return ret;
             }
         }
 
@@ -131,6 +138,9 @@ public class Lemmatizer {
                         ret.add(new HebrewToken(word, prefLen, md.getLemmas()[result], 0.9f));
                     }
                 }
+
+                if (md.haltIfFound())
+                    return ret;
             }
         }
         return ret;

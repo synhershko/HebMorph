@@ -25,6 +25,7 @@ import java.util.Comparator;
 public class MorphData {
     private ArrayList<Lemma> lemmas;
     private short prefixes;
+    private boolean haltIfFound;
 
     public static class Lemma {
         private final DescFlag descFlag;
@@ -120,6 +121,14 @@ public class MorphData {
 
     public int getPrefixes() {
         return prefixes;
+    }
+
+    public boolean haltIfFound() {
+        return haltIfFound;
+    }
+
+    public void setHaltIfFound(boolean haltIfFound) {
+        this.haltIfFound = haltIfFound;
     }
 
     @Override
