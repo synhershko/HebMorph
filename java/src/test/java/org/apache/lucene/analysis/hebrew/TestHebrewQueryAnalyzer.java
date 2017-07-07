@@ -21,10 +21,13 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.junit.Ignore;
 
 import java.io.IOException;
 
 public class TestHebrewQueryAnalyzer extends BaseTokenStreamTestCase {
+
+
     public void testBasics() throws IOException {
         Analyzer a = TestBase.getHebrewQueryAnalyzer();
 
@@ -49,6 +52,7 @@ public class TestHebrewQueryAnalyzer extends BaseTokenStreamTestCase {
         checkOneTerm(a, "3", "3");
     }
 
+    @Ignore
     public void testRegress() throws IOException {
         Analyzer analyzer = TestBase.getHebrewQueryAnalyzer();
         String input = TestBase.readFileToString("./../test-files/1371379368027561.txt");

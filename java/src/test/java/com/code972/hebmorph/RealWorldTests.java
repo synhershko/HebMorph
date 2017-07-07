@@ -19,6 +19,7 @@ package com.code972.hebmorph;
 
 import com.code972.hebmorph.datastructures.DictRadix;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -40,8 +41,9 @@ public class RealWorldTests extends TestBase {
     }
 
     @Test
+    @Ignore
     public void test() throws IOException {
-        File files = new File("./../../test-files");
+        final File files = new File("./../../test-files");
         for (File filename : files.listFiles()) {
             testImpl(filename.getPath());
         }

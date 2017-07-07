@@ -21,6 +21,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -44,6 +45,8 @@ public class TestHebrewQueryLightAnalyzer extends BaseTokenStreamTestCase {
         //assertAnalyzesTo(a, "steven\uFF07s", new String[]{"steven's$", "steven's"});
         checkOneTerm(a, "3", "3");
     }
+
+    @Ignore
     public void testRegress() throws IOException {
         Analyzer analyzer = TestBase.getHebrewQueryLightAnalyzer();
         String input = TestBase.readFileToString("./../test-files/1371379368027561.txt");

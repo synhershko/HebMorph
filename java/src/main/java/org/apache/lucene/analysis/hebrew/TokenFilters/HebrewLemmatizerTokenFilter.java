@@ -92,14 +92,13 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
             // try to lemmatize
             tokensList.clear();
             lemmatizer.lemmatize(word, tokensList);
+
             // word wasn't found in the dictionary - try tolerating it
             if (tokensList.isEmpty()) {
                 lemmatizer.lemmatizeTolerant(word, tokensList);
                 previousTolerated = true;
             }
-            // TODO the resulting list needs to be sorted once we start relying on order and other lemma metadata
-            // TODO Collections.sort(tokensList);
-            // TODO Collections.reverse(tokensList);
+            tokensList.sort(Comparator.reverseOrder());
 
             // add words to the previousLemmas : remove duplicates and tokens which aren't ranked high enough if they came from tolerating.
             // TODO: consider the ranking as an additional filter
