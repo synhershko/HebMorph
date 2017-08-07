@@ -7,6 +7,8 @@ More details at http://code972.com/HebMorph
 
 ## Lucene / Elasticsearch compatibility
 
+Since March 2017 hebmorph-lucene is being released for every Lucene/Solr version, with a matching major version number (most of the time minor as well). Matching Elasticsearch plugin versions are also available, see https://github.com/synhershko/elasticsearch-analysis-hebrew.
+
 <table>
 	<thead>
 		<tr>
