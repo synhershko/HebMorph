@@ -1,0 +1,55 @@
+plugins {
+    id 'io.codearte.nexus-staging' version '0.9.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'signing'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'com.code972.hebmorph'
+version = '6.6.0'
+
+description = """hebmorph-lucene"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+configurations.all {
+}
+
+repositories {
+     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+     mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.lucene', name: 'lucene-core', version: version
+    compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version:version
+    compile(group: 'org.apache.lucene', name: 'lucene-queries', version:version) {
+exclude(module: 'jakarta-regexp')
+    }
+    compile group: 'org.apache.lucene', name: 'lucene-memory', version:version
+    compile group: 'org.apache.lucene', name: 'lucene-highlighter', version:version
+    compile group: 'org.apache.lucene', name: 'lucene-queryparser', version:version
+    testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version:version
+    testCompile group: 'org.apache.commons', name: 'commons-lang3', version:'3.6'
+    testCompile group: 'junit', name: 'junit', version:'4.12'
+}
+
+nexusStaging {
+    packageGroup = "com.code972"
+    username = "${System.getenv('NEXUS_USER')}"
+    password = "${System.getenv('NEXUS_PWD')}"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
