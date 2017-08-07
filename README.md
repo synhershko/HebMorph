@@ -110,7 +110,7 @@ For the analyzer support, get hebmorph-lucene:
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
-            <version>2.0.2</version>
+            <version>6.6.0</version>
             <scope>compile</scope>
         </dependency>
 ```
