@@ -2,7 +2,8 @@ HebMorph is an open-source effort for making Hebrew properly searchable by vario
 
 More details at http://code972.com/HebMorph
 
-[![Build Status](https://drone.io/github.com/synhershko/HebMorph/status.png)](https://drone.io/github.com/synhershko/HebMorph/latest)  [![Build Status](https://travis-ci.org/synhershko/HebMorph.svg?branch=master)](https://travis-ci.org/synhershko/HebMorph)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.code972.hebmorph/hebmorph-lucene/badge.png)](http://mvnrepository.com/artifact/com.code972.hebmorph/hebmorph-lucene)
+[![Build Status](https://travis-ci.org/synhershko/HebMorph.svg?branch=master)](https://travis-ci.org/synhershko/HebMorph)
 
 ## Lucene / Elasticsearch compatibility
 
