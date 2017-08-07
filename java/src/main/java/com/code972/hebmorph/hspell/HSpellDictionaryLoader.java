@@ -2,10 +2,12 @@ package com.code972.hebmorph.hspell;
 
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
@@ -34,6 +36,11 @@ public class HSpellDictionaryLoader implements DictionaryLoader {
         }
         paths.add("/var/lib/hspell-data-files/");
         return paths.toArray(new String[paths.size()]);
+    }
+
+    @Override
+    public DictHebMorph loadDictionary(final InputStream stream) throws IOException {
+        throw new NotImplementedException();
     }
 
     @Override

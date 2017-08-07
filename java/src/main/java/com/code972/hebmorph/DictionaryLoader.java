@@ -20,6 +20,7 @@ package com.code972.hebmorph;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 public interface DictionaryLoader {
@@ -32,6 +33,8 @@ public interface DictionaryLoader {
     String[] dictionaryPossiblePaths();
 
     String[] getPossiblePaths(String ... basePaths);
+
+    DictHebMorph loadDictionary(final InputStream stream) throws IOException;
 
     DictHebMorph loadDictionaryFromPath(final String path) throws IOException;
 
