@@ -1,5 +1,5 @@
 plugins {
-    id 'io.codearte.nexus-staging' version '0.9.0'
+    id 'io.codearte.nexus-staging' version '0.11.0'
 }
 
 apply plugin: 'java'
@@ -8,7 +8,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = 'com.code972.hebmorph'
-version = '6.6.0'
+version = '6.6.1'
 
 description = """hebmorph-lucene"""
 
@@ -18,10 +18,8 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
-configurations.all {
-}
-
 repositories {
+     maven { url "https://oss.sonatype.org/content/repositories/releases" }
      maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
      mavenCentral()
 }
@@ -47,6 +45,15 @@ nexusStaging {
 }
 
 publishing {
+    repositories {
+        maven {
+          url "https://oss.sonatype.org/content/repositories/releases"
+          credentials {
+            username "${System.getenv('NEXUS_USER')}"
+            password "${System.getenv('NEXUS_PWD')}"
+          }
+        }
+    }
     publications {
         mavenJava(MavenPublication) {
             from components.java
