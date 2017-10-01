@@ -47,7 +47,7 @@ nexusStaging {
 publishing {
     repositories {
         maven {
-          url "https://oss.sonatype.org/content/repositories/releases"
+          url "https://oss.sonatype.org/content/repositories/staging"
           credentials {
             username "${System.getenv('NEXUS_USER')}"
             password "${System.getenv('NEXUS_PWD')}"
