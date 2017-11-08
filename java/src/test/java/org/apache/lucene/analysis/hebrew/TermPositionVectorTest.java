@@ -108,7 +108,7 @@ public class TermPositionVectorTest extends TestBase {
         Terms terms = searcher.getIndexReader().getTermVectors(num).terms("Text");
 
         Set<Term> trms_list = new HashSet<>();
-        searcher.createWeight(q,true).extractTerms(trms_list);
+        searcher.createWeight(q,true, 1.0f).extractTerms(trms_list);
 //        q.extractTerms(trms_list);
 
         for (Term t : trms_list) {
