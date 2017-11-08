@@ -7,4 +7,4 @@ cache:
   - $HOME/.gradle
 
 script:
-  - pushd java && ./gradlew clean check && popd
+  - pushd java && gradle clean check && popd
