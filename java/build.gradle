@@ -34,12 +34,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version:'4.12'
 }
 
-Properties properties = new Properties()
-File propFile = "${System.properties['user.home']}${File.separator}.gradle${File.separator}bintray.properties" as File
-properties.load(propFile.newDataInputStream())
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = 'synhershko'
+    key = System.getenv('BINTRAY_KEY')
     publications = ['mavenJava']
 
     pkg {
