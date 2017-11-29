@@ -22,6 +22,16 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.HebrewLemmatizerTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.MarkHebrewTokensFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.junit.AfterClass;
 
 import java.io.File;
@@ -67,6 +77,25 @@ public abstract class TestBase {
             dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
         return new HebrewIndexingAnalyzer(dict);
+    }
+
+    public static HebrewAnalyzer getHebrewIndexingAnalyzerWithStandardTokenizer() throws IOException {
+        if (dict == null) {
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+        }
+        return new HebrewAnalyzer(dict) {
+            @Override
+            protected TokenStreamComponents createComponents(String fieldName) {
+                Tokenizer src = new StandardTokenizer();
+                TokenStream tok = new NiqqudFilter(src);
+                tok = new ASCIIFoldingFilter(tok);
+                tok = new LowerCaseFilter(tok);
+                tok = new MarkHebrewTokensFilter(tok);
+                tok = new HebrewLemmatizerTokenFilter(tok, dict);
+                tok = new AddSuffixTokenFilter(tok, '$');
+                return new TokenStreamComponents(src, tok);
+            }
+        };
     }
 
     public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
