@@ -31,7 +31,7 @@ import java.io.*;
 public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
 
     public void testDictionaryLoaded() throws IOException {
-        HebrewAnalyzer a = TestBase.getHebrewIndexingAnalyzer();
+        HebrewAnalyzer a = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
         assertEquals(WordType.HEBREW, a.isRecognizedWord("אימא", false));
         assertEquals(WordType.HEBREW, a.isRecognizedWord("בדיקה", false));
         assertEquals(WordType.UNRECOGNIZED, a.isRecognizedWord("ץץץץץץ", false));
@@ -43,7 +43,7 @@ public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
 //    }
 
     public void testBasics() throws IOException {
-        Analyzer a = TestBase.getHebrewIndexingAnalyzer();
+        Analyzer a = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
 
         assertAnalyzesTo(a, "אימא", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "אימא$", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
@@ -68,7 +68,7 @@ public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
 
     @Ignore
     public void testRegress() throws IOException {
-        Analyzer analyzer = TestBase.getHebrewIndexingAnalyzer();
+        Analyzer analyzer = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
         String input = TestBase.readFileToString("./../test-files/1371379368027561.txt");
         String[] output = {"שני$", "שניים", "שני", "ישן", "שינה", "שנה", "שני", "עשורים$", "עשור", "מההקמה$", "הקמה", "פעילות$", "פעילה", "פעילות",
                 "מי$", "מי", "מים", "עדן$", "עדן", "עד", "עידן", "נמכרת$", "נמכר", "לפי$", "לפלנד", "פה", "פי", "שווי$", "שווי", "שווה", "שיווה",

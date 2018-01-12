@@ -17,20 +17,18 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.memory.MemoryIndex;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.SimpleCollector;
+import org.apache.lucene.search.TermQuery;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashSet;
@@ -43,35 +41,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.fail;
 
 public class RealDataTest extends TestBase {
-    public static class TestSimpleHebrewAnalyzer extends Analyzer {
-        private final DictHebMorph dict;
-        private final DictRadix<Byte> specialTokenizationCases;
-        private final CharArraySet commonWords;
-
-        public TestSimpleHebrewAnalyzer(final DictHebMorph dict,
-                                        final DictRadix<Byte> specialTokenizationCases, final CharArraySet commonWords) throws IOException {
-            this.dict = dict;
-            this.specialTokenizationCases = specialTokenizationCases;
-            this.commonWords = commonWords;
-        }
-
-        @Override
-        protected TokenStreamComponents createComponents(String fieldName) {
-            final StreamLemmasFilter src = new StreamLemmasFilter(dict, specialTokenizationCases, commonWords, new BasicLemmaFilter());
-            src.setKeepOriginalWord(true);
-
-            return new TokenStreamComponents(src) {
-                @Override
-                protected void setReader(final Reader reader) {
-                    super.setReader(reader);
-                }
-            };
-        }
-    }
 
     @Test
     public void testSequentially() throws IOException, InterruptedException {
-        final Analyzer a = new TestSimpleHebrewAnalyzer(getDictionary(), null, null);
+        final Analyzer a = new HebrewIndexingAnalyzer(getDictionary());
         System.out.print("DictHebMorph initialized;");
 
         final HashSet<String> results = performSearch(a);

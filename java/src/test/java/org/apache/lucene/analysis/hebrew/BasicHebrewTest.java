@@ -17,7 +17,6 @@
  **************************************************************************/
 package org.apache.lucene.analysis.hebrew;
 
-import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -34,11 +33,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.junit.*;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,7 +46,7 @@ public class BasicHebrewTest extends TestBase {
     private Analyzer analyzer;
 
     public BasicHebrewTest() throws IOException {
-        analyzer = new TestAnalyzer();
+        analyzer = new HebrewIndexingAnalyzer(getDictionary());
     }
 
     @BeforeClass
@@ -119,7 +116,6 @@ public class BasicHebrewTest extends TestBase {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Test
     public void testLemmatization() throws Exception {
-        analyzer = new TestAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
         ts.reset();
 
@@ -134,7 +130,6 @@ public class BasicHebrewTest extends TestBase {
     @SuppressWarnings("StatementWithEmptyBody")
     @Test
     public void testFinalOffset() throws Exception {
-        analyzer = new TestAnalyzer();
         final TokenStream ts = analyzer.tokenStream("foo", new StringReader("מינהל"));
         OffsetAttribute offsetAttribute = ts.addAttribute(OffsetAttribute.class);
         ts.reset();
@@ -144,16 +139,15 @@ public class BasicHebrewTest extends TestBase {
         assertEquals(5, offsetAttribute.endOffset());
     }
 
-    protected void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception {
-        //System.out.println(whatToIndex);
+    private void assertFoundInText(String whatToIndex, String whatToSearch) throws Exception {
         assertEquals(1, findInText(whatToIndex, whatToSearch));
     }
 
-    protected void assertNotFoundInText(String whatToIndex, String whatToSearch) throws Exception {
+    private void assertNotFoundInText(String whatToIndex, String whatToSearch) throws Exception {
         assertEquals(0, findInText(whatToIndex, whatToSearch));
     }
 
-    protected int findInText(String whatToIndex, String whatToSearch) throws Exception {
+    private int findInText(String whatToIndex, String whatToSearch) throws Exception {
         final Directory d = new RAMDirectory();
 
         IndexWriterConfig config = new IndexWriterConfig(analyzer); //use of Version, need to look at this.
@@ -173,26 +167,6 @@ public class BasicHebrewTest extends TestBase {
         d.close();
 
         return hits.length;
-    }
-
-    private class TestAnalyzer extends Analyzer {
-
-        public TestAnalyzer() throws IOException {
-            super();
-        }
-
-        @Override
-        protected TokenStreamComponents createComponents(String fieldName) {
-            StreamLemmasFilter src = null;
-            try {
-                src = new StreamLemmasFilter(getDictionary(), null, new BasicLemmaFilter());
-                src.setKeepOriginalWord(true);
-                src.setSuffixForExactMatch('$');
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return new TokenStreamComponents(src);
-        }
     }
 }
 
