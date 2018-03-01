@@ -22,6 +22,16 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.HebrewLemmatizerTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.MarkHebrewTokensFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.junit.AfterClass;
 
 import java.io.File;
@@ -69,11 +79,18 @@ public abstract class TestBase {
         return new HebrewIndexingAnalyzer(dict);
     }
 
-    public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
+    public static HebrewAnalyzer getHebrewIndexingAnalyzerWithStandardTokenizer() throws IOException {
         if (dict == null) {
             dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
-        return new HebrewQueryAnalyzer(dict);
+        return new HebrewIndexingAnalyzer(dict);
+    }
+
+    public static HebrewLegacyQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
+        if (dict == null) {
+            dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
+        }
+        return new HebrewLegacyQueryAnalyzer(dict);
     }
 
     public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {

@@ -40,10 +40,7 @@ public final class HebrewTokenizer extends Tokenizer {
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-    //	private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-//    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
-    private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
 
     public HebrewTokenizer(HashMap<String, Integer> prefixes) {
         this(prefixes, null);
@@ -59,13 +56,13 @@ public final class HebrewTokenizer extends Tokenizer {
         this.hebMorphTokenizer.setSuffixForExactMatch(suffixForExactMatch);
     }
 
-    public static interface TOKEN_TYPES {
-        public static final int Hebrew = 0;
-        public static final int NonHebrew = 1;
-        public static final int Numeric = 2;
-        public static final int Construct = 3;
-        public static final int Acronym = 4;
-        public static final int Mixed = 5;
+    public interface TOKEN_TYPES {
+        int Hebrew = 0;
+        int NonHebrew = 1;
+        int Numeric = 2;
+        int Construct = 3;
+        int Acronym = 4;
+        int Mixed = 5;
     }
 
     public static final String[] TOKEN_TYPE_SIGNATURES = new String[]{
@@ -123,11 +120,10 @@ public final class HebrewTokenizer extends Tokenizer {
 
             break;
         }
-        // Record the term string
 
+        // Record the term string
         termAtt.copyBuffer(nextTokenVal.toCharArray(), 0, nextTokenVal.length());
         offsetAtt.setOffset(correctOffset(hebMorphTokenizer.getOffset()), correctOffset(hebMorphTokenizer.getOffset() + hebMorphTokenizer.getLengthInSource()));
-        keywordAtt.setKeyword(true);
         if ((tokenType & com.code972.hebmorph.Tokenizer.TokenType.Exact) > 0)
             hebTypeAtt.setExact(true);
 

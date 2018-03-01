@@ -22,35 +22,29 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.WordType;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.util.LuceneTestCase;
 import org.junit.Ignore;
 
-import java.io.*;
+import java.io.IOException;
 
 public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
 
     public void testDictionaryLoaded() throws IOException {
-        HebrewAnalyzer a = TestBase.getHebrewIndexingAnalyzer();
+        HebrewAnalyzer a = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
         assertEquals(WordType.HEBREW, a.isRecognizedWord("אימא", false));
         assertEquals(WordType.HEBREW, a.isRecognizedWord("בדיקה", false));
         assertEquals(WordType.UNRECOGNIZED, a.isRecognizedWord("ץץץץץץ", false));
     }
 
-//    public void testFoo() throws IOException {
-//        Analyzer a = TestBase.getHebrewIndexingAnalyzer();
-//        assertAnalyzesTo(a, "שני", new String[]{"שני$", "שניים"}); // recognized word, lemmatized
-//    }
-
     public void testBasics() throws IOException {
-        Analyzer a = TestBase.getHebrewIndexingAnalyzer();
+        Analyzer a = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
 
         assertAnalyzesTo(a, "אימא", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "אימא$", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "בדיקהבדיקה", new String[]{"בדיקהבדיקה$", "בדיקהבדיקה"}); // OOV
         assertAnalyzesTo(a, "בדיקהבדיקה$", new String[]{"בדיקהבדיקה$", "בדיקהבדיקה"}); // OOV
-        assertAnalyzesTo(a, "ץץץץץץץץץץץ", new String[]{}); // Invalid, treated as noise
-        assertAnalyzesTo(a, "ץץץץץץץץץץץ$", new String[]{}); // Invalid, treated as noise
+        assertAnalyzesTo(a, "ץץץץץץץץץץץ", new String[]{"ץץץץץץץץץץץ$", "ץץץץץץץץץץץ"}); // OOV
+        assertAnalyzesTo(a, "ץץץץץץץץץץץ$", new String[]{"ץץץץץץץץץץץ$", "ץץץץץץץץץץץ"}); // OOV
 
         assertAnalyzesTo(a, "אנציקלופדיה", new String[]{"אנציקלופדיה$", "אנציקלופדיה"});
         assertAnalyzesTo(a, "אנצקלופדיה", new String[]{"אנצקלופדיה$", "אנציקלופדיה"});
@@ -68,7 +62,7 @@ public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
 
     @Ignore
     public void testRegress() throws IOException {
-        Analyzer analyzer = TestBase.getHebrewIndexingAnalyzer();
+        Analyzer analyzer = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
         String input = TestBase.readFileToString("./../test-files/1371379368027561.txt");
         String[] output = {"שני$", "שניים", "שני", "ישן", "שינה", "שנה", "שני", "עשורים$", "עשור", "מההקמה$", "הקמה", "פעילות$", "פעילה", "פעילות",
                 "מי$", "מי", "מים", "עדן$", "עדן", "עד", "עידן", "נמכרת$", "נמכר", "לפי$", "לפלנד", "פה", "פי", "שווי$", "שווי", "שווה", "שיווה",

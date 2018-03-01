@@ -55,7 +55,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
         return SPECIAL_TOKENIZATION_CASES;
     }
 
-    protected HebrewAnalyzer(DictHebMorph dict) throws IOException {
+    protected HebrewAnalyzer(DictHebMorph dict) {
         this.dict = dict;
     }
 

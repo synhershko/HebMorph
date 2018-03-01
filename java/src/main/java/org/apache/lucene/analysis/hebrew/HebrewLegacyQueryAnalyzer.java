@@ -23,29 +23,34 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.hebrew.TokenFilters.AddSuffixTokenFilter;
+import org.apache.lucene.analysis.hebrew.TokenFilters.HebrewLemmatizerTokenFilter;
 import org.apache.lucene.analysis.hebrew.TokenFilters.NiqqudFilter;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
 import java.io.IOException;
 
-public class HebrewExactAnalyzer extends HebrewAnalyzer {
-    public HebrewExactAnalyzer(DictHebMorph dict) {
+public class HebrewLegacyQueryAnalyzer extends HebrewAnalyzer {
+    public HebrewLegacyQueryAnalyzer(DictHebMorph dict) {
         super(dict);
     }
 
-    public HebrewExactAnalyzer() throws IOException {
+    public HebrewLegacyQueryAnalyzer() throws IOException {
         super();
     }
 
     @Override
     protected TokenStreamComponents createComponents(final String fieldName) {
-        // on exact - we don't care about suffixes at all, we always output original word with suffix only
-        final HebrewTokenizer src = new HebrewTokenizer(dict.getPref(), SPECIAL_TOKENIZATION_CASES);
+        // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
+        // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
+        HebrewTokenizer src = new HebrewTokenizer(dict.getPref(), SPECIAL_TOKENIZATION_CASES);
         src.setSuffixForExactMatch(originalTermSuffix);
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);
         tok = new LowerCaseFilter(tok);
+        tok = new HebrewLemmatizerTokenFilter(tok, dict, false, true);
         tok = new AddSuffixTokenFilter(tok, '$');
         return new TokenStreamComponents(src, tok);
     }
+
+
 }
