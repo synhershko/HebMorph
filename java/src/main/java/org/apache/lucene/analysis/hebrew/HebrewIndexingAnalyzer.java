@@ -22,13 +22,15 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.hebrew.TokenFilters.*;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 import java.io.IOException;
 
 public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
-    public HebrewIndexingAnalyzer(DictHebMorph dict) throws IOException {
+    public HebrewIndexingAnalyzer(DictHebMorph dict) {
         super(dict);
     }
 
@@ -41,11 +43,11 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         // on indexing we should always keep both the stem and marked original word
         // will ignore $ && will always output all lemmas + origin word$
         // basically, if analyzerType == AnalyzerType.INDEXING)
-        HebrewTokenizer src = new HebrewTokenizer(dict.getPref(), SPECIAL_TOKENIZATION_CASES);
-        src.setSuffixForExactMatch(originalTermSuffix);
+        Tokenizer src = new StandardTokenizer();
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);
         tok = new LowerCaseFilter(tok);
+        tok = new MarkHebrewTokensFilter(tok);
         tok = new HebrewLemmatizerTokenFilter(tok, dict);
         tok = new AddSuffixTokenFilter(tok, '$');
         return new TokenStreamComponents(src, tok);

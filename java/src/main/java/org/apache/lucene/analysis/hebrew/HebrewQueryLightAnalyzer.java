@@ -31,7 +31,7 @@ import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import java.io.IOException;
 
 public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
-    public HebrewQueryLightAnalyzer(DictHebMorph dict) throws IOException {
+    public HebrewQueryLightAnalyzer(DictHebMorph dict) {
         super(dict);
     }
 

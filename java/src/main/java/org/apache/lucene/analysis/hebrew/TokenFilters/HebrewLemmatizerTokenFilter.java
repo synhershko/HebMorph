@@ -72,7 +72,7 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
         // we do not lemmatize numbers or exact words (if specified)
         if (hebrewTypeAtt.isNumeric() || (hebrewTypeAtt.isExact() &&
                 ((!lemmatizeExactHebrewWords && hebrewTypeAtt.isHebrew()) ||
-                        (!lemmatizeExactNonHebrewWords && hebrewTypeAtt.getType () == HebrewTokenTypeAttribute.HebrewType.NonHebrew))))
+                        (!lemmatizeExactNonHebrewWords && hebrewTypeAtt.getType() == HebrewTokenTypeAttribute.HebrewType.NonHebrew))))
         {
             return true;
         }

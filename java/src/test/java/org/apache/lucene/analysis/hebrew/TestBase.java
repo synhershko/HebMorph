@@ -83,26 +83,14 @@ public abstract class TestBase {
         if (dict == null) {
             dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
-        return new HebrewAnalyzer(dict) {
-            @Override
-            protected TokenStreamComponents createComponents(String fieldName) {
-                Tokenizer src = new StandardTokenizer();
-                TokenStream tok = new NiqqudFilter(src);
-                tok = new ASCIIFoldingFilter(tok);
-                tok = new LowerCaseFilter(tok);
-                tok = new MarkHebrewTokensFilter(tok);
-                tok = new HebrewLemmatizerTokenFilter(tok, dict);
-                tok = new AddSuffixTokenFilter(tok, '$');
-                return new TokenStreamComponents(src, tok);
-            }
-        };
+        return new HebrewIndexingAnalyzer(dict);
     }
 
-    public static HebrewQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
+    public static HebrewLegacyQueryAnalyzer getHebrewQueryAnalyzer() throws IOException {
         if (dict == null) {
             dict = (new HSpellDictionaryLoader().loadDictionaryFromPath(com.code972.hebmorph.TestBase.DICT_PATH));
         }
-        return new HebrewQueryAnalyzer(dict);
+        return new HebrewLegacyQueryAnalyzer(dict);
     }
 
     public static HebrewQueryLightAnalyzer getHebrewQueryLightAnalyzer() throws IOException {
