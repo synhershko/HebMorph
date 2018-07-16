@@ -31,7 +31,6 @@ public final class NiqqudFilter extends TokenFilter {
     }
 
     private CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private HebrewTokenTypeAttribute hebTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
 
     @Override
     public final boolean incrementToken() throws IOException {
@@ -39,12 +38,9 @@ public final class NiqqudFilter extends TokenFilter {
             return false;
         }
 
-        if (!hebTypeAtt.isHebrew()){
-            return true;
-        }
-
         char[] buffer = termAtt.buffer();
-        int length = termAtt.length(), j = 0;
+        final int length = termAtt.length();
+        int j = 0;
         for (int i = 0; i < length; i++) {
             if ((buffer[i] < 1455) || (buffer[i] > 1476)) { // current position is not a Niqqud character
                 buffer[j++] = buffer[i];
