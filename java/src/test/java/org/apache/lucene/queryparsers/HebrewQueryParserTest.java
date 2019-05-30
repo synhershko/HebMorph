@@ -17,8 +17,8 @@
  **************************************************************************/
 package org.apache.lucene.queryparsers;
 
-import org.apache.lucene.analysis.hebrew.SimpleAnalyzer;
 import org.apache.lucene.analysis.hebrew.TestBase;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.junit.Test;
@@ -29,9 +29,9 @@ import static org.junit.Assert.fail;
 
 public class HebrewQueryParserTest extends TestBase {
     @Test
-    public void ParsesAcronymsCorrectly() throws ParseException, IOException {
+    public void ParsesAcronymsCorrectly() throws ParseException {
 
-        QueryParser qp = new HebrewQueryParser("f", new SimpleAnalyzer(getDictionary().getPref()));
+        QueryParser qp = new HebrewQueryParser("f", new StandardAnalyzer());
         qp.parse("צה\"ל");
         qp.parse("\"צהל\"");
         qp.parse("כל הכבוד לצה\"ל");

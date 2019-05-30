@@ -22,6 +22,8 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.memory.MemoryIndex;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Scorable;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.SimpleCollector;
 import org.apache.lucene.search.TermQuery;
@@ -134,7 +136,7 @@ public class RealDataTest extends TestBase {
         }
 
         @Override
-        public void setScorer(Scorer scorer) throws IOException {
+        public void setScorer(Scorable scorer) throws IOException {
             this.exists = false;
         }
 
@@ -143,16 +145,9 @@ public class RealDataTest extends TestBase {
             exists = true;
         }
 
-        public void setNextReader(LeafReaderContext context) throws IOException {
-        }
-
-        public boolean acceptsDocsOutOfOrder() {
-            return true;
-        }
-
         @Override
-        public boolean needsScores() {
-            return false;
+        public ScoreMode scoreMode() {
+            return ScoreMode.TOP_SCORES;
         }
     }
 }

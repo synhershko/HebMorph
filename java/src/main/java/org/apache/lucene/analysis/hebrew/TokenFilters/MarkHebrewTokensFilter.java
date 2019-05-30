@@ -11,8 +11,6 @@ import java.io.IOException;
 public class MarkHebrewTokensFilter extends TokenFilter {
     /**
      * Construct a token stream filtering the given input.
-     *
-     * @param input
      */
     public MarkHebrewTokensFilter(TokenStream input) {
         super(input);

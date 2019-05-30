@@ -143,10 +143,8 @@ public class StreamLemmatizer extends Lemmatizer {
                         // TODO: Test for (lemma.Mask & DMask.D_OSMICHUT) > 0
                     }
 
-                    for (Token t : lemmas) // temp catch-all
-                    {
-                        retTokens.add(t);
-                    }
+                    // temp catch-all
+                    retTokens.addAll(lemmas);
                 }
 
                 if (retTokens.isEmpty() && ((tokenType & Tokenizer.TokenType.Acronym) > 0)) {
@@ -163,10 +161,8 @@ public class StreamLemmatizer extends Lemmatizer {
                             // TODO: Test for (lemma.Mask & DMask.D_OSMICHUT) > 0
                         }
 
-                        for (Token t : lemmas) // temp catch-all
-                        {
-                            retTokens.add(t);
-                        }
+                        // temp catch-all
+                        retTokens.addAll(lemmas);
                     } else // Word unknown to hspell - OOV case
                     {
                         // TODO: Right now we store the word as-is. Perhaps we can assume this is a Noun or a name,

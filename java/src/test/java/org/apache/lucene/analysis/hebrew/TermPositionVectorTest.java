@@ -27,6 +27,7 @@ import org.apache.lucene.queryparsers.HebrewQueryParser;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -108,7 +109,7 @@ public class TermPositionVectorTest extends TestBase {
         Terms terms = searcher.getIndexReader().getTermVectors(num).terms("Text");
 
         Set<Term> trms_list = new HashSet<>();
-        searcher.createWeight(q,true, 1.0f).extractTerms(trms_list);
+        searcher.createWeight(q, ScoreMode.COMPLETE, 1.0f).extractTerms(trms_list);
 //        q.extractTerms(trms_list);
 
         for (Term t : trms_list) {
