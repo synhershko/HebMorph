@@ -41,6 +41,7 @@ public class StreamLemmasFilter extends Tokenizer {
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
     private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     private final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
+    private final HebrewPosAttribute posAtt = addAttribute(HebrewPosAttribute.class);
 
     private final LemmaFilterBase lemmaFilter;
     private final List<Token> stack = new ArrayList<Token>();
@@ -155,7 +156,6 @@ public class StreamLemmasFilter extends Tokenizer {
 
         // If we arrived here, we hit a Hebrew word
         typeAtt.setType(HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew));
-        // TODO: typeAtt.SetType(TokenTypeSignature(TOKEN_TYPES.Acronym));
 
         // Do some filtering if requested...
         if (lemmaFilter != null && lemmaFilter.filterCollection(word, stack, filterCache) != null) {
@@ -215,6 +215,7 @@ public class StreamLemmasFilter extends Tokenizer {
     protected void createHebrewToken(HebrewToken hebToken) {
         String tokenVal = hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma();
         termAtt.copyBuffer(tokenVal.toCharArray(), 0, tokenVal.length());
+        posAtt.setHebrewToken(hebToken);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.code972.hebmorph.*;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.hebrew.HebrewPosAttribute;
 import org.apache.lucene.analysis.hebrew.HebrewTokenTypeAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -20,6 +21,7 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private final HebrewTokenTypeAttribute hebrewTypeAtt = addAttribute(HebrewTokenTypeAttribute.class);
+    private final HebrewPosAttribute posAtt = addAttribute(HebrewPosAttribute.class);
 
     private Lemmatizer lemmatizer;
 
@@ -55,8 +57,10 @@ public final class HebrewLemmatizerTokenFilter extends TokenFilter {
                     previousType == HebrewTokenTypeAttribute.HebrewType.Construct) {
                 HebrewToken hebToken = (HebrewToken) previousLemmas.remove(0);
                 tokenVal = hebToken.getLemma() == null ? hebToken.getText().substring(hebToken.getPrefixLength()) : hebToken.getLemma();
+                posAtt.setHebrewToken(hebToken);
             } else {
                 tokenVal = previousLemmas.remove(0).getText();
+                posAtt.setHebrewToken(null);
             }
             termAtt.setEmpty().append(tokenVal);
             hebrewTypeAtt.setType(HebrewTokenTypeAttribute.HebrewType.Lemma);

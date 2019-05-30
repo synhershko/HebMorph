@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 public class StreamLemmatizerTest extends TestBase {
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() {
     }
 
     @Before
@@ -92,7 +92,7 @@ public class StreamLemmatizerTest extends TestBase {
         testAutoStripMixedImpl("cellcom", "cellcom", Tokenizer.TokenType.NonHebrew);
 
         DictRadix<Byte> specialTokenizationCases = new DictRadix<>(false);
-        specialTokenizationCases.addNode("C++", new Byte((byte) 0));
+        specialTokenizationCases.addNode("C++", (byte) 0);
         testAutoStripMixedImpl("בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
         testAutoStripMixedImpl("בc++ ", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);
         testAutoStripMixedImpl(" בc++", "c++", Tokenizer.TokenType.NonHebrew, specialTokenizationCases);

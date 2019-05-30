@@ -22,6 +22,8 @@ package org.apache.lucene.analysis.hebrew;
 import com.code972.hebmorph.WordType;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.LuceneTestCase;
 import org.junit.Ignore;
 
@@ -58,6 +60,23 @@ public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
         assertAnalyzesTo(a, "steven\u2019s", new String[]{"steven's$", "steven's"});
         //assertAnalyzesTo(a, "steven\uFF07s", new String[]{"steven's$", "steven's"});
         checkOneTerm(a, "3", "3");
+    }
+
+    public void testAnalysis() throws IOException {
+        String text = "רפאל ולדן הוא פרופסור לרפואה ישראלי, מלמד באוניברסיטת תל אביב, סגן מנהל בית החולים שיבא ופעיל חברתי. מתמחה בכירוגיה כללית ובכלי דם." +
+                "ולדן נולד בצרפת ועלה לישראל בגיל 9. הוא שימש בבית החולים שיבא כמנהל האגף לכירורגיה ומנהל היחידה לכלי דם." +
+                "ולדן פעיל וחבר בהנהלה בעמותת רופאים לזכויות אדם וכמו כן חבר בהנהלת ארגון לתת. ולדן זכה באות לגיון הכבוד הצרפתי (Légion d'Honneur) של ממשלת צרפת בזכות על פעילותו במסגרת רופאים לזכויות אדם לקידום שיתוף הפעולה בין פלסטינים לישראלים. האות הוענק לו על ידי שר החוץ של צרפת, ברנאר קושנר, בטקס בשגרירות צרפת בתל אביב." +
+                "נשוי לבלשנית צביה ולדן, בתו של שמעון פרס והוא משמש כרופאו האישי של פרס.";
+        Analyzer a = TestBase.getHebrewIndexingAnalyzerWithStandardTokenizer();
+
+        TokenStream ts = a.tokenStream("foo", text);
+        ts.reset();
+        while (ts.incrementToken()) {
+            CharTermAttribute termAtt = ts.getAttribute(CharTermAttribute.class);
+            HebrewPosAttribute posAtt = ts.getAttribute(HebrewPosAttribute.class);
+//            System.out.println(termAtt.toString() + " - " + posAtt.getPosTag());
+        }
+        ts.close();
     }
 
     @Ignore
