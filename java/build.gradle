@@ -9,7 +9,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = 'com.code972.hebmorph'
-version = '8.0.0'
+version = '8.10.1'
 description = "Enabling Hebrew search in Lucene. Part of the HebMorph project, " +
         "for making Hebrew properly searchable"
 
